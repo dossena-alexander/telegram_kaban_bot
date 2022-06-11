@@ -17,10 +17,6 @@ Actual versions:
 + `telebot`  4.4.0
     
 Setup:
-```python
-import telebot
-```
-Or 
 ```
 pip install telebot
 ```
