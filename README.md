@@ -2,7 +2,7 @@
 
 ![https://img.shields.io/badge/Python-3.9.12-green](https://img.shields.io/badge/Python-3.9.12-green) 
 ![https://img.shields.io/badge/Telebot-4.4.1-green](https://img.shields.io/badge/Telebot-4.4.0-green) 
-![https://img.shields.io/badge/License-GPT-blue](https://img.shields.io/badge/License-GPT-blue)     
+![https://img.shields.io/badge/License-GPL-blue](https://img.shields.io/badge/License-GPL-blue)     
 Simple telegram bot written on Python 3 using Telebot. 
 
 ----
