@@ -55,8 +55,7 @@ userMenu.rowInlineKeyboard()
 @bot.message_handler(commands=["start"])
 def start(message):
     keys = [
-        "Анекдот",
-        "Фотокарточка",
+        "Анекдот", "Фотокарточка",
         "Какой ты кабан сегодня"
     ]
     keyboard = ReplyKeyboard()
@@ -102,21 +101,15 @@ def help(message):
 def callWorker(call):
     global msgCounter 
     global jokes
-    global msgs
 
     if call.data == 'Загрузить картинку': #+
         bot.answer_callback_query(call.id)
-        bot.edit_message_text(text="Пришли картинку, или напиши 'отмена'", chat_id=call.message.chat.id, message_id=call.message.message_id)
+        bot.edit_message_text(text="Пришли картинку, или нажми /brake", chat_id=call.message.chat.id, message_id=call.message.message_id)
         bot.register_next_step_handler(call.message, uploadPicture)
     elif call.data == 'Загрузить анекдот': #+
         bot.answer_callback_query(call.id)
-        bot.edit_message_text(text="Напиши анекдот, или напиши 'отмена'", chat_id=call.message.chat.id, message_id=call.message.message_id)
+        bot.edit_message_text(text="Напиши анекдот, или нажми /brake", chat_id=call.message.chat.id, message_id=call.message.message_id)
         bot.register_next_step_handler(call.message, uploadJoke)
-    # elif call.data == "back":
-    #     if id == adminID: 
-    #         bot.edit_message_text(call.message.chat.id, call.message.message_id, text=adminMenu.getMsg(), reply_markup=adminMenu.getInlineKeyboard())
-    #     else: 
-    #         bot.edit_message_text(call.message.chat.id, call.message.message_id, text=userMenu.getMsg(), reply_markup=userMenu.getInlineKeyboard())
     elif call.data == "Остановить бота": #+
         bot.answer_callback_query(call.id, 'Бот остановлен')
         log.info("ОСТАНОВКА БОТА")
@@ -169,13 +162,15 @@ def callWorker(call):
     elif call.data == "Сообщения":
         bot.answer_callback_query(call.id)
         bot.delete_message(call.message.chat.id, call.message.message_id)
-        msgs = msgBD.getAllMsgs()
         seeMsgs(call.message)
     elif call.data == "Картинки":
         bot.answer_callback_query(call.id)
         bot.delete_message(call.message.chat.id, call.message.message_id)
         seePics(call.message)
-
+    elif call.data == "Сообщение админу":
+        bot.answer_callback_query(call.id)
+        bot.edit_message_text(text="Напиши сообщение или нажми /brake", chat_id=call.message.chat.id, message_id=call.message.message_id)
+        bot.register_next_step_handler(call.message, uploadMsg)
 
 
 def see_jokes(message):
@@ -261,7 +256,7 @@ def notify(message):
         bot.send_message(adminID, "Пользователей для рассылки нет")
 
 
-def uploadPicture(message): #+
+def uploadPicture(message): 
     global adminID
 
     if message.content_type == 'photo':
@@ -289,7 +284,7 @@ def uploadPicture(message): #+
             bot.send_message(message.chat.id, txt)
     else:
         if message.content_type == "text":
-            if message.text.lower() == "отмена":
+            if message.text.lower() == "/brake":
                 bot.send_message(message.chat.id, "Отменено")  
             else:
                 bot.send_message(message.chat.id, "Это не картинка!")
@@ -299,10 +294,11 @@ def uploadPicture(message): #+
             bot.register_next_step_handler(message, uploadPicture)
 
 
-def uploadJoke(message): #+
+def uploadJoke(message):
     global adminID
+
     if message.content_type == "text":
-        if message.text.lower() != "отмена":
+        if message.text.lower() != "/brake":
             joke = message.text
             id = message.from_user.id 
             if id == adminID: jokeBD.setTableName('adminJokes'); txt = "Сохранил"
@@ -318,20 +314,36 @@ def uploadJoke(message): #+
         bot.register_next_step_handler(message, uploadJoke)
 
 
-def getWct(message):
-    pass
-    # WCT is Which Caban (boar) you Today is
-    # every day user changes his "board id"
-    # if user in one day, when he used function in bot, will use wct again, wct give the same "boar id"
+def uploadMsg(message): #+-
+    global adminID
+
+    if message.content_type == "text":
+        if message.text.lower() != "/brake":
+            msg = message.text
+            log.info("uploadMsg -- Запись сообщения в БД")
+            msgBD.newRecord(msgBD.getTableName(), msgBD.getColName(), msg)
+            log.info("                 Успешно")
+            bot.send_message(message.chat.id, "Отправлено")
+        else:
+            bot.send_message(message.chat.id, "Отменено")
+    else:
+        bot.send_message(message.chat.id, "Только текст!")
+        bot.register_next_step_handler(message, uploadJoke)
+
+
+# def getWct(message):
+#     # WCT is Which Caban (boar) you Today is
+#     # every day user changes his "board id"
+#     # if user in one day, when he used function in bot, will use wct again, wct give the same "boar id"
     
-    # photo_folder = './wct/'
-    # id = message.from_user.id 
-    # users = userBD.getUsersList()
-    # if id not in users:
-    #     random_file=random.choice(os.listdir(photo_folder))
-    #     return open(photo_folder + random_file, 'rb')
-    # else:
-    #     bot.send_photo(message.chat.id, open(photo_folder + Users_ids[message.from_user.id], 'rb'))
+#     photo_folder = './wct/'
+#     id = message.from_user.id 
+#     users = userBD.getUsersList()
+#     if id not in users:
+#         random_file=random.choice(os.listdir(photo_folder))
+#         return open(photo_folder + random_file, 'rb')
+#     else:
+#         bot.send_photo(message.chat.id, open(photo_folder + Users_ids[message.from_user.id], 'rb'))
 
 
 @bot.message_handler(content_types="text") #+

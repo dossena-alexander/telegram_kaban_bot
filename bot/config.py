@@ -1,3 +1,2 @@
-# token = "5398770324:AAHovWa3__3YF97r7zCr4L_iAn1fS0bLZZs"
-token = "5324892613:AAH_gp9kHtml0J-CX-upR8F4HumAqMaFbCA"
-adminID = 1631513712
+token = ""
+adminID = 0
