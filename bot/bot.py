@@ -106,11 +106,11 @@ def callWorker(call):
 
     if call.data == 'Загрузить картинку': #+
         bot.answer_callback_query(call.id)
-        bot.edit_message_text(text="Пришли картинку, или напиши 'отмена'", chat_id=call.message.chat.id, message_id=call.message.message_id)
+        bot.edit_message_text(text="Пришли картинку, или нажми /brake", chat_id=call.message.chat.id, message_id=call.message.message_id)
         bot.register_next_step_handler(call.message, uploadPicture)
     elif call.data == 'Загрузить анекдот': #+
         bot.answer_callback_query(call.id)
-        bot.edit_message_text(text="Напиши анекдот, или напиши 'отмена'", chat_id=call.message.chat.id, message_id=call.message.message_id)
+        bot.edit_message_text(text="Напиши анекдот, или нажми /brake", chat_id=call.message.chat.id, message_id=call.message.message_id)
         bot.register_next_step_handler(call.message, uploadJoke)
     # elif call.data == "back":
     #     if id == adminID: 
@@ -175,6 +175,9 @@ def callWorker(call):
         bot.answer_callback_query(call.id)
         bot.delete_message(call.message.chat.id, call.message.message_id)
         seePics(call.message)
+    elif call.data == "Сообщение админу":
+        bot.answer_callback_query(call.id)
+        bot.edit_message_text(text="Напиши сообщение или нажми /brake", chat_id=call.message.chat.id, message_id=call.message.message_id)
 
 
 
@@ -289,7 +292,7 @@ def uploadPicture(message): #+
             bot.send_message(message.chat.id, txt)
     else:
         if message.content_type == "text":
-            if message.text.lower() == "отмена":
+            if message.text.lower() == "/brake":
                 bot.send_message(message.chat.id, "Отменено")  
             else:
                 bot.send_message(message.chat.id, "Это не картинка!")
@@ -301,8 +304,9 @@ def uploadPicture(message): #+
 
 def uploadJoke(message): #+
     global adminID
+
     if message.content_type == "text":
-        if message.text.lower() != "отмена":
+        if message.text.lower() != "/brake":
             joke = message.text
             id = message.from_user.id 
             if id == adminID: jokeBD.setTableName('adminJokes'); txt = "Сохранил"
@@ -311,6 +315,23 @@ def uploadJoke(message): #+
             jokeBD.newRecord(jokeBD.getTableName(), jokeBD.getColName(), joke)
             log.info("                 Успешно")
             bot.send_message(message.chat.id, txt)
+        else:
+            bot.send_message(message.chat.id, "Отменено")
+    else:
+        bot.send_message(message.chat.id, "Только текст!")
+        bot.register_next_step_handler(message, uploadJoke)
+
+
+def uploadMsg(message): #+-
+    global adminID
+
+    if message.content_type == "text":
+        if message.text.lower() != "/brake":
+            msg = message.text
+            log.info("uploadMsg -- Запись шутки в БД")
+            msgBD.newRecord(msgBD.getTableName(), msgBD.getColName(), msg)
+            log.info("                 Успешно")
+            bot.send_message(message.chat.id, "Отправлено")
         else:
             bot.send_message(message.chat.id, "Отменено")
     else:
