@@ -92,6 +92,13 @@ class MsgBD(BD):
         self.col = 'msg'
 
 
+    def getMsg(self, recNum: int) -> str:
+        info = self.bd_cursor.execute('SELECT * FROM msgs')
+        record = self.bd_cursor.fetchall()
+        msg = record[recNum]
+        return msg[0]
+
+
     def hasMsg(self) -> bool:
         info = self.bd_cursor.execute('SELECT * FROM msgs')
         record = self.bd_cursor.fetchall()
