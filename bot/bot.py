@@ -331,19 +331,19 @@ def uploadMsg(message): #+-
         bot.register_next_step_handler(message, uploadJoke)
 
 
-def getWct(message):
-    # WCT is Which Caban (boar) you Today is
-    # every day user changes his "board id"
-    # if user in one day, when he used function in bot, will use wct again, wct give the same "boar id"
+# def getWct(message):
+#     # WCT is Which Caban (boar) you Today is
+#     # every day user changes his "board id"
+#     # if user in one day, when he used function in bot, will use wct again, wct give the same "boar id"
     
-    photo_folder = './wct/'
-    id = message.from_user.id 
-    users = userBD.getUsersList()
-    if id not in users:
-        random_file=random.choice(os.listdir(photo_folder))
-        return open(photo_folder + random_file, 'rb')
-    else:
-        bot.send_photo(message.chat.id, open(photo_folder + Users_ids[message.from_user.id], 'rb'))
+#     photo_folder = './wct/'
+#     id = message.from_user.id 
+#     users = userBD.getUsersList()
+#     if id not in users:
+#         random_file=random.choice(os.listdir(photo_folder))
+#         return open(photo_folder + random_file, 'rb')
+#     else:
+#         bot.send_photo(message.chat.id, open(photo_folder + Users_ids[message.from_user.id], 'rb'))
 
 
 @bot.message_handler(content_types="text") #+
