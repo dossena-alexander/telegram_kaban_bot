@@ -55,8 +55,7 @@ userMenu.rowInlineKeyboard()
 @bot.message_handler(commands=["start"])
 def start(message):
     keys = [
-        "Анекдот",
-        "Фотокарточка",
+        "Анекдот", "Фотокарточка",
         "Какой ты кабан сегодня"
     ]
     keyboard = ReplyKeyboard()
@@ -102,7 +101,6 @@ def help(message):
 def callWorker(call):
     global msgCounter 
     global jokes
-    global msgs
 
     if call.data == 'Загрузить картинку': #+
         bot.answer_callback_query(call.id)
@@ -112,11 +110,6 @@ def callWorker(call):
         bot.answer_callback_query(call.id)
         bot.edit_message_text(text="Напиши анекдот, или нажми /brake", chat_id=call.message.chat.id, message_id=call.message.message_id)
         bot.register_next_step_handler(call.message, uploadJoke)
-    # elif call.data == "back":
-    #     if id == adminID: 
-    #         bot.edit_message_text(call.message.chat.id, call.message.message_id, text=adminMenu.getMsg(), reply_markup=adminMenu.getInlineKeyboard())
-    #     else: 
-    #         bot.edit_message_text(call.message.chat.id, call.message.message_id, text=userMenu.getMsg(), reply_markup=userMenu.getInlineKeyboard())
     elif call.data == "Остановить бота": #+
         bot.answer_callback_query(call.id, 'Бот остановлен')
         log.info("ОСТАНОВКА БОТА")
@@ -169,7 +162,6 @@ def callWorker(call):
     elif call.data == "Сообщения":
         bot.answer_callback_query(call.id)
         bot.delete_message(call.message.chat.id, call.message.message_id)
-        msgs = msgBD.getAllMsgs()
         seeMsgs(call.message)
     elif call.data == "Картинки":
         bot.answer_callback_query(call.id)
@@ -178,7 +170,7 @@ def callWorker(call):
     elif call.data == "Сообщение админу":
         bot.answer_callback_query(call.id)
         bot.edit_message_text(text="Напиши сообщение или нажми /brake", chat_id=call.message.chat.id, message_id=call.message.message_id)
-
+        bot.register_next_step_handler(call.message, uploadMsg)
 
 
 def see_jokes(message):
@@ -264,7 +256,7 @@ def notify(message):
         bot.send_message(adminID, "Пользователей для рассылки нет")
 
 
-def uploadPicture(message): #+
+def uploadPicture(message): 
     global adminID
 
     if message.content_type == 'photo':
@@ -302,7 +294,7 @@ def uploadPicture(message): #+
             bot.register_next_step_handler(message, uploadPicture)
 
 
-def uploadJoke(message): #+
+def uploadJoke(message):
     global adminID
 
     if message.content_type == "text":
@@ -328,7 +320,7 @@ def uploadMsg(message): #+-
     if message.content_type == "text":
         if message.text.lower() != "/brake":
             msg = message.text
-            log.info("uploadMsg -- Запись шутки в БД")
+            log.info("uploadMsg -- Запись сообщения в БД")
             msgBD.newRecord(msgBD.getTableName(), msgBD.getColName(), msg)
             log.info("                 Успешно")
             bot.send_message(message.chat.id, "Отправлено")
