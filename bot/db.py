@@ -47,16 +47,31 @@ class UserDB(DB):
         self.col = 'id'
 
     
-    def getUsersList(self):
+    def getUsersList(self) -> list:
         info = self.bd_cursor.execute('SELECT userID FROM users')
         records = self.bd_cursor.fetchall()
         records_listed = [record[0] for record in records]
         return records_listed
 
 
-    def getWctForUser(self, userID):
+    def getWctForUser(self, userID) -> str:
         info = self.bd_cursor.execute(f'SELECT wct FROM users WHERE userID={userID}')
         return self.bd_cursor.fetchall()[0][0] # list > tuple > string
+
+
+    def setWctForUser(self, userID, boarID) -> None:
+        self.bd_cursor.execute(f'INSERT INTO users (wctID) WHERE userID={userID} VALUES (?)', (boarID, ) )
+        self.bd.commit()
+
+
+    def getPrevWctId(self, userID) -> str:
+        info = self.bd_cursor.execute(f'SELECT wct FROM users WHERE userID={userID}')
+        return self.bd_cursor.fetchall()[0][0] # list > tuple > string
+
+
+    def setPrevWctId(self, userID, boarID) -> None:
+        self.bd_cursor.execute(f'INSERT INTO users (prevID) WHERE userID={userID} VALUES (?)', (boarID, ) )
+        self.bd.commit()
 
 
     def addUser(self, userID: str) -> None:
