@@ -55,12 +55,12 @@ class UserDB(DB):
 
 
     def getWctForUser(self, userID: int) -> str:
-        info = self.bd_cursor.execute(f'SELECT wct FROM users WHERE userID={userID}')
+        info = self.bd_cursor.execute(f'SELECT wctID FROM users WHERE userID={userID}')
         return self.bd_cursor.fetchall()[0][0] # list > tuple > string
 
 
     def setWctForUser(self, userID: int, boarID: str) -> None:
-        self.bd_cursor.execute(f'INSERT INTO users (wctID) WHERE userID={userID} VALUES (?)', (boarID, ) )
+        self.bd_cursor.execute(f'UPDATE users SET wctID = {boarID} WHERE userID={userID}')
         self.bd.commit()
 
     
@@ -70,7 +70,7 @@ class UserDB(DB):
 
     
     def setPrevDay(self, day: int, userID: int) -> None:
-        self.bd_cursor.execute(f'INSERT INTO users (prevDay) WHERE userID={userID} VALUES (?)', (day, ) )
+        self.bd_cursor.execute(f'UPDATE users SET prevDay = {day} WHERE userID={userID}')
         self.bd.commit()
 
 
