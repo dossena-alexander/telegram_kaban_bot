@@ -45,7 +45,15 @@ userKeys = [
                "Сообщение админу"
 ]
 
-helpMenu.setMsg("") #!!!
+helpMenu.setMsg(
+    "<b>Что я умею</b>:\n" +
+		" <i>Мои команды:</i>\n" +
+		" • /start - запуск\n" +
+		" • /auth - Аутентификация пользователя\n" +
+        " <i>Мои возможности:</i>\n" +
+        " • Какой ты кабан сегодня\n" +
+        " • Фотокарточка -- рандомная смешная картинка" +
+        " • Анекдот -- рандомный анекдот из более чем тысячной базы данных")
 adminMenu.setMsg("Админ меню")
 adminMenu.setInlineKeyboard(adminKeys)
 adminMenu.rowInlineKeyboard()
@@ -96,7 +104,7 @@ def user(message):
 
 @bot.message_handler(commands=['help'])
 def help(message):
-    bot.send_message(message.chat.id, helpMenu.getMsg())
+    bot.send_message(message.chat.id, helpMenu.getMsg(), parse_mode="html")
 
 
 @bot.callback_query_handler(func=lambda call: True)
