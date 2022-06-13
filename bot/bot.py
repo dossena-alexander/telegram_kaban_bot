@@ -5,7 +5,7 @@ from logger import *
 from config import *
 from upload import *
 from keyboard import *
-
+from datetime import datetime, date
 
 # from dialog import Dialog
 
@@ -387,11 +387,15 @@ def getWct(message):
         bot.send_message(message.chat.id, "Ты не зарегистрировался. Нажми /auth, чтобы зарегистрироваться")
         return None
     else:
-        if userDB.getPrevWct(id) == userDB.getWctForUser(id):
+        now = date.today()
+        now_day = now.day
+        prev_day = userDB.getPrevDay(id)
+        if now_day == prev_day:
             boarID = userDB.getWctForUser(id)
             boar = boarDB.getID(boarID)
             return open(photo_folder + boar, 'rb')
         else:
+            userDB.setPrevDay(now_day, id)
             boarID = random.randint(0, boarDB.getRecCount( boarDB.getTableName() ) - 1)
             userDB.setWctForUser(id, boarID)
             userDB.setPrevWct(id, boarID)
