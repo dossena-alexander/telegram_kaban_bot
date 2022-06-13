@@ -119,7 +119,6 @@ def callWorker(call):
     elif call.data == "Анекдоты": #+
         bot.answer_callback_query(call.id)
         bot.delete_message(call.message.chat.id, call.message.message_id)
-        jokes = jokeDB.getAllJokes()
         see_jokes(call.message)
     elif call.data == "Выйти": #+
         bot.answer_callback_query(call.id)
@@ -378,7 +377,7 @@ def getWct(message):
         bot.send_message(message.chat.id, "Ты не зарегистрировался. Нажми /auth, чтобы зарегистрироваться")
         return None
     else:
-        return open(photo_folder + boarDB.getID(random.randint(0, boarDB.getRecCount(boarDB.getTableName()))), 'rb')
+        return open(photo_folder + boarDB.getID(random.randint(0, boarDB.getRecCount(boarDB.getTableName()) - 1)), 'rb')
 
 
 @bot.message_handler(content_types="text") #+
@@ -391,6 +390,6 @@ def textWorker(message):
         bot.send_message(message.chat.id, 
         jokeDB.getJoke(recNum=random.randint(0, jokeDB.getRecCount("adminJokes") - 1)))
     elif msg == "какой ты кабан сегодня":
-        if getWct() != None:
-            bot.send_photo(message.chat.id, getWct())
+        if getWct(message) != None:
+            bot.send_photo(message.chat.id, getWct(message))
 
