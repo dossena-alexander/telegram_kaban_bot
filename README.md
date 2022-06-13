@@ -7,11 +7,11 @@ Simple telegram bot written on Python 3 using Telebot.
 
 ----
 ## Contents:
-1. [Setuping](#setuping)
-2. [Using](#using)
+1. [Setup](#setup)
+2. [Usage](#usage)
 ----
 ----
-## Setuping
+## Setup
 Actual versions:    
 + `python`  3.9.12    
 + `telebot`  4.4.0
@@ -24,7 +24,7 @@ pip install telebot
 
 ----
 ----
-## Using
+## Usage
 
 In main bot has two menu: __admin__ and __user__. Both of them have keyboard and message they send to user
 ```python

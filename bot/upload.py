@@ -3,6 +3,8 @@ class UploadPic():
     def __init__(self, src: str) -> None:
         if src == 'admin':
             self.main_src = 'photos/'
+        elif src == 'wct':
+            self.main_src = 'wct/'
         else:
             self.main_src = 'recieved_photos/'
 
