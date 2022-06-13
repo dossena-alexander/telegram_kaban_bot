@@ -5,7 +5,7 @@ from logger import *
 from config import *
 from upload import *
 from keyboard import *
-
+from datetime import datetime, date
 
 # from dialog import Dialog
 
@@ -45,7 +45,15 @@ userKeys = [
                "Сообщение админу"
 ]
 
-helpMenu.setMsg("") #!!!
+helpMenu.setMsg(
+    "<b>Что я умею</b>:\n" +
+		" <i>Мои команды:</i>\n" +
+		" • /start - запуск\n" +
+		" • /auth - Аутентификация пользователя\n" +
+        " <i>Мои возможности:</i>\n" +
+        " • Какой ты кабан сегодня\n" +
+        " • Фотокарточка -- рандомная смешная картинка" +
+        " • Анекдот -- рандомный анекдот из более чем тысячной базы данных")
 adminMenu.setMsg("Админ меню")
 adminMenu.setInlineKeyboard(adminKeys)
 adminMenu.rowInlineKeyboard()
@@ -96,7 +104,7 @@ def user(message):
 
 @bot.message_handler(commands=['help'])
 def help(message):
-    bot.send_message(message.chat.id, helpMenu.getMsg())
+    bot.send_message(message.chat.id, helpMenu.getMsg(), parse_mode="html")
 
 
 @bot.callback_query_handler(func=lambda call: True)
@@ -314,7 +322,7 @@ def uploadJoke(message):
         else:
             bot.send_message(message.chat.id, "Отменено")
     else:
-        bot.send_message(message.chat.id, "Только текст!")
+        bot.send_message(message.chat.id, "Только текст, пиши или нажми /brake")
         bot.register_next_step_handler(message, uploadJoke)
 
 
@@ -331,7 +339,7 @@ def uploadMsg(message): #+-
         else:
             bot.send_message(message.chat.id, "Отменено")
     else:
-        bot.send_message(message.chat.id, "Только текст!")
+        bot.send_message(message.chat.id, "Только текст, пиши или нажми /brake")
         bot.register_next_step_handler(message, uploadJoke)
 
 
@@ -358,10 +366,10 @@ def uploadWct(message):
             if message.text.lower() == "/brake":
                 bot.send_message(message.chat.id, "Отменено")  
             else:
-                bot.send_message(message.chat.id, "Это не картинка!")
+                bot.send_message(message.chat.id, "Это не картинка, пришли фото или жми /brake")
                 bot.register_next_step_handler(message, uploadWct)    
         else:      
-            bot.send_message(message.chat.id, "Это не картинка!")
+            bot.send_message(message.chat.id, "Это не картинка, пришли фото или жми /brake")
             bot.register_next_step_handler(message, uploadWct)
 
 
@@ -379,7 +387,19 @@ def getWct(message):
         bot.send_message(message.chat.id, "Ты не зарегистрировался. Нажми /auth, чтобы зарегистрироваться")
         return None
     else:
-        return open(photo_folder + boarDB.getID(random.randint(0, boarDB.getRecCount(boarDB.getTableName()) - 1)), 'rb')
+        now = date.today()
+        now_day = now.day
+        prev_day = userDB.getPrevDay(id)
+        if now_day == prev_day:
+            boarID = userDB.getWctForUser(id)
+            boar = boarDB.getID(boarID)
+            return open(photo_folder + boar, 'rb')
+        else:
+            userDB.setPrevDay(now_day, id)
+            boarID = random.randint(0, boarDB.getRecCount( boarDB.getTableName() ) - 1)
+            userDB.setWctForUser(id, boarID)
+            boar = boarDB.getID(boarID)
+            return open(photo_folder + boar, 'rb')
 
 
 @bot.message_handler(content_types="text") #+

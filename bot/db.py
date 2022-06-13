@@ -47,16 +47,31 @@ class UserDB(DB):
         self.col = 'id'
 
     
-    def getUsersList(self):
+    def getUsersList(self) -> list:
         info = self.bd_cursor.execute('SELECT userID FROM users')
         records = self.bd_cursor.fetchall()
         records_listed = [record[0] for record in records]
         return records_listed
 
 
-    def getWctForUser(self, userID):
-        info = self.bd_cursor.execute(f'SELECT wct FROM users WHERE userID={userID}')
+    def getWctForUser(self, userID: int) -> str:
+        info = self.bd_cursor.execute(f'SELECT wctID FROM users WHERE userID={userID}')
         return self.bd_cursor.fetchall()[0][0] # list > tuple > string
+
+
+    def setWctForUser(self, userID: int, boarID: str) -> None:
+        self.bd_cursor.execute(f'UPDATE users SET wctID = {boarID} WHERE userID={userID}')
+        self.bd.commit()
+
+    
+    def getPrevDay(self, userID: int) -> int:
+        info = self.bd_cursor.execute(f'SELECT prevDay FROM users WHERE userID={userID}')
+        return self.bd_cursor.fetchall()[0][0] # list > tuple > string
+
+    
+    def setPrevDay(self, day: int, userID: int) -> None:
+        self.bd_cursor.execute(f'UPDATE users SET prevDay = {day} WHERE userID={userID}')
+        self.bd.commit()
 
 
     def addUser(self, userID: str) -> None:
