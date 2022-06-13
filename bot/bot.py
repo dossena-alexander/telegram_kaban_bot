@@ -398,7 +398,6 @@ def getWct(message):
             userDB.setPrevDay(now_day, id)
             boarID = random.randint(0, boarDB.getRecCount( boarDB.getTableName() ) - 1)
             userDB.setWctForUser(id, boarID)
-            userDB.setPrevWct(id, boarID)
             boar = boarDB.getID(boarID)
             return open(photo_folder + boar, 'rb')
 
