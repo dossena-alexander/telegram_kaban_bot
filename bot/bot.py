@@ -322,7 +322,7 @@ def uploadJoke(message):
         else:
             bot.send_message(message.chat.id, "Отменено")
     else:
-        bot.send_message(message.chat.id, "Только текст!")
+        bot.send_message(message.chat.id, "Только текст, пиши или нажми /brake")
         bot.register_next_step_handler(message, uploadJoke)
 
 
@@ -339,7 +339,7 @@ def uploadMsg(message): #+-
         else:
             bot.send_message(message.chat.id, "Отменено")
     else:
-        bot.send_message(message.chat.id, "Только текст!")
+        bot.send_message(message.chat.id, "Только текст, пиши или нажми /brake")
         bot.register_next_step_handler(message, uploadJoke)
 
 
@@ -366,10 +366,10 @@ def uploadWct(message):
             if message.text.lower() == "/brake":
                 bot.send_message(message.chat.id, "Отменено")  
             else:
-                bot.send_message(message.chat.id, "Это не картинка!")
+                bot.send_message(message.chat.id, "Это не картинка, пришли фото или жми /brake")
                 bot.register_next_step_handler(message, uploadWct)    
         else:      
-            bot.send_message(message.chat.id, "Это не картинка!")
+            bot.send_message(message.chat.id, "Это не картинка, пришли фото или жми /brake")
             bot.register_next_step_handler(message, uploadWct)
 
 
@@ -387,7 +387,16 @@ def getWct(message):
         bot.send_message(message.chat.id, "Ты не зарегистрировался. Нажми /auth, чтобы зарегистрироваться")
         return None
     else:
-        return open(photo_folder + boarDB.getID(random.randint(0, boarDB.getRecCount(boarDB.getTableName()) - 1)), 'rb')
+        if userDB.getPrevWct(id) == userDB.getWctForUser(id):
+            boarID = userDB.getWctForUser(id)
+            boar = boarDB.getID(boarID)
+            return open(photo_folder + boar, 'rb')
+        else:
+            boarID = random.randint(0, boarDB.getRecCount( boarDB.getTableName() ) - 1)
+            userDB.setWctForUser(id, boarID)
+            userDB.setPrevWct(id, boarID)
+            boar = boarDB.getID(boarID)
+            return open(photo_folder + boar, 'rb')
 
 
 @bot.message_handler(content_types="text") #+
