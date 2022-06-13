@@ -1,7 +1,7 @@
 import sqlite3
 
 
-class BD():
+class DB():
     def __init__(self) -> None:
         self.bd = sqlite3.connect('./db/main.db', check_same_thread=False)
         self.bd_cursor = self.bd.cursor()
@@ -40,7 +40,7 @@ class BD():
         setattr(self, "col", colName)
 
 
-class UserBD(BD):
+class UserDB(DB):
     def __init__(self) -> None:
         super().__init__()
         self.table = "users"
@@ -52,12 +52,17 @@ class UserBD(BD):
         return self.bd_cursor.fetchall()
 
 
+    def getWctForUser(self, userID):
+        info = self.bd_cursor.execute(f'SELECT wct FROM users WHERE userID={userID}')
+        return self.bd_cursor.fetchall()[0][0] # list > tuple > string
+
+
     def addUser(self, userID: str) -> None:
         self.bd_cursor.execute('INSERT INTO users (id) VALUES (?)', (userID, ) )
         self.bd.commit()
 
 
-class JokeBD(BD):
+class JokeDB(DB):
     def __init__(self) -> None:
         super().__init__()
         self.table = "adminJokes"
@@ -85,7 +90,7 @@ class JokeBD(BD):
         else: return True
 
 
-class MsgBD(BD):
+class MsgDB(DB):
     def __init__(self) -> None:
         super().__init__()
         self.table = "msgs"
@@ -112,7 +117,7 @@ class MsgBD(BD):
         msg = record[recNum]
         return msg[0]
 
-class PicBD(BD):
+class PicDB(DB):
     def __init__(self) -> None:
         super().__init__()
         self.table = "pics"
@@ -130,3 +135,18 @@ class PicBD(BD):
         record = self.bd_cursor.fetchall()
         picID = record[recNum]
         return picID[0]
+
+
+class BoarDB(DB):
+    def __init__(self) -> None:
+        super().__init__()
+        self.table = "boarsID"
+        self.col = "ID"
+
+
+    def getID(self, recNum: int) -> str:
+        info = self.bd_cursor.execute('SELECT * FROM boarsID')
+        record = self.bd_cursor.fetchall()
+        ID = record[recNum]
+        return ID[0]
+
