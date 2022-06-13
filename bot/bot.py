@@ -366,6 +366,8 @@ def uploadWct(message):
 
 
 def getWct(message):
+    global adminID
+
 #     # WCT is "Which Caban (boar) you Today is"
 #     # every day user changes his "board id"
 #     # if user in one day, when he used function in bot, will use wct again, wct give the same "boar id"
@@ -373,7 +375,7 @@ def getWct(message):
     photo_folder = './wct/'
     id = message.from_user.id 
     users = userDB.getUsersList()
-    if id not in users:
+    if id != adminID and id not in users:
         bot.send_message(message.chat.id, "Ты не зарегистрировался. Нажми /auth, чтобы зарегистрироваться")
         return None
     else:
