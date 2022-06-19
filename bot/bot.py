@@ -26,50 +26,19 @@ helpMenu = menu.Menu()
 # shed = Shed()
 # dialog = Dialog()
 
-
-
-# keys below will be rowed as you see
-# In other words, in one row -- two buttons
-# keys is a button text and callback data in the same time
-
-adminKeys = [
-         "Картинки",           "Анекдоты",
-    "Загрузить картинку", "Загрузить анекдот",
-         "Сообщения",          "Рассылка", 
-      "Остановить бота", "Пользовательское меню",
-                "Добавить кабана"
-]
-
-userKeys = [
-    "Загрузить картинку", "Загрузить анекдот",
-               "Сообщение админу"
-]
-
-helpMenu.setMsg(
-    "<b>Что я умею</b>:\n" +
-		" <i>Мои команды:</i>\n" +
-		" • /start - запуск\n" +
-		" • /auth - Аутентификация пользователя\n" +
-        " <i>Мои возможности:</i>\n" +
-        " • Какой ты кабан сегодня\n" +
-        " • Фотокарточка -- рандомная смешная картинка" +
-        " • Анекдот -- рандомный анекдот из более чем тысячной базы данных")
-adminMenu.setMsg("Админ меню")
+helpMenu.setMsg(helpMsg)
+adminMenu.setMsg(adminMsg)
 adminMenu.setInlineKeyboard(adminKeys)
 adminMenu.rowInlineKeyboard()
-userMenu.setMsg("Меню пользователя")
+userMenu.setMsg(userMsg)
 userMenu.setInlineKeyboard(userKeys)
 userMenu.rowInlineKeyboard()
 
 
 @bot.message_handler(commands=["start"])
 def start(message):
-    keys = [
-        "Анекдот", "Фотокарточка",
-        "Какой ты кабан сегодня"
-    ]
     keyboard = ReplyKeyboard()
-    keyboard.add(keys)
+    keyboard.add(startKeys)
     keyboard.autoRow()
     bot.send_message(message.chat.id, "Вечер в хату, кабан {0.first_name}!"
         .format(message.from_user, bot.get_me()), reply_markup=keyboard.get())
