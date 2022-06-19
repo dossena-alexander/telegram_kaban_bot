@@ -5,10 +5,11 @@ from logger import log
 
 class DB():
     def __init__(self) -> None:
-        self.bd = sqlite3.connect('./db/main.db', check_same_thread=False)
+        self.bd = sqlite3.connect('../db/main.db', check_same_thread=False)
         self.bd_cursor = self.bd.cursor()
         self.table = ''
         self.col = ''
+
 
     def delRecord(self, table, col, record) -> None:
         log.info("Удаление записи БД в таблице: " + table + "Столбец:  " + col)
@@ -146,6 +147,7 @@ class MsgDB(DB):
         record = self.bd_cursor.fetchall()
         msg = record[recNum]
         return msg[0]
+
 
 class PicDB(DB):
     def __init__(self) -> None:
