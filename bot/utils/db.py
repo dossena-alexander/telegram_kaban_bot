@@ -1,6 +1,5 @@
-import imp
 import sqlite3
-from logger import *
+from utils.logger import log
 
 
 class DB():
@@ -12,14 +11,14 @@ class DB():
 
 
     def delRecord(self, table, col, record) -> None:
-        log.info("Удаление записи БД в таблице: " + table + "Столбец:  " + col)
+        log.info("Удаление записи БД в таблице: " + table + " Столбец: " + col)
         self.bd_cursor.execute( f'DELETE FROM {table} WHERE {col}=?', (record, ) )
         self.bd.commit()
         log.info("Успешно")
 
 
     def newRecord(self, table, col, record) -> None:
-        log.info("Новая запись БД в таблице: " + table + "Столбец:  " + col)
+        log.info("Новая запись БД в таблице: " + table + " Столбец: " + col)
         self.bd_cursor.execute(f'INSERT INTO {table} ({col}) VALUES (?)', (record, ) ) 
         self.bd.commit()
         log.info("Успешно")

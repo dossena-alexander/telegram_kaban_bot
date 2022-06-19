@@ -1,25 +1,21 @@
-import telebot, random, utils.db
-import utils.menu
-import os
+import telebot, random
+from datetime import date
 from config import *
-from utils.upload import *
-from utils.keyboard import *
-from datetime import datetime, date
+import utils
 
 # from dialog import Dialog
-
-# from shedule import Shed
+# from shedule import Shedule
 
 bot = telebot.TeleBot(token=token)
 msgCounter = 0 # records counter that`s used to see user msgs in admin menu
-userDB = utils.db.UserDB()
-boarDB = utils.db.BoarDB()
-jokeDB = utils.db.JokeDB()
-msgDB = utils.db.MsgDB()
-picDB = utils.db.PicDB()
-adminMenu = utils.menu.Menu()
-userMenu = utils.menu.Menu()
-helpMenu = utils.menu.Menu()
+userDB = utils.UserDB()
+boarDB = utils.BoarDB()
+jokeDB = utils.JokeDB()
+msgDB = utils.MsgDB()
+picDB = utils.PicDB()
+adminMenu = utils.Menu()
+userMenu = utils.Menu()
+helpMenu = utils.Menu()
 
 # soon...
 # shed = Shed()
@@ -36,7 +32,7 @@ userMenu.rowInlineKeyboard()
 
 @bot.message_handler(commands=["start"])
 def start(message):
-    keyboard = ReplyKeyboard()
+    keyboard = utils.ReplyKeyboard()
     keyboard.add(startKeys)
     keyboard.autoRow()
     bot.send_message(message.chat.id, "Вечер в хату, кабан {0.first_name}!"
@@ -88,7 +84,7 @@ def callWorker(call):
         bot.register_next_step_handler(call.message, uploadJoke)
     elif call.data == "Остановить бота": #+
         bot.answer_callback_query(call.id, 'Бот остановлен')
-        log.info("ОСТАНОВКА БОТА")
+        utils.log.info("ОСТАНОВКА БОТА")
         bot.stop_polling()
     elif call.data == "Анекдоты": #+
         bot.answer_callback_query(call.id)
@@ -161,10 +157,10 @@ def see_jokes(message):
 
     back_key = ["Выйти"]
 
-    stand_keyboard = InlineKeyboard()
+    stand_keyboard = utils.InlineKeyboard()
     stand_keyboard.add(stand_keys)
     stand_keyboard.autoRow()
-    back_keyboard = InlineKeyboard()
+    back_keyboard = utils.InlineKeyboard()
     back_keyboard.add(back_key)
 
     # get records len with jokeDB method
@@ -199,10 +195,10 @@ def seeMsgs(message):
 
     back_key = ["Выйти"]
 
-    stand_keyboard = InlineKeyboard()
+    stand_keyboard = utils.InlineKeyboard()
     stand_keyboard.add(stand_keys)
     stand_keyboard.autoRow()
-    back_keyboard = InlineKeyboard()
+    back_keyboard = utils.InlineKeyboard()
     back_keyboard.add(back_key)
 
     # get records len with msgDB method
@@ -246,8 +242,8 @@ def uploadPicture(message):
             # Checking ID of user, if admin is adding, pics`ll be added to main folder "photos/
             # if not, bot send photo id to DB, after all admin`ll be able to save pics to "photos/
             # uploadPic('admin') is saving pics to main -- "photos/"; picDB saving photo id to accepted pics table
-            if id == adminID: upPic = UploadPic('admin'); txt = "Сохранил"; picDB.setTableName("accPics")
-            else: upPic = UploadPic('user'); txt = "Добавлено на рассмотрение"; picDB.setTableName("pics")
+            if id == adminID: upPic = utils.UploadPic('admin'); txt = "Сохранил"; picDB.setTableName("accPics")
+            else: upPic = utils.UploadPic('user'); txt = "Добавлено на рассмотрение"; picDB.setTableName("pics")
             file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
             file = bot.download_file(file_info.file_path)
             # saving photo id to DB of pics, either accepted pics table or pics table
@@ -275,9 +271,7 @@ def uploadJoke(message):
             id = message.from_user.id 
             if id == adminID: jokeDB.setTableName('adminJokes'); txt = "Сохранил"
             else: jokeDB.setTableName('userJokes'); txt = "Добавлено на рассмотрение"
-            log.info("uploadJoke -- Запись шутки в БД")
             jokeDB.newRecord(jokeDB.getTableName(), jokeDB.getColName(), joke)
-            log.info("                 Успешно")
             bot.send_message(message.chat.id, txt)
         else:
             bot.send_message(message.chat.id, "Отменено")
@@ -292,9 +286,7 @@ def uploadMsg(message): #+-
     if message.content_type == "text":
         if message.text.lower() != "/brake":
             msg = message.text
-            log.info("uploadMsg -- Запись сообщения в БД")
             msgDB.newRecord(msgDB.getTableName(), msgDB.getColName(), msg)
-            log.info("                 Успешно")
             bot.send_message(message.chat.id, "Отправлено")
         else:
             bot.send_message(message.chat.id, "Отменено")
@@ -309,17 +301,11 @@ def uploadWct(message):
             bot.send_message(message.chat.id, "Пришли только одну картинку")
             bot.register_next_step_handler(message, uploadWct)
         else:
-            upPic = UploadPic('wct')
-            log.info("UploadWct -- Загрузка файла")
+            upPic = utils.UploadPic('wct')
             file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
-            log.info("                  Успешно")
             file = bot.download_file(file_info.file_path)
-            log.info("                 Запись в БД")
             boarDB.newRecord(boarDB.getTableName(), boarDB.getColName(), file_info.file_path.replace('photos/', ''))
-            log.info("                  Успешно")
-            log.info("                 Загрузка файла на сервер")
             upPic.upload(file, file_info)
-            log.info("                  Успешно")
             bot.send_message(message.chat.id, "Сохранил")
     else:
         if message.content_type == "text":
@@ -379,5 +365,5 @@ def textWorker(message):
 
 if __name__ == "__main__":
     print("BOT STARTED")
-    log.info("BOT STARTED")
+    utils.log.info("BOT STARTED")
     bot.polling()
