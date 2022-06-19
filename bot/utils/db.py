@@ -1,6 +1,6 @@
 import imp
 import sqlite3
-from logger import log
+from logger import *
 
 
 class DB():

@@ -1,5 +1,5 @@
-token = ""
-adminID = 0
+token = "5324892613:AAH_gp9kHtml0J-CX-upR8F4HumAqMaFbCA"
+adminID = 1631513712
 
 userMsg = "Меню пользователя"
 adminMsg = "Админ меню"

@@ -1,4 +1,4 @@
-import telebot, random, db
+import telebot, random, utils.db
 import utils.menu
 import os
 from config import *
@@ -12,11 +12,11 @@ from datetime import datetime, date
 
 bot = telebot.TeleBot(token=token)
 msgCounter = 0 # records counter that`s used to see user msgs in admin menu
-userDB = db.UserDB()
-boarDB = db.BoarDB()
-jokeDB = db.JokeDB()
-msgDB = db.MsgDB()
-picDB = db.PicDB()
+userDB = utils.db.UserDB()
+boarDB = utils.db.BoarDB()
+jokeDB = utils.db.JokeDB()
+msgDB = utils.db.MsgDB()
+picDB = utils.db.PicDB()
 adminMenu = utils.menu.Menu()
 userMenu = utils.menu.Menu()
 helpMenu = utils.menu.Menu()
