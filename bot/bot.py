@@ -1,7 +1,6 @@
 import telebot, random, db
 import menu
 import os
-from logger import *
 from config import *
 from upload import *
 from keyboard import *
@@ -55,9 +54,7 @@ def auth(message):
     else:
         usersList = userDB.getUsersList()
         if userID not in usersList:
-            log.info("Auth -- Добавление пользователя в БД")
             userDB.addUser(userID)
-            log.info("      Успешно")
             user(message)
         else:
             user(message)
@@ -248,20 +245,14 @@ def uploadPicture(message):
             id = message.from_user.id
             # Checking ID of user, if admin is adding, pics`ll be added to main folder "photos/
             # if not, bot send photo id to DB, after all admin`ll be able to save pics to "photos/
-            if id == adminID: upPic = UploadPic('admin'); txt = "Сохранил"; picDB.setTableName("accPics")
             # uploadPic('admin') is saving pics to main -- "photos/"; picDB saving photo id to accepted pics table
+            if id == adminID: upPic = UploadPic('admin'); txt = "Сохранил"; picDB.setTableName("accPics")
             else: upPic = UploadPic('user'); txt = "Добавлено на рассмотрение"; picDB.setTableName("pics")
-            log.info("UploadPicture -- Загрузка файла")
             file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
-            log.info("                  Успешно")
             file = bot.download_file(file_info.file_path)
             # saving photo id to DB of pics, either accepted pics table or pics table
-            log.info("                 Запись в БД")
             picDB.newRecord(picDB.getTableName(), picDB.getColName(), file_info.file_path.replace('photos/', ''))
-            log.info("                  Успешно")
-            log.info("                 Загрузка файла на сервер")
             upPic.upload(file, file_info)
-            log.info("                  Успешно")
             bot.send_message(message.chat.id, txt)
     else:
         if message.content_type == "text":
