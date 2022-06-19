@@ -250,6 +250,8 @@ def uploadPicture(message):
             picDB.newRecord(picDB.getTableName(), picDB.getColName(), file_info.file_path.replace('photos/', ''))
             upPic.upload(file, file_info)
             bot.send_message(message.chat.id, txt)
+            bot.send_message(message.chat.id, "Пришли еще картинку, или нажми /brake")
+            bot.register_next_step_handler(message, uploadPicture)
     else:
         if message.content_type == "text":
             if message.text.lower() == "/brake":
@@ -273,6 +275,8 @@ def uploadJoke(message):
             else: jokeDB.setTableName('userJokes'); txt = "Добавлено на рассмотрение"
             jokeDB.newRecord(jokeDB.getTableName(), jokeDB.getColName(), joke)
             bot.send_message(message.chat.id, txt)
+            bot.send_message(message.chat.id, "Напиши анекдот, или нажми /brake")
+            bot.register_next_step_handler(message, uploadJoke)
         else:
             bot.send_message(message.chat.id, "Отменено")
     else:
