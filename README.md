@@ -63,7 +63,8 @@ def admin(message):
     button2 = types.InlineKeyboardButton(text='button2', callback_data='call_2')
     button3 = types.InlineKeyboardButton(text='button3', callback_data='call_3')
     markup = types.InlineKeyboardMarkup()
-    markup.add(button1, button2, button3)
+    markup.row(button1, button2)
+    markup.row(button3)
     bot.send_message(message.chat.id, 'msg', reply_markup=markup)
 ```
 **I use:**
