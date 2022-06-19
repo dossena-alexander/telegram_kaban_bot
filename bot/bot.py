@@ -1,9 +1,9 @@
 import telebot, random, db
-import menu
+import utils.menu
 import os
 from config import *
-from upload import *
-from keyboard import *
+from utils.upload import *
+from utils.keyboard import *
 from datetime import datetime, date
 
 # from dialog import Dialog
@@ -17,9 +17,9 @@ boarDB = db.BoarDB()
 jokeDB = db.JokeDB()
 msgDB = db.MsgDB()
 picDB = db.PicDB()
-adminMenu = menu.Menu()
-userMenu = menu.Menu()
-helpMenu = menu.Menu()
+adminMenu = utils.menu.Menu()
+userMenu = utils.menu.Menu()
+helpMenu = utils.menu.Menu()
 
 # soon...
 # shed = Shed()
