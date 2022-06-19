@@ -1,24 +1,31 @@
 import sqlite3
+from utils.logger import log
 
 
 class DB():
     def __init__(self) -> None:
-        self.bd = sqlite3.connect('./db/main.db', check_same_thread=False)
+        self.bd = sqlite3.connect('../db/main.db', check_same_thread=False)
         self.bd_cursor = self.bd.cursor()
         self.table = ''
         self.col = ''
 
+
     def delRecord(self, table, col, record) -> None:
+        log.info("Удаление записи БД в таблице: " + table + " Столбец: " + col)
         self.bd_cursor.execute( f'DELETE FROM {table} WHERE {col}=?', (record, ) )
         self.bd.commit()
+        log.info("Успешно")
 
 
     def newRecord(self, table, col, record) -> None:
+        log.info("Новая запись БД в таблице: " + table + " Столбец: " + col)
         self.bd_cursor.execute(f'INSERT INTO {table} ({col}) VALUES (?)', (record, ) ) 
         self.bd.commit()
+        log.info("Успешно")
 
     
     def getRecCount(self, table) -> int:
+        log.info("Количество записей БД в таблице: " + table)
         info = self.bd_cursor.execute(f"SELECT * FROM {table}")
         record = self.bd_cursor.fetchall()
         return len(record)
@@ -60,8 +67,10 @@ class UserDB(DB):
 
 
     def setWctForUser(self, userID: int, boarID: str) -> None:
+        log.info("Установка wct для пользователя")
         self.bd_cursor.execute(f'UPDATE users SET wctID = {boarID} WHERE userID={userID}')
         self.bd.commit()
+        log.info("Успешно")
 
     
     def getPrevDay(self, userID: int) -> int:
@@ -70,13 +79,17 @@ class UserDB(DB):
 
     
     def setPrevDay(self, day: int, userID: int) -> None:
+        log.info("Установка предыдущего дня")
         self.bd_cursor.execute(f'UPDATE users SET prevDay = {day} WHERE userID={userID}')
         self.bd.commit()
+        log.info("Успешно")
 
 
     def addUser(self, userID: str) -> None:
+        log.info("Auth -- Добавление пользователя в БД")
         self.bd_cursor.execute('INSERT INTO users (userID) VALUES (?)', (userID, ) )
         self.bd.commit()
+        log.info("Успешно")
 
 
 class JokeDB(DB):
@@ -133,6 +146,7 @@ class MsgDB(DB):
         record = self.bd_cursor.fetchall()
         msg = record[recNum]
         return msg[0]
+
 
 class PicDB(DB):
     def __init__(self) -> None:

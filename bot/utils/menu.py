@@ -1,11 +1,12 @@
-import keyboard
+from utils.keyboard import ReplyKeyboard, InlineKeyboard
+
 
 class Menu():
     msg = ''
 
     def __init__(self) -> None:
-        self.replyKeyboard = keyboard.ReplyKeyboard()
-        self.inlineKeyboard = keyboard.InlineKeyboard()
+        self.replyKeyboard = ReplyKeyboard()
+        self.inlineKeyboard = InlineKeyboard()
 
 
     def setMsg(self, x: str):

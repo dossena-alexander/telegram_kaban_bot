@@ -1,7 +1,7 @@
 import time
 
 
-class Shed():
+class Shedule():
     def __init__(self) -> None:
         pass
 
