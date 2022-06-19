@@ -59,9 +59,11 @@ Or use standart types.ReplyKeyboardMarkup()
 **Instead of:**
 ```python
 def admin(message):
-    button = types.InlineKeyboardButton(text='button', callback_data='call')
+    button1 = types.InlineKeyboardButton(text='button1', callback_data='call_1')
+    button2 = types.InlineKeyboardButton(text='button2', callback_data='call_2')
+    button3 = types.InlineKeyboardButton(text='button3', callback_data='call_3')
     markup = types.InlineKeyboardMarkup()
-    markup.add(button)
+    markup.add(button1, button2, button3)
     bot.send_message(message.chat.id, 'msg', reply_markup=markup)
 ```
 **I use:**
@@ -70,8 +72,8 @@ Keys = [
     "Key one", "Key two",
          "Key three"
 ]
-
-adminMenu.setMsg("Message")
+msg = "Hello!"
+adminMenu.setMsg(msg)
 adminMenu.setInlineKeyboard(Keys)
 adminMenu.rowInlineKeyboard()
 
