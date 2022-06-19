@@ -1,5 +1,6 @@
 import keyboard
 
+
 class Menu():
     msg = ''
 
