@@ -357,7 +357,7 @@ def textWorker(message):
     elif msg == "анекдот":
         bot.send_message(message.chat.id, 
         jokeDB.getJoke(recNum=random.randint(0, jokeDB.getRecCount("adminJokes") - 1)))
-    elif msg == "какой ты кабан сегодня":
+    elif msg == "какой я кабан сегодня":
         if getWct(message) != None:
             bot.send_photo(message.chat.id, getWct(message))
 
