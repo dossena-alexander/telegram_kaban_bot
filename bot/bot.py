@@ -76,7 +76,7 @@ def help(message):
 @bot.callback_query_handler(func=lambda call: True)
 def callWorker(call):
     global msgCounter 
-    global jokes
+
 
     if call.data == 'Загрузить картинку': #+
         bot.answer_callback_query(call.id)
