@@ -375,3 +375,9 @@ def textWorker(message):
         if getWct(message) != None:
             bot.send_photo(message.chat.id, getWct(message))
 
+
+
+if __name__ == "__main__":
+    print("BOT STARTED")
+    log.info("BOT STARTED")
+    bot.polling()
