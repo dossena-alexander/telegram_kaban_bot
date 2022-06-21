@@ -23,10 +23,17 @@ class DB():
         self.bd.commit()
         log.info("Успешно")
 
-    
+
     def getRecCount(self, table) -> int:
         log.info("Количество записей БД в таблице: " + table)
         info = self.bd_cursor.execute(f"SELECT * FROM {table}")
+        record = self.bd_cursor.fetchall()
+        return len(record)
+
+
+    def getRecCount(self) -> int:
+        log.info("Количество записей БД в таблице: " + self.table)
+        info = self.bd_cursor.execute(f"SELECT * FROM {self.table}")
         record = self.bd_cursor.fetchall()
         return len(record)
 
@@ -180,3 +187,18 @@ class BoarDB(DB):
         record = self.bd_cursor.fetchall()
         ID = record[recNum]
         return ID[0]
+
+
+#кабаны юзеры шутки фотки
+class Statistics(DB):
+    def __init__(self) -> None:
+        super().__init__()
+        self.b = BoarDB()
+        self.u = UserDB()
+        self.j = JokeDB()
+        self.p = PicDB()
+
+
+    def get(self) -> str:
+        txt = f"<b>Статистика</b>\n•Кабаны: {self.b.getRecCount()}\n•Пользователи: {self.u.getRecCount()}\n•Анекдоты: {self.j.getRecCount()}\n•Картинки: {self.p.getRecCount()}"
+        return txt
