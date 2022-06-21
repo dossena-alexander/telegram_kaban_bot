@@ -330,7 +330,7 @@ def getWct(message):
 #     # every day user changes his "board id"
 #     # if user in one day, when he used function in bot, will use wct again, wct give the same "boar id"
     
-    photo_folder = './wct/'
+    photo_folder = '../wct/'
     id = message.from_user.id 
     users = userDB.getUsersList()
     if id != adminID and id not in users:
@@ -357,7 +357,7 @@ def textWorker(message):
     msg = message.text.lower()
     if msg == "фотокарточка":
         bot.send_photo(message.chat.id, 
-        open("./photos/" + picDB.getPicID(recNum=random.randint(0, picDB.getRecCount("accPics") - 1)), "rb"))
+        open("../photos/" + picDB.getPicID(recNum=random.randint(0, picDB.getRecCount("accPics") - 1)), "rb"))
     elif msg == "анекдот":
         bot.send_message(message.chat.id, 
         jokeDB.getJoke(recNum=random.randint(0, jokeDB.getRecCount("adminJokes") - 1)))
