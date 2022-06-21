@@ -146,6 +146,16 @@ def callWorker(call):
         bot.answer_callback_query(call.id)
         bot.edit_message_text(text="Отправь фото или нажми /brake", chat_id=call.message.chat.id, message_id=call.message.message_id)
         bot.register_next_step_handler(call.message, uploadWct)
+    elif call.data == "Статистика":
+        stats = utils.Statistics()
+        bot.answer_callback_query(call.id)
+        back = utils.InlineKeyboard()
+        back.add(["Назад"])
+        bot.edit_message_text(text=stats.get(), chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=back.get(), parse_mode="html")
+        del stats
+    elif call.data == "Назад":
+        bot.answer_callback_query(call.id)
+        bot.edit_message_text(text=adminMenu.getMsg(), chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=adminMenu.getInlineKeyboard())
 
 def see_jokes(message):
     global msgCounter
