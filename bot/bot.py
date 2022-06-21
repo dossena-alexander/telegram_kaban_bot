@@ -10,9 +10,10 @@ bot = telebot.TeleBot(token=token)
 msgCounter = 0 # records counter that`s used to see user msgs in admin menu
 userDB = utils.UserDB()
 boarDB = utils.BoarDB()
-jokeDB = utils.JokeDB()
+adminJokeDB = utils.JokeDB("adminJokes")
+userJokeDB = utils.JokeDB("userJokes")
 msgDB = utils.MsgDB()
-picDB = utils.PicDB()
+adminPicDB = utils.PicDB("accPics")
 adminMenu = utils.Menu()
 userMenu = utils.Menu()
 helpMenu = utils.Menu()
@@ -106,23 +107,20 @@ def callWorker(call):
     elif call.data == "Принять": #joke
         bot.answer_callback_query(call.id)
         bot.delete_message(call.message.chat.id, call.message.message_id)
-        jokeDB.setTableName("adminJokes")
-        jokeDB.newRecord(jokeDB.getTableName(), jokeDB.getColName(), jokeDB.seeJoke(msgCounter))
-        jokeDB.setTableName("userJokes")
-        jokeDB.delRecord(jokeDB.getTableName(), jokeDB.getColName(), jokeDB.seeJoke(msgCounter))
+        adminJokeDB.newRecord(adminJokeDB.getJoke(msgCounter))
+        userJokeDB.delRecord(userJokeDB.getJoke(msgCounter))
         msgCounter += 1
         see_jokes(call.message)
     elif call.data == "Удалить": #joke
         bot.answer_callback_query(call.id)
         bot.delete_message(call.message.chat.id, call.message.message_id)
-        jokeDB.setTableName("userJokes")
-        jokeDB.delRecord(jokeDB.getTableName(), jokeDB.getColName(), jokeDB.seeJoke(msgCounter))
+        userJokeDB.delRecord(userJokeDB.getJoke(msgCounter))
         msgCounter = 0
         see_jokes(call.message)
     elif call.data == "Вычеркнуть": #msg
         bot.answer_callback_query(call.id)
         bot.delete_message(call.message.chat.id, call.message.message_id)
-        msgDB.delRecord(msgDB.getTableName(), msgDB.getColName(), msgDB.seeMsg(msgCounter))
+        msgDB.delRecord(msgDB.seeMsg(msgCounter))
         msgCounter = 0
         seeMsgs(call.message)
     elif call.data == "Рассылка": #+
@@ -176,12 +174,12 @@ def see_jokes(message):
     back_keyboard.add(back_key)
 
     # get records len with jokeDB method
-    record_len = jokeDB.getRecCount("userJokes")
+    record_len = userJokeDB.getRecCount()
     if record_len != 0:
         if msgCounter < record_len: # msgCounter is counter which increase and count every each record 
             bot.send_message(message.chat.id,
                 f"{record_len} записей\n" +
-                f"{jokeDB.seeJoke(recNum=msgCounter)}",
+                f"{userJokeDB.getJoke(recNum=msgCounter)}",
                 reply_markup=stand_keyboard.get())
         else:
             msgCounter = 0
@@ -251,18 +249,20 @@ def uploadPicture(message):
             bot.register_next_step_handler(message, uploadPicture)
         else:
             id = message.from_user.id
+            picDB = utils.PicDB("accPics")
             # Checking ID of user, if admin is adding, pics`ll be added to main folder "photos/
             # if not, bot send photo id to DB, after all admin`ll be able to save pics to "photos/
             # uploadPic('admin') is saving pics to main -- "photos/"; picDB saving photo id to accepted pics table
-            if id == adminID: upPic = utils.UploadPic('admin'); txt = "Сохранил"; picDB.setTableName("accPics")
+            if id == adminID: upPic = utils.UploadPic('admin'); txt = "Сохранил"
             else: upPic = utils.UploadPic('user'); txt = "Добавлено на рассмотрение"; picDB.setTableName("pics")
             file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
             file = bot.download_file(file_info.file_path)
             # saving photo id to DB of pics, either accepted pics table or pics table
-            picDB.newRecord(picDB.getTableName(), picDB.getColName(), file_info.file_path.replace('photos/', ''))
+            picDB.newRecord(file_info.file_path.replace('photos/', ''))
             upPic.upload(file, file_info)
             bot.send_message(message.chat.id, txt)
             bot.send_message(message.chat.id, "Пришли еще картинку, или нажми /brake")
+            del picDB
             bot.register_next_step_handler(message, uploadPicture)
     else:
         if message.content_type == "text":
@@ -283,9 +283,10 @@ def uploadJoke(message):
         if message.text.lower() != "/brake":
             joke = message.text
             id = message.from_user.id 
-            if id == adminID: jokeDB.setTableName('adminJokes'); txt = "Сохранил"
+            jokeDB = utils.JokeDB("adminJokes")
+            if id == adminID: txt = "Сохранил"
             else: jokeDB.setTableName('userJokes'); txt = "Добавлено на рассмотрение"
-            jokeDB.newRecord(jokeDB.getTableName(), jokeDB.getColName(), joke)
+            jokeDB.newRecord(joke)
             bot.send_message(message.chat.id, txt)
             bot.send_message(message.chat.id, "Напиши анекдот, или нажми /brake")
             bot.register_next_step_handler(message, uploadJoke)
@@ -345,7 +346,7 @@ def getWct(message):
     photo_folder = '../wct/'
     id = message.from_user.id 
     users = userDB.getUsersList()
-    if id != adminID and id not in users:
+    if id != adminID or id not in users:
         bot.send_message(message.chat.id, "Ты не зарегистрировался. Нажми /auth, чтобы зарегистрироваться")
         return None
     else:
@@ -369,10 +370,10 @@ def textWorker(message):
     msg = message.text.lower()
     if msg == "фотокарточка":
         bot.send_photo(message.chat.id, 
-        open("../photos/" + picDB.getPicID(recNum=random.randint(0, picDB.getRecCount("accPics") - 1)), "rb"))
+        open("../photos/" + adminPicDB.getPicID(recNum=random.randint(0, adminPicDB.getRecCount() - 1)), "rb"))
     elif msg == "анекдот":
         bot.send_message(message.chat.id, 
-        jokeDB.getJoke(recNum=random.randint(0, jokeDB.getRecCount("adminJokes") - 1)))
+        adminJokeDB.getJoke(recNum=random.randint(0, adminJokeDB.getRecCount() - 1)))
     elif msg == "какой я кабан сегодня":
         if getWct(message) != None:
             bot.send_photo(message.chat.id, getWct(message))
