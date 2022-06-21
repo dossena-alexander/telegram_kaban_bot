@@ -31,7 +31,7 @@ class DB():
         return len(record)
 
 
-    def getRecCount(self) -> int:
+    def getSelfRecCount(self) -> int:
         log.info("Количество записей БД в таблице: " + self.table)
         info = self.bd_cursor.execute(f"SELECT * FROM {self.table}")
         record = self.bd_cursor.fetchall()
@@ -200,5 +200,5 @@ class Statistics(DB):
 
 
     def get(self) -> str:
-        txt = f"<b>Статистика</b>\n•Кабаны: {self.b.getRecCount()}\n•Пользователи: {self.u.getRecCount()}\n•Анекдоты: {self.j.getRecCount()}\n•Картинки: {self.p.getRecCount()}"
+        txt = f"<b>Статистика</b>\n•Кабаны: {self.b.getSelfRecCount()}\n•Пользователи: {self.u.getSelfRecCount()}\n•Анекдоты: {self.j.getSelfRecCount()}\n•Картинки: {self.p.getSelfRecCount()}"
         return txt
