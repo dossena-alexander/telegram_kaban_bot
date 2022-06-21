@@ -27,6 +27,7 @@ startKeys = [
     "Какой я кабан сегодня"
 ]
 
+#limits for user per day
 max_jokes_per_day = 10
 max_msgs_per_day = 5
 max_photos_per_day = 10
