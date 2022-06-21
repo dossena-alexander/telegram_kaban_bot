@@ -108,6 +108,8 @@ def callWorker(call):
         bot.delete_message(call.message.chat.id, call.message.message_id)
         jokeDB.setTableName("adminJokes")
         jokeDB.newRecord(jokeDB.getTableName(), jokeDB.getColName(), jokeDB.seeJoke(msgCounter))
+        jokeDB.setTableName("userJokes")
+        jokeDB.delRecord(jokeDB.getTableName(), jokeDB.getColName(), jokeDB.seeJoke(msgCounter))
         msgCounter += 1
         see_jokes(call.message)
     elif call.data == "Удалить": #joke
