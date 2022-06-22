@@ -3,7 +3,7 @@ adminID = 0
 
 userMsg = "Меню пользователя"
 adminMsg = "Админ меню"
-helpMsg = "<b>Что я умею</b>:\n <i>Мои команды:</i>\n • /start - запуск\n • /auth - Аутентификация пользователя\n <i>Мои возможности:</i>\n • Какой ты кабан сегодня\n • Фотокарточка -- рандомная смешная картинка • Анекдот -- рандомный анекдот из более чем тысячной базы данных"
+helpMsg = "<b>Что я умею</b>\n <i>Мои команды:</i>\n • /start - Запуск\n • /help - Помощь\n • /auth - Аутентификация\n <i>Мои возможности:</i>\n • <b>Какой ты кабан сегодня</b>\n • <b>Фотокарточка</b> –– Смешная картинка\n • <b>Анекдот</b> –– Рандомный анекдот из тысячи"
 
 # keys below will be rowed as you see
 # In other words, in one row -- two buttons
@@ -31,3 +31,12 @@ startKeys = [
 max_jokes_per_day = 10
 max_msgs_per_day = 5
 max_photos_per_day = 10
+
+#text-worker filter
+word_filter = ["Фотокарточка", "Анекдот", "Какой я кабан сегодня"
+               "/auth", "/help", "/start"]
+
+#folders
+wct_path = '../wct/'
+photos_path = '../photos/'
+recieved_photos_path = '../recieved_photos/'
