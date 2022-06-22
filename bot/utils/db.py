@@ -1,7 +1,7 @@
 import sqlite3
+import config
 from utils.logger import log
 
-pathToDB = '../db/main.db'
 
 # DB structure
 #      +---------------------------------+
@@ -28,7 +28,7 @@ pathToDB = '../db/main.db'
 
 class DB():
     def __init__(self) -> None:
-        self.bd = sqlite3.connect(pathToDB, check_same_thread=False)
+        self.bd = sqlite3.connect(config.db_path, check_same_thread=False)
         self.bd_cursor = self.bd.cursor()
         self.table = ''
         self.col = ''
@@ -111,7 +111,7 @@ class UserDB(DB):
 
     def addUser(self, userID: str) -> None:
         log.info("Auth -- Добавление пользователя в БД")
-        self.bd_cursor.execute('INSERT INTO {self.table} (userID) VALUES (?)', (userID, ) )
+        self.bd_cursor.execute(f'INSERT INTO {self.table} (userID) VALUES (?)', (userID, ) )
         self.bd.commit()
         log.info("Успешно")
 
@@ -211,3 +211,6 @@ class Statistics(DB):
     def get(self) -> str:
         txt = f"<b>Статистика</b>\n•Кабаны: <b>{self.b.getRecCount()}</b>\n•Пользователи: <b>{self.u.getRecCount()}</b>\n•Анекдоты: <b>{self.j.getRecCount()}</b>\n•Картинки: <b>{self.p.getRecCount()}</b>"
         return txt
+
+
+x = UserDB()
