@@ -258,7 +258,7 @@ def uploadPicture(message):
             picDB.newRecord(file_info.file_path.replace('photos/', ''))
             upPic.upload(file, file_info)
             bot.send_message(message.chat.id, txt)
-            bot.send_message(message.chat.id, "Пришли еще картинку, или нажми /brake")
+            bot.send_message(message.chat.id, "Пришли еще картинку или нажми /brake")
             del picDB
             bot.register_next_step_handler(message, uploadPicture)
     else:
