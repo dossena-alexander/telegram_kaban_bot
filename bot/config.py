@@ -40,3 +40,5 @@ word_filter = ["Фотокарточка", "Анекдот", "Какой я ка
 wct_path = '../wct/'
 photos_path = '../photos/'
 recieved_photos_path = '../recieved_photos/'
+db_path = '../db/main.db'
+log_path = "../Logs/bot.log"
