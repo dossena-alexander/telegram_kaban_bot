@@ -1,5 +1,6 @@
 import telebot, random
 from datetime import date
+from bot.utils import keyboard
 import config
 import utils
 
@@ -154,6 +155,18 @@ def callWorker(call):
     elif call.data == "Назад":
         bot.answer_callback_query(call.id)
         bot.edit_message_text(text=adminMenu.getMsg(), chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=adminMenu.getInlineKeyboard())
+    elif call.data == "Предложения":
+        bot.answer_callback_query(call.id)
+        keyboard = utils.InlineKeyboard()
+        keyboard.add(["Картинки", "Анекдоты"])
+        keyboard.autoRow()
+        bot.edit_message_text(text="Предложения", chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard)
+    elif call.data == "Загрузка":
+        bot.answer_callback_query(call.id)
+        keyboard = utils.InlineKeyboard()
+        keyboard.add(["Загрузить картинку", "Загрузить анекдот", "Добавить кабана"])
+        keyboard.autoRow()
+        bot.edit_message_text(text="Загрузка", chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard)
 
 
 def see_jokes(message):
