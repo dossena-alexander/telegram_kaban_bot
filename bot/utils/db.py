@@ -204,7 +204,7 @@ class Statistics(DB):
         super().__init__()
         self.b = BoarDB()
         self.u = UserDB()
-        self.j = JokeDB()
+        self.j = JokeDB("adminJokes")
         self.p = PicDB("accPics")
 
 
