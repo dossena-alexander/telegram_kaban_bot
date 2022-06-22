@@ -1,12 +1,12 @@
 import telebot, random
 from datetime import date
-from config import *
+import config
 import utils
 
 # from dialog import Dialog
 # from shedule import Shedule
 
-bot = telebot.TeleBot(token=token)
+bot = telebot.TeleBot(token=config.token)
 msgCounter = 0 # records counter that`s used to see user msgs in admin menu
 userDB = utils.UserDB()
 boarDB = utils.BoarDB()
@@ -22,19 +22,19 @@ helpMenu = utils.Menu()
 # shed = Shed()
 # dialog = Dialog()
 
-helpMenu.setMsg(helpMsg)
-adminMenu.setMsg(adminMsg)
-adminMenu.setInlineKeyboard(adminKeys)
+helpMenu.setMsg(config.helpMsg)
+adminMenu.setMsg(config.adminMsg)
+adminMenu.setInlineKeyboard(config.adminKeys)
 adminMenu.rowInlineKeyboard()
-userMenu.setMsg(userMsg)
-userMenu.setInlineKeyboard(userKeys)
+userMenu.setMsg(config.userMsg)
+userMenu.setInlineKeyboard(config.userKeys)
 userMenu.rowInlineKeyboard()
 
 
 @bot.message_handler(commands=["start"])
 def start(message):
     keyboard = utils.ReplyKeyboard()
-    keyboard.add(startKeys)
+    keyboard.add(config.startKeys)
     keyboard.autoRow()
     bot.send_message(message.chat.id, "Вечер в хату, кабан {0.first_name}!"
         .format(message.from_user, bot.get_me()), reply_markup=keyboard.get())
@@ -42,11 +42,9 @@ def start(message):
 
 @bot.message_handler(commands=["auth"])
 def auth(message):
-    global adminID
-
     # as long as ...user.id is integer, userID get it in string to be recorded to DB (column has string type)
     userID = str(message.from_user.id) 
-    if userID == str(adminID):
+    if userID == str(config.adminID):
         admin(message)
     else:
         usersList = userDB.getUsersList()
@@ -107,7 +105,7 @@ def callWorker(call):
     elif call.data == "Принять": #joke
         bot.answer_callback_query(call.id)
         bot.delete_message(call.message.chat.id, call.message.message_id)
-        adminJokeDB.newRecord(adminJokeDB.getJoke(msgCounter))
+        adminJokeDB.newRecord(userJokeDB.getJoke(msgCounter))
         userJokeDB.delRecord(userJokeDB.getJoke(msgCounter))
         msgCounter += 1
         see_jokes(call.message)
@@ -156,6 +154,7 @@ def callWorker(call):
     elif call.data == "Назад":
         bot.answer_callback_query(call.id)
         bot.edit_message_text(text=adminMenu.getMsg(), chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=adminMenu.getInlineKeyboard())
+
 
 def see_jokes(message):
     global msgCounter
@@ -212,7 +211,7 @@ def seeMsgs(message):
     back_keyboard.add(back_key)
 
     # get records len with msgDB method
-    record_len = msgDB.getRecCount("msgs")
+    record_len = msgDB.getRecCount()
     if record_len != 0:
         if msgCounter < record_len: # msgCounter is counter which increase and count every each record 
             bot.send_message(message.chat.id,
@@ -237,12 +236,10 @@ def notify(message):
             bot.send_message(i[0], 
             "<b>Сообщение от админа:</b>\n" + msg, parse_mode="html")
     else:
-        bot.send_message(adminID, "Пользователей для рассылки нет")
+        bot.send_message(config.adminID, "Пользователей для рассылки нет")
 
 
 def uploadPicture(message): 
-    global adminID
-
     if message.content_type == 'photo':
         if message.content_type == "media_group": # able to save not only one pic
             bot.send_message(message.chat.id, "Пришли только одну картинку")
@@ -253,7 +250,7 @@ def uploadPicture(message):
             # Checking ID of user, if admin is adding, pics`ll be added to main folder "photos/
             # if not, bot send photo id to DB, after all admin`ll be able to save pics to "photos/
             # uploadPic('admin') is saving pics to main -- "photos/"; picDB saving photo id to accepted pics table
-            if id == adminID: upPic = utils.UploadPic('admin'); txt = "Сохранил"
+            if id == config.adminID: upPic = utils.UploadPic('admin'); txt = "Сохранил"
             else: upPic = utils.UploadPic('user'); txt = "Добавлено на рассмотрение"; picDB.setTableName("pics")
             file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
             file = bot.download_file(file_info.file_path)
@@ -277,14 +274,12 @@ def uploadPicture(message):
 
 
 def uploadJoke(message):
-    global adminID
-
     if message.content_type == "text":
         if message.text.lower() != "/brake":
             joke = message.text
             id = message.from_user.id 
             jokeDB = utils.JokeDB("adminJokes")
-            if id == adminID: txt = "Сохранил"
+            if id == config.adminID: txt = "Сохранил"
             else: jokeDB.setTableName('userJokes'); txt = "Добавлено на рассмотрение"
             jokeDB.newRecord(joke)
             bot.send_message(message.chat.id, txt)
@@ -297,19 +292,17 @@ def uploadJoke(message):
         bot.register_next_step_handler(message, uploadJoke)
 
 
-def uploadMsg(message): #+-
-    global adminID
-
+def uploadMsg(message): 
     if message.content_type == "text":
         if message.text.lower() != "/brake":
             msg = message.text
-            msgDB.newRecord(msgDB.getTableName(), msgDB.getColName(), msg)
+            msgDB.newRecord(msg)
             bot.send_message(message.chat.id, "Отправлено")
         else:
             bot.send_message(message.chat.id, "Отменено")
     else:
         bot.send_message(message.chat.id, "Только текст, пиши или нажми /brake")
-        bot.register_next_step_handler(message, uploadJoke)
+        bot.register_next_step_handler(message, uploadMsg)
 
 
 def uploadWct(message):
@@ -321,7 +314,7 @@ def uploadWct(message):
             upPic = utils.UploadPic('wct')
             file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
             file = bot.download_file(file_info.file_path)
-            boarDB.newRecord(boarDB.getTableName(), boarDB.getColName(), file_info.file_path.replace('photos/', ''))
+            boarDB.newRecord(file_info.file_path.replace('photos/', ''))
             upPic.upload(file, file_info)
             bot.send_message(message.chat.id, "Сохранил")
     else:
@@ -337,16 +330,13 @@ def uploadWct(message):
 
 
 def getWct(message):
-    global adminID
-
-#     # WCT is "Which Caban (boar) you Today is"
-#     # every day user changes his "board id"
-#     # if user in one day, when he used function in bot, will use wct again, wct give the same "boar id"
+    # WCT is "Which Caban (boar) you Today is"
+    # every day user changes his "board id"
+    # if user in one day, when he used function in bot, will use wct again, wct give the same "boar id"
     
-    photo_folder = '../wct/'
     id = message.from_user.id 
     users = userDB.getUsersList()
-    if id != adminID or id not in users:
+    if id != config.adminID and id not in users:
         bot.send_message(message.chat.id, "Ты не зарегистрировался. Нажми /auth, чтобы зарегистрироваться")
         return None
     else:
@@ -356,13 +346,13 @@ def getWct(message):
         if now_day == prev_day:
             boarID = userDB.getWctForUser(id)
             boar = boarDB.getID(boarID)
-            return open(photo_folder + boar, 'rb')
+            return open(config.wct_path + boar, 'rb')
         else:
             userDB.setPrevDay(now_day, id)
-            boarID = random.randint(0, boarDB.getRecCount( boarDB.getTableName() ) - 1)
+            boarID = random.randint(0, boarDB.getRecCount() - 1)
             userDB.setWctForUser(id, boarID)
             boar = boarDB.getID(boarID)
-            return open(photo_folder + boar, 'rb')
+            return open(config.wct_path + boar, 'rb')
 
 
 @bot.message_handler(content_types="text") #+
