@@ -276,15 +276,19 @@ def uploadPicture(message):
 def uploadJoke(message):
     if message.content_type == "text":
         if message.text.lower() != "/brake":
-            joke = message.text
-            id = message.from_user.id 
-            jokeDB = utils.JokeDB("adminJokes")
-            if id == config.adminID: txt = "Сохранил"
-            else: jokeDB.setTableName('userJokes'); txt = "Добавлено на рассмотрение"
-            jokeDB.newRecord(joke)
-            bot.send_message(message.chat.id, txt)
-            bot.send_message(message.chat.id, "Напиши анекдот, или нажми /brake")
-            bot.register_next_step_handler(message, uploadJoke)
+            if message.text not in config.word_filter:
+                joke = message.text
+                id = message.from_user.id 
+                jokeDB = utils.JokeDB("adminJokes")
+                if id == config.adminID: txt = "Сохранил"
+                else: jokeDB.setTableName('userJokes'); txt = "Добавлено на рассмотрение"
+                jokeDB.newRecord(joke)
+                bot.send_message(message.chat.id, txt)
+                bot.send_message(message.chat.id, "Напиши анекдот, или нажми /brake")
+                bot.register_next_step_handler(message, uploadJoke)
+            else:
+               bot.send_message(message.chat.id, "Это не то, но я жду твой анекдот") 
+               bot.register_next_step_handler(message, uploadJoke)
         else:
             bot.send_message(message.chat.id, "Отменено")
     else:
@@ -295,9 +299,12 @@ def uploadJoke(message):
 def uploadMsg(message): 
     if message.content_type == "text":
         if message.text.lower() != "/brake":
-            msg = message.text
-            msgDB.newRecord(msg)
-            bot.send_message(message.chat.id, "Отправлено")
+            if message.text not in config.word_filter:
+                msgDB.newRecord(message.text)
+                bot.send_message(message.chat.id, "Отправлено")
+            else:
+                bot.send_message(message.chat.id, "Это не то, но я жду твое сообщение")
+                bot.register_next_step_handler(message, uploadJoke)
         else:
             bot.send_message(message.chat.id, "Отменено")
     else:
@@ -307,7 +314,7 @@ def uploadMsg(message):
 
 def uploadWct(message):
     if message.content_type == 'photo':
-        if message.content_type == "media_group": # able to save not only one pic
+        if message.content_type == "media_group": # able to save not only one pic (in future)
             bot.send_message(message.chat.id, "Пришли только одну картинку")
             bot.register_next_step_handler(message, uploadWct)
         else:
