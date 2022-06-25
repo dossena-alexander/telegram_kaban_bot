@@ -1,6 +1,5 @@
 import telebot, random
 from datetime import date
-from bot.utils import keyboard
 import config
 import utils
 
@@ -18,11 +17,12 @@ adminPicDB = utils.PicDB("accPics")
 adminMenu = utils.Menu()
 userMenu = utils.Menu()
 helpMenu = utils.Menu()
+userSubMenu = utils.Menu()
 
 # soon...
 # shed = Shed()
 # dialog = Dialog()
-
+userSubMenu.setMsg(config.userSubMenuMsg)
 helpMenu.setMsg(config.helpMsg)
 adminMenu.setMsg(config.adminMsg)
 adminMenu.setInlineKeyboard(config.adminKeys)
@@ -119,14 +119,14 @@ def callWorker(call):
     elif call.data == "Вычеркнуть": #msg
         bot.answer_callback_query(call.id)
         bot.delete_message(call.message.chat.id, call.message.message_id)
-        msgDB.delRecord(msgDB.seeMsg(msgCounter))
+        msgDB.delRecord(msgDB.getMsg(msgCounter))
         msgCounter = 0
         seeMsgs(call.message)
     elif call.data == "Рассылка": #+
         bot.answer_callback_query(call.id)
         bot.edit_message_text(text="Напиши сообщение пользователям", chat_id=call.message.chat.id, message_id=call.message.message_id)
         bot.register_next_step_handler(call.message, notify)
-    elif call.data == "Пользовательское меню": #+
+    elif call.data == "Пользователь": #+
         bot.answer_callback_query(call.id)
         bot.edit_message_text(text=userMenu.getMsg(), chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=userMenu.getInlineKeyboard())
     elif call.data == "Сообщения":
@@ -155,18 +155,37 @@ def callWorker(call):
     elif call.data == "Назад":
         bot.answer_callback_query(call.id)
         bot.edit_message_text(text=adminMenu.getMsg(), chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=adminMenu.getInlineKeyboard())
+    elif call.data == "Вернуться":
+        bot.answer_callback_query(call.id)
+        bot.edit_message_text(text=userMenu.getMsg(), chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=userMenu.getInlineKeyboard())
     elif call.data == "Предложения":
         bot.answer_callback_query(call.id)
         keyboard = utils.InlineKeyboard()
         keyboard.add(["Картинки", "Анекдоты"])
         keyboard.autoRow()
-        bot.edit_message_text(text="Предложения", chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard)
+        keyboard.add(["Назад"])
+        bot.edit_message_text(text="Предложения", chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard.get())
     elif call.data == "Загрузка":
         bot.answer_callback_query(call.id)
         keyboard = utils.InlineKeyboard()
         keyboard.add(["Загрузить картинку", "Загрузить анекдот", "Добавить кабана"])
         keyboard.autoRow()
-        bot.edit_message_text(text="Загрузка", chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard)
+        keyboard.add(["Назад"])
+        bot.edit_message_text(text="Загрузка", chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard.get())
+    elif call.data == "Кабаний перевод телеграмм":
+        bot.answer_callback_query(call.id)
+        keyboard = utils.InlineKeyboard()
+        keyboard.addUrlButton("Русский", "https://t.me/setlanguage/ru")
+        keyboard.addUrlButton("Кабаний", "https://t.me/setlanguage/kabanchikoff")
+        keyboard.add(["Вернуться"])
+        bot.edit_message_text(text=userSubMenu.getMsg(), chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard.get())
+    elif call.data == "Загрузить":
+        bot.answer_callback_query(call.id)
+        keyboard = utils.InlineKeyboard()
+        keyboard.add(["Загрузить картинку", "Загрузить анекдот"])
+        keyboard.autoRow()
+        keyboard.add(["Вернуться"])
+        bot.edit_message_text(text="Загрузка", chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard.get())
 
 
 def see_jokes(message):
@@ -229,7 +248,7 @@ def seeMsgs(message):
         if msgCounter < record_len: # msgCounter is counter which increase and count every each record 
             bot.send_message(message.chat.id,
                 f"{record_len} записей\n" +
-                f"{msgDB.seeMsg(recNum=msgCounter)}",
+                f"{msgDB.getMsg(recNum=msgCounter)}",
                 reply_markup=stand_keyboard.get())
         else:
             msgCounter = 0
@@ -242,14 +261,22 @@ def seeMsgs(message):
 
 
 def notify(message):
-    msg = message.text
-    users = userDB.getUsersList()
-    if len(users) != 0:
-        for i in users:
-            bot.send_message(i[0], 
-            "<b>Сообщение от админа:</b>\n" + msg, parse_mode="html")
-    else:
-        bot.send_message(config.adminID, "Пользователей для рассылки нет")
+    if message.content_type == 'text':
+        msg = message.text
+        if msg != '/brake':
+            if msg not in config.word_filter:
+                users = userDB.getUsersList()
+                if len(users) != 0:
+                    for id in users:
+                        bot.send_message(id, 
+                        "<b>Сообщение от админа:</b>\n" + msg, parse_mode="html")
+                else:
+                    bot.send_message(config.adminID, "Пользователей для рассылки нет")
+            else:
+                bot.send_message(config.adminID, "Это не то, но я жду твое сообщение")
+                bot.register_next_step_handler(message, notify)
+        else:
+            bot.send_message(config.adminID, "Отменено")
 
 
 def uploadPicture(message): 
@@ -293,8 +320,11 @@ def uploadJoke(message):
                 joke = message.text
                 id = message.from_user.id 
                 jokeDB = utils.JokeDB("adminJokes")
-                if id == config.adminID: txt = "Сохранил"
-                else: jokeDB.setTableName('userJokes'); txt = "Добавлено на рассмотрение"
+                if id == config.adminID: 
+                    txt = "Сохранил"
+                else: 
+                    jokeDB.setTableName('userJokes')
+                    txt = "Добавлено на рассмотрение"
                 jokeDB.newRecord(joke)
                 bot.send_message(message.chat.id, txt)
                 bot.send_message(message.chat.id, "Напиши анекдот, или нажми /brake")
@@ -320,9 +350,26 @@ def uploadMsg(message):
                 bot.register_next_step_handler(message, uploadJoke)
         else:
             bot.send_message(message.chat.id, "Отменено")
-    else:
-        bot.send_message(message.chat.id, "Только текст, пиши или нажми /brake")
-        bot.register_next_step_handler(message, uploadMsg)
+    elif message.content_type == 'photo':
+        if message.photo.caption == '':
+            caption = message.caption
+            upPic = utils.UploadPic('')
+            file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
+            file = bot.download_file(file_info.file_path)
+            fileID = file_info.file_path.replace('photos/', '')
+            msgDB.newFileID(fileID)
+            msgDB.insertMsgForFileID(caption, fileID)
+            upPic.upload(file, file_info)
+            bot.send_message(message.chat.id, "Отправил")
+            del upPic
+        else:
+            upPic = utils.UploadPic('')
+            file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
+            file = bot.download_file(file_info.file_path)
+            msgDB.newFileID(file_info.file_path.replace('photos/', ''))
+            upPic.upload(file, file_info)
+            bot.send_message(message.chat.id, "Отправил")
+            del upPic
 
 
 def uploadWct(message):
