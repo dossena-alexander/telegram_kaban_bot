@@ -237,3 +237,33 @@ class Statistics(DB):
         txt = f"<b>Статистика</b>\n•Кабаны: <b>{self.b.getRecCount()}</b>\n•Пользователи: <b>{self.u.getRecCount()}</b>\n•Анекдоты: <b>{self.j.getRecCount()}</b>\n•Картинки: <b>{self.p.getRecCount()}</b>"
         return txt
 
+
+class new_suggestions(DB):
+    def __init__(self) -> None:
+        super().__init__()
+        self.tables = ['pics', 'userJokes', 'msgs']
+        self.photo = 0
+        self.jokes = 0
+        self.msgs = 0
+    
+
+    def exist(self) -> bool:
+        for i in self.tables:
+            self.table = i
+            count = self.getRecCount()
+            if count > 0:
+                # return True
+                if self.table == "pics":
+                    self.photo = count
+                elif self.table == "userJokes":
+                    self.jokes = count
+                elif self.table == "msgs":
+                    self.msgs = count
+                return True
+            else:
+                return False
+
+
+    def getMsg(self) -> str:
+        msg = f"Админ меню.\nПредложений: {self.photo}, {self.jokes}. Сообщений: {self.msgs}"
+        return msg
