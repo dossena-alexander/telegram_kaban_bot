@@ -50,6 +50,7 @@ class DB():
         self.bd.commit()
         log.info("Успешно")
 
+
     # in case of often uses recursive cursors, I had to use threading lock
     def getRecCount(self) -> int:
         try:
@@ -57,9 +58,10 @@ class DB():
             log.info("Количество записей БД в таблице: " + self.table)
             info = self.bd_cursor.execute(f"SELECT * FROM {self.table}")
             record = self.bd_cursor.fetchall()
-            return len(record)
         finally:
             lock.release()
+            return len(record)
+
 
     
     def getTableName(self) -> str:
@@ -248,22 +250,24 @@ class new_suggestions(DB):
     
 
     def exist(self) -> bool:
-        for i in self.tables:
-            self.table = i
+        exist = False
+
+        for table in self.tables:
+            self.table = table
             count = self.getRecCount()
+            print(count)
+            print(self.table)
             if count > 0:
-                # return True
+                exist = True
                 if self.table == "pics":
                     self.photo = count
                 elif self.table == "userJokes":
                     self.jokes = count
                 elif self.table == "msgs":
                     self.msgs = count
-                return True
-            else:
-                return False
+        return exist
 
 
     def getMsg(self) -> str:
-        msg = f"Админ меню.\nПредложений: {self.photo}, {self.jokes}. Сообщений: {self.msgs}"
+        msg = f"Админ меню.\nКартинок: {self.photo}. Сообщений: {self.msgs}. Анекдотов: {self.jokes}"
         return msg

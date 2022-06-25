@@ -1,6 +1,5 @@
 import telebot, random
 from datetime import date
-from bot.utils.db import new_suggestions
 import config
 import utils
 
@@ -19,7 +18,7 @@ adminMenu = utils.Menu()
 userMenu = utils.Menu()
 helpMenu = utils.Menu()
 userSubMenu = utils.Menu()
-new_suggestions = new_suggestions()
+new_suggestions = utils.new_suggestions()
 
 # soon...
 # shed = Shed()
@@ -61,7 +60,7 @@ def auth(message):
 def admin(message):
     if new_suggestions.exist():
         adminMenu.setMsg(new_suggestions.getMsg())
-    bot.send_message(message.chat.id, adminMenu.getMsg(), reply_markup=adminMenu.getInlineKeyboard())
+    bot.send_message(message.chat.id, adminMenu.getMsg(), reply_markup=adminMenu.getInlineKeyboard(), parse_mode="html")
 
 
 def user(message):
