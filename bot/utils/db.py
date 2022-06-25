@@ -255,8 +255,6 @@ class new_suggestions(DB):
         for table in self.tables:
             self.table = table
             count = self.getRecCount()
-            print(count)
-            print(self.table)
             if count > 0:
                 exist = True
                 if self.table == "pics":
