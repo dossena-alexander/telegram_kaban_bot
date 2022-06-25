@@ -222,6 +222,7 @@ def see_jokes(message):
         bot.send_message(message.chat.id, "Анекдотов нет", reply_markup=back_keyboard.get())
 
 
+
 def seePics(message):
     pass
 
