@@ -2,6 +2,7 @@ import telebot, random
 from datetime import date
 import config
 import utils
+import shutil
 
 #========================INSTANCE===================================
 

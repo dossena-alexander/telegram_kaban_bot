@@ -170,8 +170,7 @@ def callWorker(call):
     elif call.data == "Добавить":
         bot.delete_message(call.message.chat.id, call.message.message_id)
         adminPicDB.newRecord(userPicDB.getRecord(msgCounter))
-        upload = utils.UploadPic("admin")
-        upload.uploadDirectly(open(config.photos_path + adminPicDB.getPicID(msgCounter)))
+        shutil.move(config.recieved_photos_path + userPicDB.getPicID(msgCounter), config.photos_path)
         userPicDB.delRecord(userPicDB.getRecord(msgCounter))
         msgCounter += 1
         seePics(call.message)
