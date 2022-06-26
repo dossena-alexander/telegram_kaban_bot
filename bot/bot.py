@@ -1,4 +1,4 @@
-# v1.7.5
+# v1.7.5.1
 from header import *
 
 
@@ -64,7 +64,7 @@ def callWorker(call):
     
     elif call.data == "Анекдоты": #+
         bot.delete_message(call.message.chat.id, call.message.message_id)
-        see(call.message, userJokeDB, ["Выйти", "Далее", "Принять","Удалить"])
+        see(call.message, "txt", userJokeDB, ["Выйти", "Далее", "Принять","Удалить"])
     
     elif call.data == "Выйти": #+
         bot.edit_message_text(text=adminMenu.getMsg(), chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=adminMenu.getInlineKeyboard())
@@ -72,28 +72,28 @@ def callWorker(call):
     elif call.data == "Далее": #joke
         msgCounter += 1
         bot.delete_message(call.message.chat.id, call.message.message_id)
-        see(call.message, userJokeDB, ["Выйти", "Далее", "Принять","Удалить"])
+        see(call.message, "txt", userJokeDB, ["Выйти", "Далее", "Принять","Удалить"])
         
     elif call.data == "Далее>>": #msg
         msgCounter += 1
         bot.delete_message(call.message.chat.id, call.message.message_id)
-        see(call.message, msgDB, ["Выйти", "Далее>>", "Вычеркнуть"])
+        see(call.message, "txt", msgDB, ["Выйти", "Далее>>", "Вычеркнуть"])
     
     elif call.data == "Принять": #joke
         bot.delete_message(call.message.chat.id, call.message.message_id)
         adminJokeDB.newRecord(userJokeDB.getRecord(msgCounter))
         userJokeDB.delRecord(userJokeDB.getRecord(msgCounter))
-        see(call.message, userJokeDB, ["Выйти", "Далее", "Принять", "Удалить"])
+        see(call.message, "txt", userJokeDB, ["Выйти", "Далее", "Принять", "Удалить"])
     
     elif call.data == "Удалить": #joke
         bot.delete_message(call.message.chat.id, call.message.message_id)
         userJokeDB.delRecord(userJokeDB.getRecord(msgCounter))
-        see(call.message, userJokeDB, ["Выйти", "Далее", "Принять", "Удалить"])
+        see(call.message, "txt", userJokeDB, ["Выйти", "Далее", "Принять", "Удалить"])
     
     elif call.data == "Вычеркнуть": #msg
         bot.delete_message(call.message.chat.id, call.message.message_id)
         msgDB.delRecord(msgDB.getRecord(msgCounter))
-        see(call.message, msgDB, ["Выйти", "Далее>>", "Вычеркнуть"])
+        see(call.message, "txt", msgDB, ["Выйти", "Далее>>", "Вычеркнуть"])
     
     elif call.data == "Рассылка": #+
         bot.edit_message_text(text="Напиши сообщение пользователям", chat_id=call.message.chat.id, message_id=call.message.message_id)
@@ -104,11 +104,11 @@ def callWorker(call):
     
     elif call.data == "Сообщения":
         bot.delete_message(call.message.chat.id, call.message.message_id)
-        see(call.message, msgDB, ["Выйти", "Далее>>", "Вычеркнуть"])
+        see(call.message, "txt", msgDB, ["Выйти", "Далее>>", "Вычеркнуть"])
     
     elif call.data == "Картинки":
         bot.delete_message(call.message.chat.id, call.message.message_id)
-        seePics(call.message)
+        see(call.message, type="pic", db=userPicDB, keys=["выйти", "далее>", "Добавить", "Отменить"])
     
     elif call.data == "Сообщение админу":
         bot.edit_message_text(text="Напиши сообщение или нажми /brake", chat_id=call.message.chat.id, message_id=call.message.message_id)
@@ -162,52 +162,23 @@ def callWorker(call):
     elif call.data == "далее>":
         msgCounter += 1
         bot.delete_message(call.message.chat.id, call.message.message_id)
-        seePics(call.message)
+        see(call.message, type="pic", db=userPicDB, keys=["выйти", "далее>", "Добавить", "Отменить"])
 
     elif call.data == "Добавить":
         bot.delete_message(call.message.chat.id, call.message.message_id)
         adminPicDB.newRecord(userPicDB.getRecord(msgCounter))
         shutil.move(config.recieved_photos_path + userPicDB.getPicID(msgCounter), config.photos_path)
         userPicDB.delRecord(userPicDB.getRecord(msgCounter))
-        seePics(call.message)
+        see(call.message, type="pic", db=userPicDB, keys=["выйти", "далее>", "Добавить", "Отменить"])
 
     elif call.data == "Отменить":    
         bot.delete_message(call.message.chat.id, call.message.message_id)
         os.remove(config.recieved_photos_path + userPicDB.getPicID(msgCounter))
         userPicDB.delRecord(userPicDB.getRecord(msgCounter))
-        seePics(call.message)
+        see(call.message, type="pic", db=userPicDB, keys=["выйти", "далее>", "Добавить", "Отменить"])
 
 
-def seePics(message):
-    global msgCounter
-
-    keys = [
-        "выйти", "далее>", 
-        "Добавить", "Отменить"
-    ]
-    back_key = ["Выйти"]
-    stand_keyboard = utils.InlineKeyboard()
-    stand_keyboard.add(keys)
-    stand_keyboard.autoRow()
-    back_keyboard = utils.InlineKeyboard()
-    back_keyboard.add(back_key)
-
-    # get records len with DB method
-    record_len = userPicDB.getRecCount()
-    if record_len != 0:
-        if msgCounter < record_len: # msgCounter is counter which increase and count every each record 
-            bot.send_photo(message.chat.id, open(config.recieved_photos_path + userPicDB.getPicID(msgCounter), "rb"), reply_markup=stand_keyboard.get())
-        else:
-            msgCounter = 0
-            bot.send_message(
-                message.chat.id,
-                "Сообщения кончились",
-                reply_markup=back_keyboard.get())
-    else:
-        bot.send_message(message.chat.id, "Сообщений нет", reply_markup=back_keyboard.get())
-
-
-def see(message, db: utils.DB, keys: list):
+def see(message, type: str, db: utils.DB, keys: list):
     global msgCounter
 
     back_key = ["Выйти"]
@@ -221,10 +192,16 @@ def see(message, db: utils.DB, keys: list):
     record_len = db.getRecCount()
     if record_len != 0:
         if msgCounter < record_len: # msgCounter is counter which increase and count every each record 
-            bot.send_message(message.chat.id,
-                f"{record_len} записей\n" +
-                f"{db.getRecord(recNum=msgCounter)}",
-                reply_markup=stand_keyboard.get())
+            if type == "txt":
+                bot.send_message(message.chat.id,
+                    f"{record_len} записей\n" +
+                    f"{db.getRecord(recNum=msgCounter)}",
+                    reply_markup=stand_keyboard.get())
+            else:
+                bot.send_photo(message.chat.id, 
+                    open(config.recieved_photos_path + userPicDB.getPicID(msgCounter), "rb"),
+                    reply_markup=stand_keyboard.get(),
+                    caption=f"{record_len} записей")
         else:
             msgCounter = 0
             bot.send_message(
