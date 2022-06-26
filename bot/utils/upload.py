@@ -18,4 +18,11 @@ class UploadPic():
             new_file.write(file)
         log.info("Успешно")
 
+    
+    def uploadDirectly(self, file) -> None:
+        log.info("UploadPic -- Загрузка файла")
+        src = self.main_src
+        with open(src, 'wb') as new_file:
+            new_file.write(file)
+        log.info("Успешно")
 
