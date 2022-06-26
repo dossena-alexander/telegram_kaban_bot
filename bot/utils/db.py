@@ -51,6 +51,13 @@ class DB():
         log.info("Успешно")
 
 
+    def hasRecords(self) -> bool:
+        info = self.bd_cursor.execute(f'SELECT * FROM {self.table}')
+        record = self.bd_cursor.fetchall()
+        if len(record) == 0: return False
+        else: return True
+
+
     # in case of often uses recursive cursors, I had to use threading lock
     def getRecCount(self) -> int:
         try:
@@ -62,6 +69,12 @@ class DB():
             lock.release()
             return len(record)
 
+
+    def getRecord(self, recNum: int) -> str:
+        info = self.bd_cursor.execute(f'SELECT * FROM {self.table}')
+        record = self.bd_cursor.fetchall()
+        rec = record[recNum]
+        return rec[0]
 
     
     def getTableName(self) -> str:
@@ -136,39 +149,11 @@ class JokeDB(DB):
         self.col = 'joke'
 
 
-    def getJoke(self, recNum: int) -> str:
-        info = self.bd_cursor.execute(f'SELECT * FROM {self.table}')
-        record = self.bd_cursor.fetchall()
-        joke = record[recNum]
-        return joke[0]
-
-
-    def hasJokes(self) -> bool:
-        info = self.bd_cursor.execute(f'SELECT * FROM {self.table}')
-        record = self.bd_cursor.fetchall()
-        if len(record) == 0: return False
-        else: return True
-
-
 class MsgDB(DB):
     def __init__(self) -> None:
         super().__init__()
         self.table = "msgs"
         self.col = 'msg'
-
-
-    def getMsg(self, recNum: int) -> str:
-        info = self.bd_cursor.execute(f'SELECT * FROM {self.table}')
-        record = self.bd_cursor.fetchall()
-        msg = record[recNum]
-        return msg[0]
-
-
-    def hasMsg(self) -> bool:
-        info = self.bd_cursor.execute(f'SELECT * FROM {self.table}')
-        record = self.bd_cursor.fetchall()
-        if len(record) == 0: return False
-        else: return True
 
 
     def getFileID(self, recNum: int) -> str:
@@ -198,12 +183,6 @@ class PicDB(DB):
         self.table = table
         self.col = 'fileID'
     
-
-    def hasPics(self) -> bool:
-        info = self.bd_cursor.execute(f'SELECT * FROM {self.table}')
-        record = self.bd_cursor.fetchall()
-        if len(record) == 0: return False
-
     
     def getPicID(self, recNum: int) -> str:
         info = self.bd_cursor.execute(f'SELECT * FROM {self.table}')
@@ -244,13 +223,13 @@ class new_suggestions(DB):
     def __init__(self) -> None:
         super().__init__()
         self.tables = ['pics', 'userJokes', 'msgs']
-        self.photo = 0
-        self.jokes = 0
-        self.msgs = 0
     
 
     def exist(self) -> bool:
         exist = False
+        self.photo = 0
+        self.jokes = 0
+        self.msgs = 0
 
         for table in self.tables:
             self.table = table
