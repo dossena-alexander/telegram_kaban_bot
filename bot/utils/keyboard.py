@@ -6,17 +6,17 @@ class ReplyKeyboard():
         self.keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
 
 
-    def get(self):
+    def get(self) -> types.ReplyKeyboardMarkup:
         return self.keyboard
 
 
-    def add(self, keys: list):
+    def add(self, keys: list) -> None:
         self._keys = keys
         for button in keys:
             self.keyboard.add(button)
 
 
-    def autoRow(self):
+    def autoRow(self) -> None:
         """
         one row -- two buttons
         """
@@ -40,11 +40,11 @@ class InlineKeyboard():
         self.keyboard = types.InlineKeyboardMarkup()
 
 
-    def get(self):
+    def get(self) -> types.InlineKeyboardMarkup:
         return self.keyboard
 
 
-    def add(self, keys: list):
+    def add(self, keys: list) -> None:
         """
         keys text is button and callback data
         """
@@ -54,7 +54,17 @@ class InlineKeyboard():
             self.keyboard.add(button)
 
 
-    def autoRow(self):
+    def addUrlButton(self, key: str, url: str) -> None:
+        button = types.InlineKeyboardButton(text=key, url=url)
+        self.keyboard.add(button)
+
+    
+    def rowUrlButton(self, key: str, url: str) -> None:
+        button = types.InlineKeyboardButton(text=key, url=url)
+        self.keyboard.row(button)
+
+
+    def autoRow(self) -> None:
         """
         one row -- two buttons
         """

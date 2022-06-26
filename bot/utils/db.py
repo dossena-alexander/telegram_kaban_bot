@@ -1,7 +1,9 @@
 import sqlite3
 import config
 from utils.logger import log
+import threading
 
+lock = threading.Lock()
 
 # DB structure
 #      +---------------------------------+
@@ -41,18 +43,37 @@ class DB():
         log.info("Успешно")
 
 
-    def newRecord(self, record) -> None:
+    def newRecord(self, record: str) -> None:
         log.info("Новая запись БД в таблице: " + self.table + " Столбец: " + self.col)
         self.bd_cursor.execute(f'INSERT INTO {self.table} ({self.col}) VALUES (?)', (record, ) ) 
         self.bd.commit()
         log.info("Успешно")
 
 
-    def getRecCount(self) -> int:
-        log.info("Количество записей БД в таблице: " + self.table)
-        info = self.bd_cursor.execute(f"SELECT * FROM {self.table}")
+    def hasRecords(self) -> bool:
+        info = self.bd_cursor.execute(f'SELECT * FROM {self.table}')
         record = self.bd_cursor.fetchall()
-        return len(record)
+        if len(record) == 0: return False
+        else: return True
+
+
+    # in case of often uses recursive cursors, I had to use threading lock
+    def getRecCount(self) -> int:
+        try:
+            lock.acquire(True)
+            log.info("Количество записей БД в таблице: " + self.table)
+            info = self.bd_cursor.execute(f"SELECT * FROM {self.table}")
+            record = self.bd_cursor.fetchall()
+        finally:
+            lock.release()
+            return len(record)
+
+
+    def getRecord(self, recNum: int) -> str:
+        info = self.bd_cursor.execute(f'SELECT * FROM {self.table}')
+        record = self.bd_cursor.fetchall()
+        rec = record[recNum]
+        return rec[0]
 
     
     def getTableName(self) -> str:
@@ -79,10 +100,16 @@ class UserDB(DB):
 
     
     def getUsersList(self) -> list:
-        info = self.bd_cursor.execute(f'SELECT userID FROM {self.table}')
-        records = self.bd_cursor.fetchall()
-        records_listed = [record[0] for record in records]
-        return records_listed
+        try:
+            lock.acquire(True)
+            log.info("Getting users list")
+            info = self.bd_cursor.execute(f'SELECT userID FROM {self.table}')
+            records = self.bd_cursor.fetchall()
+            records_listed = [record[0] for record in records]
+            log.info("Успешно")
+            return records_listed
+        finally:
+            lock.release()
 
 
     def getWctForUser(self, userID: int) -> str:
@@ -123,20 +150,6 @@ class JokeDB(DB):
         self.col = 'joke'
 
 
-    def getJoke(self, recNum: int) -> str:
-        info = self.bd_cursor.execute(f'SELECT * FROM {self.table}')
-        record = self.bd_cursor.fetchall()
-        joke = record[recNum]
-        return joke[0]
-
-
-    def hasJokes(self) -> bool:
-        info = self.bd_cursor.execute(f'SELECT * FROM {self.table}')
-        record = self.bd_cursor.fetchall()
-        if len(record) == 0: return False
-        else: return True
-
-
 class MsgDB(DB):
     def __init__(self) -> None:
         super().__init__()
@@ -144,25 +157,25 @@ class MsgDB(DB):
         self.col = 'msg'
 
 
-    def getMsg(self, recNum: int) -> str:
-        info = self.bd_cursor.execute(f'SELECT * FROM {self.table}')
+    def getFileID(self, recNum: int) -> str:
+        info = self.bd_cursor.execute(f'SELECT fileID FROM {self.table}')
         record = self.bd_cursor.fetchall()
         msg = record[recNum]
         return msg[0]
 
+    # new record with file id of photo sent to admin
+    def newFileID(self, record: str) -> None:
+        log.info("Новая запись БД в таблице: " + self.table + " Столбец: fileID")
+        self.bd_cursor.execute(f'INSERT INTO {self.table} (fileID) VALUES (?)', (record, ) ) 
+        self.bd.commit()
+        log.info("Успешно")
 
-    def hasMsg(self) -> bool:
-        info = self.bd_cursor.execute(f'SELECT * FROM {self.table}')
-        record = self.bd_cursor.fetchall()
-        if len(record) == 0: return False
-        else: return True
-
-
-    def seeMsg(self, recNum: int) -> str:
-        info = self.bd_cursor.execute(f'SELECT * FROM {self.table}')
-        record = self.bd_cursor.fetchall()
-        msg = record[recNum]
-        return msg[0]
+    # new record with caption below photo sent to admin
+    def insertMsgForFileID(self, msg: str, fileID: str) -> None:
+        log.info("")
+        self.bd_cursor.execute(f'UPDATE {self.table} SET msg = {msg} WHERE fileID={fileID}')
+        self.bd.commit()
+        log.info("Успешно")
 
 
 class PicDB(DB):
@@ -171,12 +184,6 @@ class PicDB(DB):
         self.table = table
         self.col = 'fileID'
     
-
-    def hasPics(self) -> bool:
-        info = self.bd_cursor.execute(f'SELECT * FROM {self.table}')
-        record = self.bd_cursor.fetchall()
-        if len(record) == 0: return False
-
     
     def getPicID(self, recNum: int) -> str:
         info = self.bd_cursor.execute(f'SELECT * FROM {self.table}')
@@ -213,4 +220,32 @@ class Statistics(DB):
         return txt
 
 
-x = UserDB()
+class new_suggestions(DB):
+    def __init__(self) -> None:
+        super().__init__()
+        self.tables = ['pics', 'userJokes', 'msgs']
+    
+
+    def exist(self) -> bool:
+        exist = False
+        self.photo = 0
+        self.jokes = 0
+        self.msgs = 0
+
+        for table in self.tables:
+            self.table = table
+            count = self.getRecCount()
+            if count > 0:
+                exist = True
+                if self.table == "pics":
+                    self.photo = count
+                elif self.table == "userJokes":
+                    self.jokes = count
+                elif self.table == "msgs":
+                    self.msgs = count
+        return exist
+
+
+    def getMsg(self) -> str:
+        msg = f"Админ меню.\nКартинок: {self.photo}. Сообщений: {self.msgs}. Анекдотов: {self.jokes}"
+        return msg
