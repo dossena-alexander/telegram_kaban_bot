@@ -83,19 +83,16 @@ def callWorker(call):
         bot.delete_message(call.message.chat.id, call.message.message_id)
         adminJokeDB.newRecord(userJokeDB.getRecord(msgCounter))
         userJokeDB.delRecord(userJokeDB.getRecord(msgCounter))
-        msgCounter += 1
         see(call.message, userJokeDB, ["Выйти", "Далее", "Принять", "Удалить"])
     
     elif call.data == "Удалить": #joke
         bot.delete_message(call.message.chat.id, call.message.message_id)
         userJokeDB.delRecord(userJokeDB.getRecord(msgCounter))
-        msgCounter = 0
         see(call.message, userJokeDB, ["Выйти", "Далее", "Принять", "Удалить"])
     
     elif call.data == "Вычеркнуть": #msg
         bot.delete_message(call.message.chat.id, call.message.message_id)
         msgDB.delRecord(msgDB.getRecord(msgCounter))
-        msgCounter = 0
         see(call.message, msgDB, ["Выйти", "Далее>>", "Вычеркнуть"])
     
     elif call.data == "Рассылка": #+
@@ -172,13 +169,12 @@ def callWorker(call):
         adminPicDB.newRecord(userPicDB.getRecord(msgCounter))
         shutil.move(config.recieved_photos_path + userPicDB.getPicID(msgCounter), config.photos_path)
         userPicDB.delRecord(userPicDB.getRecord(msgCounter))
-        msgCounter += 1
         seePics(call.message)
 
     elif call.data == "Отменить":    
         bot.delete_message(call.message.chat.id, call.message.message_id)
+        os.remove(config.recieved_photos_path + userPicDB.getPicID(msgCounter))
         userPicDB.delRecord(userPicDB.getRecord(msgCounter))
-        msgCounter = 0
         seePics(call.message)
 
 
