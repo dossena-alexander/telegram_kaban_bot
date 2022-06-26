@@ -28,7 +28,7 @@ userMenu = utils.Menu()
 helpMenu = utils.Menu()
 userSubMenu = utils.Menu()
 
-#========================SET-UP===================================
+#========================MENU_SET-UP===================================
 
 userSubMenu.setMsg(config.userSubMenuMsg)
 helpMenu.setMsg(config.helpMsg)
