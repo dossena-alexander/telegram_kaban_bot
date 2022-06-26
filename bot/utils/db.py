@@ -1,4 +1,3 @@
-from distutils.spawn import find_executable
 import sqlite3
 import config
 from utils.logger import log
@@ -103,9 +102,11 @@ class UserDB(DB):
     def getUsersList(self) -> list:
         try:
             lock.acquire(True)
+            log.info("Getting users list")
             info = self.bd_cursor.execute(f'SELECT userID FROM {self.table}')
             records = self.bd_cursor.fetchall()
             records_listed = [record[0] for record in records]
+            log.info("Успешно")
             return records_listed
         finally:
             lock.release()
