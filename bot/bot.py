@@ -13,17 +13,14 @@ def start(message):
 
 @bot.message_handler(commands=["auth"])
 def auth(message):
-    # as long as user.id is integer, userID get it in string to be recorded to DB (column has string type)
-    userID = str(message.from_user.id) 
+    userID = message.from_user.id
     if userID == str(config.adminID):
         admin(message)
     else:
         usersList = userDB.getUsersList()
         if userID not in usersList:
             userDB.addUser(userID)
-            user(message)
-        else:
-            user(message)
+        user(message)
 
 
 def admin(message):
