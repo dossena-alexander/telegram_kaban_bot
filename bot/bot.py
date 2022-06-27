@@ -96,7 +96,7 @@ def callWorker(call):
         see(call.message, "txt", msgDB, ["Выйти", "Далее>>", "Вычеркнуть"])
     
     elif call.data == "Рассылка": #+
-        bot.edit_message_text(text="Напиши сообщение пользователям", chat_id=call.message.chat.id, message_id=call.message.message_id)
+        bot.edit_message_text(text="Напиши сообщение пользователям, или нажми /brake", chat_id=call.message.chat.id, message_id=call.message.message_id)
         bot.register_next_step_handler(call.message, notify)
     
     elif call.data == "Пользователь": #+
@@ -382,7 +382,7 @@ def textWorker(message):
     msg = message.text.lower()
     if msg == "фотокарточка":
         bot.send_photo(message.chat.id, 
-        open(config.recieved_photos_path + adminPicDB.getPicID(recNum=random.randint(0, adminPicDB.getRecCount() - 1)), "rb"))
+        open(config.photos_path + adminPicDB.getPicID(recNum=random.randint(0, adminPicDB.getRecCount() - 1)), "rb"))
     elif msg == "анекдот":
         bot.send_message(message.chat.id, 
         adminJokeDB.getRecord(recNum=random.randint(0, adminJokeDB.getRecCount() - 1)))
