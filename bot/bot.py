@@ -253,7 +253,7 @@ def uploadPicture(message):
             picDB.newRecord(file_info.file_path.replace('photos/', ''))
             upPic.upload(file, file_info)
             bot.send_message(message.chat.id, txt)
-            bot.send_message(message.chat.id, "Пришли еще картинку или нажми /brake")
+            bot.send_message(message.chat.id, "Пришли еще картинку. Для отмены нажми /brake")
             del picDB
             bot.register_next_step_handler(message, uploadPicture)
     else:
@@ -261,10 +261,10 @@ def uploadPicture(message):
             if message.text.lower() == "/brake":
                 bot.send_message(message.chat.id, "Отменено")  
             else:
-                bot.send_message(message.chat.id, "Это не картинка!")
+                bot.send_message(message.chat.id, "Это не то, но я жду картинку. Для отмены нажми /brake")
                 bot.register_next_step_handler(message, uploadPicture)    
         else:      
-            bot.send_message(message.chat.id, "Это не картинка!")
+            bot.send_message(message.chat.id, "Это не то, но я жду картинку. Для отмены нажми /brake")
             bot.register_next_step_handler(message, uploadPicture)
 
 
@@ -282,15 +282,15 @@ def uploadJoke(message):
                     txt = "Добавлено на рассмотрение"
                 jokeDB.newRecord(joke)
                 bot.send_message(message.chat.id, txt)
-                bot.send_message(message.chat.id, "Напиши анекдот, или нажми /brake")
+                bot.send_message(message.chat.id, "Напиши анекдот. Для отмены нажми /brake")
                 bot.register_next_step_handler(message, uploadJoke)
             else:
-               bot.send_message(message.chat.id, "Это не то, но я жду твой анекдот") 
+               bot.send_message(message.chat.id, "Это не то, но я жду твой анекдот. Для отмены нажми /brake") 
                bot.register_next_step_handler(message, uploadJoke)
         else:
             bot.send_message(message.chat.id, "Отменено")
     else:
-        bot.send_message(message.chat.id, "Только текст, пиши или нажми /brake")
+        bot.send_message(message.chat.id, "Это не то, но я жду твой анекдот. Для отмены нажми /brake")
         bot.register_next_step_handler(message, uploadJoke)
 
 
@@ -301,7 +301,7 @@ def uploadMsg(message):
                 msgDB.newRecord(message.text)
                 bot.send_message(message.chat.id, "Отправлено")
             else:
-                bot.send_message(message.chat.id, "Это не то, но я жду твое сообщение")
+                bot.send_message(message.chat.id, "Это не то, но я жду твое сообщение. Для отмены нажми /brake")
                 bot.register_next_step_handler(message, uploadJoke)
         else:
             bot.send_message(message.chat.id, "Отменено")
@@ -400,6 +400,9 @@ if __name__ == "__main__":
         utils.log.info("BOT STARTED")
         bot.polling()
     except:
-        print("BOT reSTARTED")
-        utils.log.info("BOT reSTARTED")
-        bot.polling()
+        bot.send_message(config.adminID, "bot stoped")
+        # you may use bot.polling() or sh script to restart bot.py
+        # for sh script use:
+        # import subprocess
+        # proc = subprocess.Popen('./your_sh.sh', stdout=subprocess.PIPE)
+        # output = proc.stdout.read()
