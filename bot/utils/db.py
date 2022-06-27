@@ -64,9 +64,9 @@ class DB():
             log.info("Количество записей БД в таблице: " + self.table)
             info = self.bd_cursor.execute(f"SELECT * FROM {self.table}")
             record = self.bd_cursor.fetchall()
+            return len(record)
         finally:
             lock.release()
-            return len(record)
 
 
     def getRecord(self, recNum: int) -> str:
@@ -107,6 +107,7 @@ class UserDB(DB):
             records = self.bd_cursor.fetchall()
             records_listed = [record[0] for record in records]
             log.info("Успешно")
+            # records_listed is integer list
             return records_listed
         finally:
             lock.release()
