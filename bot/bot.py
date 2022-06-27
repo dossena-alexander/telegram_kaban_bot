@@ -1,4 +1,4 @@
-# v1.7.5
+# v1.7.5.2
 from header import *
 
 
@@ -13,17 +13,14 @@ def start(message):
 
 @bot.message_handler(commands=["auth"])
 def auth(message):
-    # as long as user.id is integer, userID get it in string to be recorded to DB (column has string type)
-    userID = str(message.from_user.id) 
-    if userID == str(config.adminID):
+    userID = message.from_user.id
+    if userID == config.adminID:
         admin(message)
     else:
         usersList = userDB.getUsersList()
         if userID not in usersList:
             userDB.addUser(userID)
-            user(message)
-        else:
-            user(message)
+        user(message)
 
 
 def admin(message):
@@ -48,76 +45,18 @@ def callWorker(call):
     global msgCounter 
 
     bot.answer_callback_query(call.id)
+#========================COMM====================================================    
 
     if call.data == 'Загрузить картинку': #+
         bot.edit_message_text(text="Пришли картинку, или нажми /brake", chat_id=call.message.chat.id, message_id=call.message.message_id)
         bot.register_next_step_handler(call.message, uploadPicture)
-    
+
     elif call.data == 'Загрузить анекдот': #+
         bot.edit_message_text(text="Напиши анекдот, или нажми /brake", chat_id=call.message.chat.id, message_id=call.message.message_id)
         bot.register_next_step_handler(call.message, uploadJoke)
-    
-    elif call.data == "Остановить бота": #+
-        bot.answer_callback_query(call.id, 'Бот остановлен')
-        utils.log.info("ОСТАНОВКА БОТА")
-        bot.stop_polling()
-    
-    elif call.data == "Анекдоты": #+
-        bot.delete_message(call.message.chat.id, call.message.message_id)
-        see(call.message, userJokeDB, ["Выйти", "Далее", "Принять","Удалить"])
-    
-    elif call.data == "Выйти": #+
-        bot.edit_message_text(text=adminMenu.getMsg(), chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=adminMenu.getInlineKeyboard())
-    
-    elif call.data == "Далее": #joke
-        msgCounter += 1
-        bot.delete_message(call.message.chat.id, call.message.message_id)
-        see(call.message, userJokeDB, ["Выйти", "Далее", "Принять","Удалить"])
-        
-    elif call.data == "Далее>>": #msg
-        msgCounter += 1
-        bot.delete_message(call.message.chat.id, call.message.message_id)
-        see(call.message, msgDB, ["Выйти", "Далее>>", "Вычеркнуть"])
-    
-    elif call.data == "Принять": #joke
-        bot.delete_message(call.message.chat.id, call.message.message_id)
-        adminJokeDB.newRecord(userJokeDB.getRecord(msgCounter))
-        userJokeDB.delRecord(userJokeDB.getRecord(msgCounter))
-        see(call.message, userJokeDB, ["Выйти", "Далее", "Принять", "Удалить"])
-    
-    elif call.data == "Удалить": #joke
-        bot.delete_message(call.message.chat.id, call.message.message_id)
-        userJokeDB.delRecord(userJokeDB.getRecord(msgCounter))
-        see(call.message, userJokeDB, ["Выйти", "Далее", "Принять", "Удалить"])
-    
-    elif call.data == "Вычеркнуть": #msg
-        bot.delete_message(call.message.chat.id, call.message.message_id)
-        msgDB.delRecord(msgDB.getRecord(msgCounter))
-        see(call.message, msgDB, ["Выйти", "Далее>>", "Вычеркнуть"])
-    
-    elif call.data == "Рассылка": #+
-        bot.edit_message_text(text="Напиши сообщение пользователям", chat_id=call.message.chat.id, message_id=call.message.message_id)
-        bot.register_next_step_handler(call.message, notify)
-    
-    elif call.data == "Пользователь": #+
-        bot.edit_message_text(text=userMenu.getMsg(), chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=userMenu.getInlineKeyboard())
-    
-    elif call.data == "Сообщения":
-        bot.delete_message(call.message.chat.id, call.message.message_id)
-        see(call.message, msgDB, ["Выйти", "Далее>>", "Вычеркнуть"])
-    
-    elif call.data == "Картинки":
-        bot.delete_message(call.message.chat.id, call.message.message_id)
-        seePics(call.message)
-    
-    elif call.data == "Сообщение админу":
-        bot.edit_message_text(text="Напиши сообщение или нажми /brake", chat_id=call.message.chat.id, message_id=call.message.message_id)
-        bot.register_next_step_handler(call.message, uploadMsg)
-    
-    elif call.data == "Добавить кабана":
-        bot.edit_message_text(text="Отправь фото или нажми /brake", chat_id=call.message.chat.id, message_id=call.message.message_id)
-        bot.register_next_step_handler(call.message, uploadWct)
-    
+
+#========================ADMIN_MENU====================================================
+
     elif call.data == "Статистика":
         stats = utils.Statistics()
         back = utils.InlineKeyboard()
@@ -128,9 +67,11 @@ def callWorker(call):
     elif call.data == "Назад":
         bot.edit_message_text(text=adminMenu.getMsg(), chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=adminMenu.getInlineKeyboard())
     
-    elif call.data == "Вернуться":
-        bot.edit_message_text(text=userMenu.getMsg(), chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=userMenu.getInlineKeyboard())
-    
+    elif call.data == "Остановить бота": #+
+        bot.answer_callback_query(call.id, 'Бот остановлен')
+        utils.log.info("ОСТАНОВКА БОТА")
+        bot.stop_polling()
+
     elif call.data == "Предложения":
         keyboard = utils.InlineKeyboard()
         keyboard.add(["Картинки", "Анекдоты"])
@@ -145,13 +86,80 @@ def callWorker(call):
         keyboard.add(["Назад"])
         bot.edit_message_text(text="Загрузка", chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard.get())
     
-    elif call.data == "Кабаний перевод телеграмм":
-        keyboard = utils.InlineKeyboard()
-        keyboard.addUrlButton("Русский", "https://t.me/setlanguage/ru")
-        keyboard.addUrlButton("Кабаний", "https://t.me/setlanguage/kabanchikoff")
-        keyboard.add(["Вернуться"])
-        bot.edit_message_text(text=userSubMenu.getMsg(), chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard.get())
+    elif call.data == "Рассылка": #+
+        bot.edit_message_text(text="Напиши сообщение пользователям, или нажми /brake", chat_id=call.message.chat.id, message_id=call.message.message_id)
+        bot.register_next_step_handler(call.message, notify)
     
+    elif call.data == "Пользователь": #+
+        bot.edit_message_text(text=userMenu.getMsg(), chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=userMenu.getInlineKeyboard())
+
+    elif call.data == "Картинки":
+        bot.delete_message(call.message.chat.id, call.message.message_id)
+        see(call.message, type="pic", db=userPicDB, keys=["выйти", "далее>", "Добавить", "Отменить"])
+
+    elif call.data == "Добавить кабана":
+        bot.edit_message_text(text="Отправь фото или нажми /brake", chat_id=call.message.chat.id, message_id=call.message.message_id)
+        bot.register_next_step_handler(call.message, uploadWct)
+
+#========================ADMIN_SEE_PICS===================================
+
+    elif call.data == "далее>":
+        msgCounter += 1
+        bot.delete_message(call.message.chat.id, call.message.message_id)
+        see(call.message, type="pic", db=userPicDB, keys=["выйти", "далее>", "Добавить", "Отменить"])
+
+    elif call.data == "Добавить":
+        bot.delete_message(call.message.chat.id, call.message.message_id)
+        adminPicDB.newRecord(userPicDB.getRecord(msgCounter))
+        shutil.move(config.recieved_photos_path + userPicDB.getPicID(msgCounter), config.photos_path)
+        userPicDB.delRecord(userPicDB.getRecord(msgCounter))
+        see(call.message, type="pic", db=userPicDB, keys=["выйти", "далее>", "Добавить", "Отменить"])
+
+    elif call.data == "Отменить":    
+        bot.delete_message(call.message.chat.id, call.message.message_id)
+        os.remove(config.recieved_photos_path + userPicDB.getPicID(msgCounter))
+        userPicDB.delRecord(userPicDB.getRecord(msgCounter))
+        see(call.message, type="pic", db=userPicDB, keys=["выйти", "далее>", "Добавить", "Отменить"])
+
+#========================ADMIN_SEE_JOKE===================================
+
+    elif call.data == "Анекдоты": 
+        bot.delete_message(call.message.chat.id, call.message.message_id)
+        see(call.message, "txt", userJokeDB, ["Выйти", "Далее", "Принять","Удалить"])
+
+    elif call.data == "Далее": #joke
+        msgCounter += 1
+        bot.delete_message(call.message.chat.id, call.message.message_id)
+        see(call.message, "txt", userJokeDB, ["Выйти", "Далее", "Принять","Удалить"])
+
+    elif call.data == "Принять": #joke
+        bot.delete_message(call.message.chat.id, call.message.message_id)
+        adminJokeDB.newRecord(userJokeDB.getRecord(msgCounter))
+        userJokeDB.delRecord(userJokeDB.getRecord(msgCounter))
+        see(call.message, "txt", userJokeDB, ["Выйти", "Далее", "Принять", "Удалить"])
+
+    elif call.data == "Удалить": #joke
+        bot.delete_message(call.message.chat.id, call.message.message_id)
+        userJokeDB.delRecord(userJokeDB.getRecord(msgCounter))
+        see(call.message, "txt", userJokeDB, ["Выйти", "Далее", "Принять", "Удалить"])
+
+#========================ADMIN_SEE_MESSAGES===================================
+
+    elif call.data == "Сообщения":
+        bot.delete_message(call.message.chat.id, call.message.message_id)
+        see(call.message, "txt", msgDB, ["Выйти", "Далее>>", "Вычеркнуть"])
+
+    elif call.data == "Далее>>": #msg
+        msgCounter += 1
+        bot.delete_message(call.message.chat.id, call.message.message_id)
+        see(call.message, "txt", msgDB, ["Выйти", "Далее>>", "Вычеркнуть"])
+
+    elif call.data == "Вычеркнуть": #msg
+        bot.delete_message(call.message.chat.id, call.message.message_id)
+        msgDB.delRecord(msgDB.getRecord(msgCounter))
+        see(call.message, "txt", msgDB, ["Выйти", "Далее>>", "Вычеркнуть"])
+
+#========================USER_MENU====================================================
     elif call.data == "Загрузить":
         keyboard = utils.InlineKeyboard()
         keyboard.add(["Загрузить картинку", "Загрузить анекдот"])
@@ -159,72 +167,44 @@ def callWorker(call):
         keyboard.add(["Вернуться"])
         bot.edit_message_text(text="Загрузка", chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard.get())
 
-    elif call.data == "далее>":
-        msgCounter += 1
-        bot.delete_message(call.message.chat.id, call.message.message_id)
-        seePics(call.message)
+    elif call.data == "Сообщение админу":
+        bot.edit_message_text(text="Напиши сообщение или нажми /brake", chat_id=call.message.chat.id, message_id=call.message.message_id)
+        bot.register_next_step_handler(call.message, uploadMsg)
 
-    elif call.data == "Добавить":
-        bot.delete_message(call.message.chat.id, call.message.message_id)
-        adminPicDB.newRecord(userPicDB.getRecord(msgCounter))
-        shutil.move(config.recieved_photos_path + userPicDB.getPicID(msgCounter), config.photos_path)
-        userPicDB.delRecord(userPicDB.getRecord(msgCounter))
-        seePics(call.message)
-
-    elif call.data == "Отменить":    
-        bot.delete_message(call.message.chat.id, call.message.message_id)
-        os.remove(config.recieved_photos_path + userPicDB.getPicID(msgCounter))
-        userPicDB.delRecord(userPicDB.getRecord(msgCounter))
-        seePics(call.message)
+    elif call.data == "Кабаний перевод телеграмм":
+        keyboard = utils.InlineKeyboard()
+        keyboard.addUrlButton("Русский", "https://t.me/setlanguage/ru")
+        keyboard.addUrlButton("Кабаний", "https://t.me/setlanguage/kabanchikoff")
+        keyboard.add(["Вернуться"])
+        bot.edit_message_text(text=userSubMenu.getMsg(), chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard.get())
+    
+    elif call.data == "Вернуться":
+        bot.edit_message_text(text=userMenu.getMsg(), chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=userMenu.getInlineKeyboard())
 
 
-def seePics(message):
+def see(message, type: str, db: utils.DB, keys: list):
     global msgCounter
 
-    keys = [
-        "выйти", "далее>", 
-        "Добавить", "Отменить"
-    ]
-    back_key = ["Выйти"]
     stand_keyboard = utils.InlineKeyboard()
     stand_keyboard.add(keys)
     stand_keyboard.autoRow()
     back_keyboard = utils.InlineKeyboard()
-    back_keyboard.add(back_key)
-
-    # get records len with DB method
-    record_len = userPicDB.getRecCount()
-    if record_len != 0:
-        if msgCounter < record_len: # msgCounter is counter which increase and count every each record 
-            bot.send_photo(message.chat.id, open(config.recieved_photos_path + userPicDB.getPicID(msgCounter), "rb"), reply_markup=stand_keyboard.get())
-        else:
-            msgCounter = 0
-            bot.send_message(
-                message.chat.id,
-                "Сообщения кончились",
-                reply_markup=back_keyboard.get())
-    else:
-        bot.send_message(message.chat.id, "Сообщений нет", reply_markup=back_keyboard.get())
-
-
-def see(message, db: utils.DB, keys: list):
-    global msgCounter
-
-    back_key = ["Выйти"]
-    stand_keyboard = utils.InlineKeyboard()
-    stand_keyboard.add(keys)
-    stand_keyboard.autoRow()
-    back_keyboard = utils.InlineKeyboard()
-    back_keyboard.add(back_key)
+    back_keyboard.add(["Назад"])
 
     # get records len with DB method
     record_len = db.getRecCount()
     if record_len != 0:
         if msgCounter < record_len: # msgCounter is counter which increase and count every each record 
-            bot.send_message(message.chat.id,
-                f"{record_len} записей\n" +
-                f"{db.getRecord(recNum=msgCounter)}",
-                reply_markup=stand_keyboard.get())
+            if type == "txt":
+                bot.send_message(message.chat.id,
+                    f"{record_len} записей\n" +
+                    f"{db.getRecord(recNum=msgCounter)}",
+                    reply_markup=stand_keyboard.get())
+            else:
+                bot.send_photo(message.chat.id, 
+                    open(config.recieved_photos_path + userPicDB.getPicID(msgCounter), "rb"),
+                    reply_markup=stand_keyboard.get(),
+                    caption=f"{record_len} записей")
         else:
             msgCounter = 0
             bot.send_message(
@@ -233,7 +213,6 @@ def see(message, db: utils.DB, keys: list):
                 reply_markup=back_keyboard.get())
     else:
         bot.send_message(message.chat.id, "Сообщений нет", reply_markup=back_keyboard.get())
-
 
 
 def notify(message):
@@ -405,7 +384,7 @@ def textWorker(message):
     msg = message.text.lower()
     if msg == "фотокарточка":
         bot.send_photo(message.chat.id, 
-        open(config.recieved_photos_path + adminPicDB.getPicID(recNum=random.randint(0, adminPicDB.getRecCount() - 1)), "rb"))
+        open(config.photos_path + adminPicDB.getPicID(recNum=random.randint(0, adminPicDB.getRecCount() - 1)), "rb"))
     elif msg == "анекдот":
         bot.send_message(message.chat.id, 
         adminJokeDB.getRecord(recNum=random.randint(0, adminJokeDB.getRecCount() - 1)))
@@ -416,6 +395,11 @@ def textWorker(message):
 
 
 if __name__ == "__main__":
-    print("BOT STARTED")
-    utils.log.info("BOT STARTED")
-    bot.polling()
+    try:
+        print("BOT STARTED")
+        utils.log.info("BOT STARTED")
+        bot.polling()
+    except:
+        print("BOT reSTARTED")
+        utils.log.info("BOT reSTARTED")
+        bot.polling()
