@@ -14,7 +14,7 @@ def start(message):
 @bot.message_handler(commands=["auth"])
 def auth(message):
     userID = message.from_user.id
-    if userID == str(config.adminID):
+    if userID == config.adminID:
         admin(message)
     else:
         usersList = userDB.getUsersList()
@@ -395,6 +395,11 @@ def textWorker(message):
 
 
 if __name__ == "__main__":
-    print("BOT STARTED")
-    utils.log.info("BOT STARTED")
-    bot.polling()
+    try:
+        print("BOT STARTED")
+        utils.log.info("BOT STARTED")
+        bot.polling()
+    except:
+        print("BOT reSTARTED")
+        utils.log.info("BOT reSTARTED")
+        bot.polling()
