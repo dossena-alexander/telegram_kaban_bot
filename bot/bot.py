@@ -1,4 +1,4 @@
-# v1.7.5.2
+# v1.7.6
 from header import *
 
 
@@ -391,6 +391,10 @@ def textWorker(message):
     elif msg == "какой я кабан сегодня":
         if getWct(message) != None:
             bot.send_photo(message.chat.id, getWct(message))
+    elif msg == "расписание":
+        bot.send_message(message.chat.id, "Отправляю расписание")
+        bot.send_photo(message.chat.id, open(shedule.getShedule(), 'rb'), shedule.currentDay())
+
 
 
 

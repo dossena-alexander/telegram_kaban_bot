@@ -20,6 +20,7 @@ userJokeDB = utils.JokeDB("userJokes")
 
 msgCounter = 0 # records counter that`s used to see user msgs in admin menu
 new_suggestions = utils.new_suggestions()
+shedule = utils.Shedule()
 
 #========================MENU===================================
 
