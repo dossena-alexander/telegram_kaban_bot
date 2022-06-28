@@ -1,4 +1,3 @@
-import imp
 import time
 from config import shedule_path
 from utils.logger import log

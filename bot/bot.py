@@ -392,7 +392,6 @@ def textWorker(message):
         if getWct(message) != None:
             bot.send_photo(message.chat.id, getWct(message))
     elif msg == "расписание":
-        bot.send_message(message.chat.id, "Отправляю расписание")
         bot.send_photo(message.chat.id, open(shedule.getShedule(), 'rb'), shedule.currentDay())
 
 
