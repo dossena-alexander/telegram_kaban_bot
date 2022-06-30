@@ -5,25 +5,27 @@ import threading
 
 lock = threading.Lock()
 
-# DB structure
+#      DB structure
+# 
 #      +---------------------------------+
-#      |TABLES         |columns          |
+#      |TABLES         |COLUMNS          |
 #      |===============|=================|
 #      |accPics________|_________________|
-#      |               |fileID: STRING   |
+#      |               |fileID:  STRING  |
 #      |pics___________|_________________|
-#      |               |fileID: STRING   |
+#      |               |fileID:  STRING  |
 #      |adminJokes_____|_________________|
-#      |               |joke: STRING     |
+#      |               |joke:    STRING  |
 #      |userJokes______|_________________|
-#      |               |joke: STRING     |
+#      |               |joke:    STRING  |
 #      |boarsID________|_________________|
-#      |               |ID: STRING       |
+#      |               |ID:      STRING  |
 #      |msgs___________|_________________|
-#      |               |msg: STRING      |
+#      |               |msg:     STRING  |
+#      |               |fileID:  STRING  |
 #      |users__________|_________________|
-#      |               |userID: INTEGER  |
-#      |               |wctID: STRING    |
+#      |               |userID:  INTEGER |
+#      |               |wctID:   INTEGER |
 #      |               |prevDay: INTEGER |
 #      +---------------------------------+
 
@@ -37,24 +39,45 @@ class DB():
 
 
     def delRecord(self, record) -> None:
-        log.info("Удаление записи БД в таблице: " + self.table + " Столбец: " + self.col)
-        self.bd_cursor.execute( f'DELETE FROM {self.table} WHERE {self.col}=?', (record, ) )
-        self.bd.commit()
-        log.info("Успешно")
+        try:
+            lock.acquire(True)
+            log.info("Удаление записи БД в таблице: " + self.table + " Столбец: " + self.col)
+            self.bd_cursor.execute( f'DELETE FROM {self.table} WHERE {self.col}=?', (record, ) )
+            self.bd.commit()
+        except Exception as e:
+            log.error(e)
+            print(e)
+        finally:
+            log.info("Успешно")
+            lock.release()
 
 
     def newRecord(self, record: str) -> None:
-        log.info("Новая запись БД в таблице: " + self.table + " Столбец: " + self.col)
-        self.bd_cursor.execute(f'INSERT INTO {self.table} ({self.col}) VALUES (?)', (record, ) ) 
-        self.bd.commit()
-        log.info("Успешно")
+        try:
+            lock.acquire(True)
+            log.info("Новая запись БД в таблице: " + self.table + " Столбец: " + self.col)
+            self.bd_cursor.execute(f'INSERT INTO {self.table} ({self.col}) VALUES (?)', (record, ) ) 
+            self.bd.commit()
+        except Exception as e:
+            log.error(e)
+            print(e)
+        finally:
+            log.info("Успешно")
+            lock.release()
 
 
     def hasRecords(self) -> bool:
-        info = self.bd_cursor.execute(f'SELECT * FROM {self.table}')
-        record = self.bd_cursor.fetchall()
-        if len(record) == 0: return False
-        else: return True
+        try:
+            lock.acquire(True)
+            info = self.bd_cursor.execute(f'SELECT * FROM {self.table}')
+            record = self.bd_cursor.fetchall()
+            if len(record) == 0: return False
+            else: return True
+        except Exception as e:
+            log.error(e)
+            print(e)
+        finally:
+            lock.release()
 
 
     # in case of often uses recursive cursors, I had to use threading lock
@@ -64,16 +87,26 @@ class DB():
             log.info("Количество записей БД в таблице: " + self.table)
             info = self.bd_cursor.execute(f"SELECT * FROM {self.table}")
             record = self.bd_cursor.fetchall()
+            return len(record)
+        except Exception as e:
+            log.error(e)
+            print(e)
         finally:
             lock.release()
-            return len(record)
 
 
     def getRecord(self, recNum: int) -> str:
-        info = self.bd_cursor.execute(f'SELECT * FROM {self.table}')
-        record = self.bd_cursor.fetchall()
-        rec = record[recNum]
-        return rec[0]
+        try:
+            lock.acquire(True)    
+            info = self.bd_cursor.execute(f'SELECT * FROM {self.table}')
+            record = self.bd_cursor.fetchall()
+            rec = record[recNum]
+            return rec[0]
+        except Exception as e:
+            log.error(e)
+            print(e)
+        finally:
+            lock.release()
 
     
     def getTableName(self) -> str:
@@ -107,40 +140,79 @@ class UserDB(DB):
             records = self.bd_cursor.fetchall()
             records_listed = [record[0] for record in records]
             log.info("Успешно")
+            # records_listed is integer list
             return records_listed
+        except Exception as e:
+            log.error(e)
+            print(e)
         finally:
             lock.release()
 
 
     def getWctForUser(self, userID: int) -> str:
-        info = self.bd_cursor.execute(f'SELECT wctID FROM {self.table} WHERE userID={userID}')
-        return self.bd_cursor.fetchall()[0][0] # list > tuple > string
+        try:
+            lock.acquire(True)
+            info = self.bd_cursor.execute(f'SELECT wctID FROM {self.table} WHERE userID={userID}')
+            return self.bd_cursor.fetchall()[0][0] # list > tuple > string
+        except Exception as e:
+            log.error(e)
+            print(e)
+        finally:
+            lock.release()
 
 
     def setWctForUser(self, userID: int, boarID: str) -> None:
-        log.info("Установка wct для пользователя")
-        self.bd_cursor.execute(f'UPDATE {self.table} SET wctID = {boarID} WHERE userID={userID}')
-        self.bd.commit()
-        log.info("Успешно")
+        try:
+            lock.acquire(True)
+            log.info("Установка wct для пользователя")
+            self.bd_cursor.execute(f'UPDATE {self.table} SET wctID = {boarID} WHERE userID={userID}')
+            self.bd.commit()
+            log.info("Успешно")
+        except Exception as e:
+            log.error(e)
+            print(e)
+        finally:
+            lock.release()
 
     
     def getPrevDay(self, userID: int) -> int:
-        info = self.bd_cursor.execute(f'SELECT prevDay FROM {self.table} WHERE userID={userID}')
-        return self.bd_cursor.fetchall()[0][0] # list > tuple > string
+        try:
+            lock.acquire(True)
+            info = self.bd_cursor.execute(f'SELECT prevDay FROM {self.table} WHERE userID={userID}')
+            return self.bd_cursor.fetchall()[0][0] # list > tuple > string
+        except Exception as e:
+            log.error(e)
+            print(e)
+        finally:
+            lock.release()
 
     
     def setPrevDay(self, day: int, userID: int) -> None:
-        log.info("Установка предыдущего дня")
-        self.bd_cursor.execute(f'UPDATE {self.table} SET prevDay = {day} WHERE userID={userID}')
-        self.bd.commit()
-        log.info("Успешно")
+        try:
+            lock.acquire(True)
+            log.info("Установка предыдущего дня")
+            self.bd_cursor.execute(f'UPDATE {self.table} SET prevDay = {day} WHERE userID={userID}')
+            self.bd.commit()
+            log.info("Успешно")
+        except Exception as e:
+            log.error(e)
+            print(e)
+        finally:
+            lock.release()
 
 
     def addUser(self, userID: str) -> None:
-        log.info("Auth -- Добавление пользователя в БД")
-        self.bd_cursor.execute(f'INSERT INTO {self.table} (userID) VALUES (?)', (userID, ) )
-        self.bd.commit()
-        log.info("Успешно")
+        try:
+            lock.acquire(True)
+            log.info("Auth -- Добавление пользователя в БД")
+            self.bd_cursor.execute(f'INSERT INTO {self.table} (userID) VALUES (?)', (userID, ) )
+            self.bd.commit()
+            log.info("Успешно")
+        except Exception as e:
+            log.error(e)
+            print(e)
+        finally:
+            lock.release()
 
 
 class JokeDB(DB):
@@ -158,24 +230,47 @@ class MsgDB(DB):
 
 
     def getFileID(self, recNum: int) -> str:
-        info = self.bd_cursor.execute(f'SELECT fileID FROM {self.table}')
-        record = self.bd_cursor.fetchall()
-        msg = record[recNum]
-        return msg[0]
+        try:
+            lock.acquire(True)
+            info = self.bd_cursor.execute(f'SELECT fileID FROM {self.table}')
+            record = self.bd_cursor.fetchall()
+            msg = record[recNum]
+            return msg[0]
+        except Exception as e:
+            log.error(e)
+            print(e)
+        finally:
+            lock.release()
+
 
     # new record with file id of photo sent to admin
     def newFileID(self, record: str) -> None:
-        log.info("Новая запись БД в таблице: " + self.table + " Столбец: fileID")
-        self.bd_cursor.execute(f'INSERT INTO {self.table} (fileID) VALUES (?)', (record, ) ) 
-        self.bd.commit()
-        log.info("Успешно")
+        try:
+            lock.acquire(True)
+            log.info("Новая запись БД в таблице: " + self.table + " Столбец: fileID")
+            self.bd_cursor.execute(f'INSERT INTO {self.table} (fileID) VALUES (?)', (record, ) ) 
+            self.bd.commit()
+            log.info("Успешно")
+        except Exception as e:
+            log.error(e)
+            print(e)
+        finally:
+            lock.release()
+
 
     # new record with caption below photo sent to admin
     def insertMsgForFileID(self, msg: str, fileID: str) -> None:
-        log.info("")
-        self.bd_cursor.execute(f'UPDATE {self.table} SET msg = {msg} WHERE fileID={fileID}')
-        self.bd.commit()
-        log.info("Успешно")
+        try:
+            lock.acquire(True)
+            log.info("Вставка сообщения для картинки")
+            self.bd_cursor.execute(f'UPDATE {self.table} SET msg = {msg} WHERE fileID={fileID}')
+            self.bd.commit()
+            log.info("Успешно")
+        except Exception as e:
+            log.error(e)
+            print(e)
+        finally:
+            lock.release()
 
 
 class PicDB(DB):
@@ -186,10 +281,17 @@ class PicDB(DB):
     
     
     def getPicID(self, recNum: int) -> str:
-        info = self.bd_cursor.execute(f'SELECT * FROM {self.table}')
-        record = self.bd_cursor.fetchall()
-        picID = record[recNum]
-        return picID[0]
+        try:
+            lock.acquire(True)
+            info = self.bd_cursor.execute(f'SELECT * FROM {self.table}')
+            record = self.bd_cursor.fetchall()
+            picID = record[recNum]
+            return picID[0]
+        except Exception as e:
+            log.error(e)
+            print(e)
+        finally:
+            lock.release()
 
 
 class BoarDB(DB):
@@ -200,10 +302,17 @@ class BoarDB(DB):
 
 
     def getID(self, recNum: int) -> str:
-        info = self.bd_cursor.execute(f'SELECT * FROM {self.table}')
-        record = self.bd_cursor.fetchall()
-        ID = record[recNum]
-        return ID[0]
+        try:
+            lock.acquire(True)
+            info = self.bd_cursor.execute(f'SELECT * FROM {self.table}')
+            record = self.bd_cursor.fetchall()
+            ID = record[recNum]
+            return ID[0]
+        except Exception as e:
+            log.error(e)
+            print(e)
+        finally:
+            lock.release()
 
 
 class Statistics(DB):

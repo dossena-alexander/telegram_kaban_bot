@@ -1,9 +1,23 @@
 import time
-
+from config import shedule_path
+from utils.logger import log
 
 class Shedule():
-    def __init__(self) -> None:
-        pass
+    currentShedule = 'None'
+    day = ""
 
-    def currentDay():
-        return time.strftime('%a')
+
+    def currentDay(self):
+        self.day = time.strftime('%a')
+        self.currentShedule = self.day + ".JPG"
+        return self.day
+
+    
+    def getShedule(self) -> str:
+        day = self.currentDay()
+        if day == "Sat" or "Sun":
+            return shedule_path + "Mon.JPG"
+        else:
+            return shedule_path + self.currentShedule
+
+

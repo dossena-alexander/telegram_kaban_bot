@@ -1,8 +1,10 @@
 import telebot, random
 from datetime import date
+import shutil, os
+
 import config
 import utils
-import shutil, os
+
 
 #========================INSTANCE===================================
 
@@ -20,6 +22,7 @@ userJokeDB = utils.JokeDB("userJokes")
 
 msgCounter = 0 # records counter that`s used to see user msgs in admin menu
 new_suggestions = utils.new_suggestions()
+shedule = utils.Shedule()
 
 #========================MENU===================================
 
