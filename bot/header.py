@@ -2,13 +2,13 @@ import telebot, random
 from datetime import date
 import shutil, os
 
-import config
+from config import *
 import utils
 
 
 #========================INSTANCE===================================
 
-bot = telebot.TeleBot(token=config.token)
+bot = telebot.TeleBot(token=API_TOKEN)
 
 userDB = utils.UserDB()
 boarDB = utils.BoarDB()
@@ -20,7 +20,10 @@ adminPicDB = utils.PicDB("accPics")
 userPicDB = utils.PicDB("pics")
 userJokeDB = utils.JokeDB("userJokes")
 
-msgCounter = 0 # records counter that`s used to see user msgs in admin menu
+# records counter that`s used to see DB records in admin menu
+class mesg():
+    count = 0
+
 new_suggestions = utils.new_suggestions()
 shedule = utils.Shedule()
 
@@ -33,13 +36,12 @@ userSubMenu = utils.Menu()
 
 #========================MENU_SET-UP===================================
 
-userSubMenu.setMsg(config.userSubMenuMsg)
-helpMenu.setMsg(config.helpMsg)
+adminMenu.setMsg(BOT_MESSAGE.ADMIN)
+adminMenu.setInlineKeyboard(KEYS.ADMIN)
 
-adminMenu.setMsg(config.adminMsg)
-adminMenu.setInlineKeyboard(config.adminKeys)
-adminMenu.rowInlineKeyboard()
+userMenu.setMsg(BOT_MESSAGE.USER)
+userMenu.setInlineKeyboard(KEYS.USER)
 
-userMenu.setMsg(config.userMsg)
-userMenu.setInlineKeyboard(config.userKeys)
-userMenu.rowInlineKeyboard()
+userSubMenu.setMsg(BOT_MESSAGE.USER_SUB_MENU)
+
+helpMenu.setMsg(BOT_MESSAGE.HELP)

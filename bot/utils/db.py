@@ -1,5 +1,5 @@
 import sqlite3
-import config
+from config import PATH
 from utils.logger import log
 import threading
 
@@ -32,7 +32,7 @@ lock = threading.Lock()
 
 class DB():
     def __init__(self) -> None:
-        self.bd = sqlite3.connect(config.db_path, check_same_thread=False)
+        self.bd = sqlite3.connect(PATH.DB, check_same_thread=False)
         self.bd_cursor = self.bd.cursor()
         self.table = ''
         self.col = ''
@@ -279,20 +279,6 @@ class PicDB(DB):
         self.table = table
         self.col = 'fileID'
     
-    
-    def getPicID(self, recNum: int) -> str:
-        try:
-            lock.acquire(True)
-            info = self.bd_cursor.execute(f'SELECT * FROM {self.table}')
-            record = self.bd_cursor.fetchall()
-            picID = record[recNum]
-            return picID[0]
-        except Exception as e:
-            log.error(e)
-            print(e)
-        finally:
-            lock.release()
-
 
 class BoarDB(DB):
     def __init__(self) -> None:

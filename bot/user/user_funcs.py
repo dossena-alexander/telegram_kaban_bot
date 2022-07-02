@@ -1,4 +1,5 @@
-from header import bot, utils, config, msgDB, userDB, date, random, boarDB
+from header import bot, utils, msgDB, userDB, date, random, boarDB
+from config import PATH, ADMIN_ID, COMMANDS_FILTER
 
 
 def uploadPicture(message): 
@@ -12,7 +13,7 @@ def uploadPicture(message):
             # Checking ID of user, if admin is adding, pics`ll be added to main folder "photos/
             # if not, bot send photo id to DB, after all admin`ll be able to save pics to "photos/
             # uploadPic('admin') is saving pics to main -- "photos/"; picDB saving photo id to accepted pics table
-            if id == config.adminID: upPic = utils.UploadPic('admin'); txt = "Сохранил"
+            if id == ADMIN_ID: upPic = utils.UploadPic('admin'); txt = "Сохранил"
             else: upPic = utils.UploadPic('user'); txt = "Добавлено на рассмотрение"; picDB.setTableName("pics")
             file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
             file = bot.download_file(file_info.file_path)
@@ -38,11 +39,11 @@ def uploadPicture(message):
 def uploadJoke(message):
     if message.content_type == "text":
         if message.text.lower() != "/brake":
-            if message.text not in config.word_filter:
+            if message.text not in COMMANDS_FILTER:
                 joke = message.text
                 id = message.from_user.id 
                 jokeDB = utils.JokeDB("adminJokes")
-                if id == config.adminID: 
+                if id == ADMIN_ID: 
                     txt = "Сохранил"
                 else: 
                     jokeDB.setTableName('userJokes')
@@ -64,7 +65,7 @@ def uploadJoke(message):
 def uploadMsg(message): 
     if message.content_type == "text":
         if message.text.lower() != "/brake":
-            if message.text not in config.word_filter:
+            if message.text not in COMMANDS_FILTER:
                 msgDB.newRecord(message.text)
                 bot.send_message(message.chat.id, "Отправлено")
             else:
@@ -103,7 +104,7 @@ def getWct(message):
     
     id = message.from_user.id 
     users = userDB.getUsersList()
-    if id != config.adminID and id not in users:
+    if id != ADMIN_ID and id not in users:
         bot.send_message(message.chat.id, "Ты не зарегистрировался. Нажми /auth, чтобы зарегистрироваться")
         return None
     else:
@@ -113,10 +114,10 @@ def getWct(message):
         if now_day == prev_day:
             boarID = userDB.getWctForUser(id)
             boar = boarDB.getID(boarID)
-            return open(config.wct_path + boar, 'rb')
+            return open(PATH.WCT + boar, 'rb')
         else:
             userDB.setPrevDay(now_day, id)
             boarID = random.randint(0, boarDB.getRecCount() - 1)
             userDB.setWctForUser(id, boarID)
             boar = boarDB.getID(boarID)
-            return open(config.wct_path + boar, 'rb')
+            return open(PATH.WCT + boar, 'rb')

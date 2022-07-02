@@ -20,22 +20,14 @@ class Menu():
     def getReplyKeyboard(self):
         return self.replyKeyboard.get()
 
-    
-    def setReplyKeyboard(self, keys: list):
-        self.replyKeyboard.add(keys)
+
+    def setReplyKeyboard(self, keys: dict):
+        self.replyKeyboard.set_keyboard(keys)
 
 
     def getInlineKeyboard(self):
         return self.inlineKeyboard.get()
 
 
-    def setInlineKeyboard(self, keys: list):
-        self.inlineKeyboard.add(keys)
-
-
-    def rowInlineKeyboard(self):
-        self.inlineKeyboard.autoRow()
-
-
-    def rowReplyKeyboard(self):
-        self.replyKeyboard.autoRow()
+    def setInlineKeyboard(self, keys: dict):
+        self.inlineKeyboard.set_keyboard(keys)

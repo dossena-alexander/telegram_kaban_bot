@@ -1,14 +1,14 @@
 from utils.logger import log
-
+from config import PATH
 
 class UploadPic():
     def __init__(self, src: str) -> None:
         if src == 'admin':
-            self.main_src = '../photos/'
+            self.main_src = PATH.PHOTOS
         elif src == 'wct':
-            self.main_src = '../wct/'
+            self.main_src = PATH.WCT
         else:
-            self.main_src = '../recieved_photos/'
+            self.main_src = PATH.RECIEVED_PHOTOS
 
 
     def upload(self, file, file_info) -> None:
