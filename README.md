@@ -6,7 +6,7 @@
 Simple telegram bot written on Python 3 using Telebot. 
 
 ----
-need to update md)
+need to update readme)
 
 ----
 ## Contents:
