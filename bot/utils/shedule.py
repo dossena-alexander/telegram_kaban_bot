@@ -1,5 +1,5 @@
 import time
-from config import shedule_path
+from config import PATH
 from utils.logger import log
 
 class Shedule():
@@ -16,8 +16,8 @@ class Shedule():
     def getShedule(self) -> str:
         day = self.currentDay()
         if day == "Sat" or "Sun":
-            return shedule_path + "Mon.JPG"
+            return open(PATH.SHEDULE + "Mon.JPG", 'rb')
         else:
-            return shedule_path + self.currentShedule
+            return open(PATH.SHEDULE + self.currentShedule, 'rb')
 
 
