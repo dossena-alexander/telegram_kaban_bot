@@ -1,4 +1,4 @@
-# v1.8
+# v1.8.3
 from header import *
 from handlers import *
 
@@ -20,7 +20,7 @@ if __name__ == "__main__":
         bot.polling()
     except Exception as e:
         utils.log.error(e)
-        bot.send_message(config.adminID, "Bot stoped. Trouble occurred")
+        bot.send_message(ADMIN_ID, "Bot stoped. Trouble occurred")
         # you may use bot.polling() or sh script to restart bot.py
         # for sh script use:
         # import subprocess
