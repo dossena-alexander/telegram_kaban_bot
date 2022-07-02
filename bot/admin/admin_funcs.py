@@ -1,4 +1,6 @@
-from header import bot, utils, boarDB, userDB, config, userPicDB, msgCounter
+from header import boarDB, userDB, userPicDB
+from header import bot, utils, mesg
+from config import PATH, ADMIN_ID, COMMANDS_FILTER
 
 
 def uploadWct(message):
@@ -29,46 +31,44 @@ def notify(message):
     if message.content_type == 'text':
         msg = message.text
         if msg != '/brake':
-            if msg not in config.word_filter:
+            if msg not in COMMANDS_FILTER:
                 users = userDB.getUsersList()
                 if len(users) != 0:
                     for id in users:
                         bot.send_message(id, 
                         "<b>Сообщение от админа:</b>\n" + msg, parse_mode="html")
                 else:
-                    bot.send_message(config.adminID, "Пользователей для рассылки нет")
+                    bot.send_message(ADMIN_ID, "Пользователей для рассылки нет")
             else:
-                bot.send_message(config.adminID, "Это не то, но я жду твое сообщение")
+                bot.send_message(ADMIN_ID, "Это не то, но я жду твое сообщение")
                 bot.register_next_step_handler(message, notify)
         else:
-            bot.send_message(config.adminID, "Отменено")
+            bot.send_message(ADMIN_ID, "Отменено")
 
 
 def see(message, type: str, db: utils.DB, keys: list):
-    global msgCounter
-
     stand_keyboard = utils.InlineKeyboard()
-    stand_keyboard.add(keys)
-    stand_keyboard.autoRow()
+    stand_keyboard.set_keyboard(keys)
+
     back_keyboard = utils.InlineKeyboard()
-    back_keyboard.add(["Назад"])
+    back_keyboard.add_button(text="Назад", call="BACK_ADMIN")
 
     # get records len with DB method
     record_len = db.getRecCount()
     if record_len != 0:
-        if msgCounter < record_len: # msgCounter is counter which increase and count every each record 
+        if mesg.count < record_len: # msgCounter is counter which increase and count every each record 
             if type == "txt":
                 bot.send_message(message.chat.id,
                     f"{record_len} записей\n" +
-                    f"{db.getRecord(recNum=msgCounter)}",
+                    f"{db.getRecord(recNum=mesg.count)}",
                     reply_markup=stand_keyboard.get())
             else:
                 bot.send_photo(message.chat.id, 
-                    open(config.recieved_photos_path + userPicDB.getPicID(msgCounter), "rb"),
-                    reply_markup=stand_keyboard.get(),
-                    caption=f"{record_len} записей")
+                    open(PATH.RECIEVED_PHOTOS + userPicDB.getPicID(mesg.count), "rb"),
+                         reply_markup=stand_keyboard.get(),
+                         caption=f"{record_len} записей")
         else:
-            msgCounter = 0
+            mesg.count = 0
             bot.send_message(
                 message.chat.id,
                 "Сообщения кончились",
