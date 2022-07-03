@@ -1,9 +1,9 @@
-from header import boarDB, userDB, userPicDB
+from header import boarDB, userDB, userPicDB, msgDB
 from header import bot, utils, mesg
 from config import PATH, ADMIN_ID, FILTER
 
 
-def uploadWct(message):
+def uploadWct(message) -> None:
     if message.content_type == 'photo':
         if message.content_type == "media_group": # able to save not only one pic (in future)
             bot.send_message(message.chat.id, "Пришли только одну картинку")
@@ -27,7 +27,7 @@ def uploadWct(message):
             bot.register_next_step_handler(message, uploadWct)
 
 
-def notify(message):
+def notify(message) -> None:
     if message.content_type == 'text':
         msg = message.text
         if msg != '/brake':
@@ -46,7 +46,7 @@ def notify(message):
             bot.send_message(ADMIN_ID, "Отменено")
 
 
-def see(message, type: str, db: utils.DB, keys: list):
+def see(message, type: str, db: utils.DB, keys: dict) -> None:
     stand_keyboard = utils.InlineKeyboard()
     stand_keyboard.set_keyboard(keys)
 
@@ -64,9 +64,40 @@ def see(message, type: str, db: utils.DB, keys: list):
                     reply_markup=stand_keyboard.get())
             else:
                 bot.send_photo(message.chat.id, 
-                    open(PATH.RECIEVED_PHOTOS + userPicDB.getPicID(mesg.count), "rb"),
-                         reply_markup=stand_keyboard.get(),
-                         caption=f"{record_len} записей")
+                    open(PATH.RECIEVED_PHOTOS + db.getRecord(mesg.count), "rb"),
+                    reply_markup=stand_keyboard.get(),
+                    caption=f"{record_len} записей")
+        else:
+            mesg.count = 0
+            bot.send_message(
+                message.chat.id,
+                "Сообщения кончились",
+                reply_markup=back_keyboard.get())
+    else:
+        bot.send_message(message.chat.id, "Сообщений нет", reply_markup=back_keyboard.get())
+
+
+def see_msg(message, keys: dict) -> None:
+    stand_keyboard = utils.InlineKeyboard()
+    stand_keyboard.set_keyboard(keys)
+
+    back_keyboard = utils.InlineKeyboard()
+    back_keyboard.add_button(text="Назад", call="BACK_ADMIN")
+
+    # get records len with DB method
+    record_len = msgDB.getRecCount()
+    if record_len != 0:
+        if mesg.count < record_len: # msgCounter is counter which increase and count every each record 
+            if msgDB.msgHasFileID(mesg.count):
+                bot.send_photo(message.chat.id, 
+                    open(PATH.RECIEVED_PHOTOS + msgDB.getFileID(mesg.count), "rb"),
+                    reply_markup=stand_keyboard.get(),
+                    caption=f"{record_len} записей\n{msgDB.getRecord(mesg.count)}")
+            else:
+                bot.send_message(message.chat.id,
+                    f"{record_len} записей\n" +
+                    f"{msgDB.getRecord(recNum=mesg.count)}",
+                    reply_markup=stand_keyboard.get())
         else:
             mesg.count = 0
             bot.send_message(
