@@ -79,7 +79,8 @@ class LIMIT():
 #========================FILTER===================================
 
 # text-worker filter
-COMMANDS_FILTER = [
+class FILTER():
+    COMMANDS = [
             "Фотокарточка", 
             "Анекдот", 
             "Какой я кабан сегодня", 

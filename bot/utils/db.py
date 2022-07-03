@@ -243,6 +243,40 @@ class MsgDB(DB):
             lock.release()
 
 
+    def delAll(self, recNum: int) -> None:
+        try:
+            lock.acquire(True)
+            log.info("Удаление записи БД в таблице: " + self.table + " Столбец: fileID")
+
+            info = self.bd_cursor.execute(f'SELECT * FROM {self.table}')
+            rec = self.bd_cursor.fetchall()[recNum]
+            msg = rec[0]
+            fileID = rec[1]
+            self.bd_cursor.execute( f'DELETE FROM {self.table} WHERE msg=? OR fileID=?', (msg, fileID) )
+            self.bd.commit()
+        except Exception as e:
+            log.error(e)
+            print(e)
+        finally:
+            log.info("Успешно")
+            lock.release()
+
+
+    def msgHasFileID(self, recNum: int) -> bool:
+        try:
+            lock.acquire(True)
+            info = self.bd_cursor.execute(f'SELECT * FROM {self.table}')
+            record = self.bd_cursor.fetchall()
+            if record[recNum][1] == None:
+                return False
+            else:
+                return True
+        except Exception as e:
+            print(e)
+        finally:
+            lock.release()
+
+
     # new record with file id of photo sent to admin
     def newFileID(self, record: str) -> None:
         try:
@@ -263,7 +297,7 @@ class MsgDB(DB):
         try:
             lock.acquire(True)
             log.info("Вставка сообщения для картинки")
-            self.bd_cursor.execute(f'UPDATE {self.table} SET msg = {msg} WHERE fileID={fileID}')
+            self.bd_cursor.execute(f'UPDATE {self.table} SET msg=\'{msg}\' WHERE fileID=\'{fileID}\'')
             self.bd.commit()
             log.info("Успешно")
         except Exception as e:
