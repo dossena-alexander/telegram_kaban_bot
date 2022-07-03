@@ -1,6 +1,7 @@
 # v1.8.3
-from header import *
 from handlers import *
+from header import *
+
 
 bot.register_message_handler(commands=["start"], func=start, callback="none")
 bot.register_message_handler(commands=["auth"], func=auth, callback="none")
