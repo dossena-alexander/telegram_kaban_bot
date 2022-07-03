@@ -1,5 +1,5 @@
 from header import bot, utils, msgDB, userDB, date, random, boarDB
-from config import PATH, ADMIN_ID, COMMANDS_FILTER
+from config import PATH, ADMIN_ID, FILTER
 
 
 def uploadPicture(message): 
@@ -39,7 +39,7 @@ def uploadPicture(message):
 def uploadJoke(message):
     if message.content_type == "text":
         if message.text.lower() != "/brake":
-            if message.text not in COMMANDS_FILTER:
+            if message.text not in FILTER.COMMANDS:
                 joke = message.text
                 id = message.from_user.id 
                 jokeDB = utils.JokeDB("adminJokes")
@@ -65,7 +65,7 @@ def uploadJoke(message):
 def uploadMsg(message): 
     if message.content_type == "text":
         if message.text.lower() != "/brake":
-            if message.text not in COMMANDS_FILTER:
+            if message.text not in FILTER.COMMANDS:
                 msgDB.newRecord(message.text)
                 bot.send_message(message.chat.id, "Отправлено")
             else:

@@ -1,6 +1,6 @@
 from header import boarDB, userDB, userPicDB
 from header import bot, utils, mesg
-from config import PATH, ADMIN_ID, COMMANDS_FILTER
+from config import PATH, ADMIN_ID, FILTER
 
 
 def uploadWct(message):
@@ -31,7 +31,7 @@ def notify(message):
     if message.content_type == 'text':
         msg = message.text
         if msg != '/brake':
-            if msg not in COMMANDS_FILTER:
+            if msg not in FILTER.COMMANDS:
                 users = userDB.getUsersList()
                 if len(users) != 0:
                     for id in users:

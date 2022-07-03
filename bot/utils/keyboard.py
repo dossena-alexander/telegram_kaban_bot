@@ -71,11 +71,6 @@ class InlineKeyboard():
         button = types.InlineKeyboardButton(text=key, url=url)
         self.keyboard.add(button)
 
-    
-    def row_url_button(self, key: str, url: str) -> None:
-        button = types.InlineKeyboardButton(text=key, url=url)
-        self.keyboard.row(button)
-
 
     def add_button(self, text: str, call: str) -> None:
         button = types.InlineKeyboardButton(text=text, callback_data=call)
