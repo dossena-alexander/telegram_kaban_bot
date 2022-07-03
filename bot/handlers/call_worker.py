@@ -111,17 +111,19 @@ def callWorker(call):
 
     elif call.data == "SEE_MESSAGES":
         bot.delete_message(call.message.chat.id, call.message.message_id)
-        see(call.message, "txt", msgDB, KEYS.MSG_SEE)
+        see_msg(call.message, KEYS.MSG_SEE)
 
     elif call.data == "MSG_FURTHER":
         mesg.count += 1
         bot.delete_message(call.message.chat.id, call.message.message_id)
-        see(call.message, "txt", msgDB, KEYS.MSG_SEE)
+        see_msg(call.message, KEYS.MSG_SEE)
 
     elif call.data == "MSG_DELETE":
         bot.delete_message(call.message.chat.id, call.message.message_id)
-        msgDB.delRecord(msgDB.getRecord(mesg.count))
-        see(call.message, "txt", msgDB, KEYS.MSG_SEE)
+        if msgDB.msgHasFileID(mesg.count):
+            os.remove(PATH.RECIEVED_PHOTOS + msgDB.getFileID(mesg.count))
+        msgDB.delAll(mesg.count)
+        see_msg(call.message, KEYS.MSG_SEE)
 
 #========================USER_MENU====================================================
     elif call.data == "UPLOAD_MENU_USER":
