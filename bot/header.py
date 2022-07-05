@@ -44,4 +44,4 @@ userMenu.setInlineKeyboard(KEYS.USER)
 
 userSubMenu.setMsg(BOT_MESSAGE.USER_SUB_MENU)
 
-helpMenu.setMsg(BOT_MESSAGE.HELP)
+helpMenu.setMsg(BOT_MESSAGE.HELP(utils.JokeDB("adminJokes").getRecCount()))
