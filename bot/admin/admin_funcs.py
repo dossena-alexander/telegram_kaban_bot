@@ -9,7 +9,7 @@ def uploadWct(message) -> None:
             bot.send_message(message.chat.id, "Пришли только одну картинку")
             bot.register_next_step_handler(message, uploadWct)
         else:
-            upPic = utils.UploadPic('wct')
+            upPic = utils.UploadPic(PATH.WCT)
             file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
             file = bot.download_file(file_info.file_path)
             boarDB.newRecord(file_info.file_path.replace('photos/', ''))
