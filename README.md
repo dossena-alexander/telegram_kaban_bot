@@ -33,11 +33,11 @@ Menu is composite of message and keyboard bot send to user. Creating Menu object
 ```python
 menu = Menu()
 ```
-Set message. Method .setMsg(msg: str):
+Set message. Method **.setMsg(msg: str)**:
 ```python
 menu.setMsg("Hello there!")
 ```
-Set keyboard. Methods .setInlineKeyboard(keys: dict) and .setReplyKeyboard(keys: dict)
+Set keyboard. Methods **.setInlineKeyboard(keys: dict)** and **.setReplyKeyboard(keys: dict)**
 ```python
 menu.setInlineKeyboard(keys_dict)
 menu.setReplyKeyboard(keys_dict)
