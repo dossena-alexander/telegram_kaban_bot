@@ -27,12 +27,26 @@ pip install telebot
 
 ----
 ----
-## Usage
+## Menu
 
-In main bot has two menu: __admin__ and __user__. Both of them have keyboard and message they send to user
+Menu is composite of message and keyboard bot send to user. Creating Menu object
 ```python
-adminMenu = Menu()
-userMenu = Menu()
+menu = Menu()
+```
+Set message. Method .setMsg(msg: str):
+```python
+menu.setMsg("Hello there!")
+```
+Set keyboard. Methods .setInlineKeyboard(keys: dict) and .setReplyKeyboard(keys: dict)
+```python
+menu.setInlineKeyboard(keys_dict)
+menu.setReplyKeyboard(keys_dict)
+```
+To get message or keyboard you should use:
+```python
+menu.getMsg() # returns str 
+menu.getInlineKeyboard() # returns types.InlineKeyboardMarkup
+menu.getReplyKeyboard() # returns types.ReplyKeyboardMarkup(resize_keyboard=True)
 ```
 ----
 ### Keys and keyboard
