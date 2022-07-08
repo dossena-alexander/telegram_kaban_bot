@@ -1,5 +1,5 @@
 from header import bot, utils 
-from header import userSubMenu, new_suggestions, adminMenu, userMenu, userPicDB, adminPicDB, adminJokeDB, userJokeDB, msgDB
+from header import userSubMenu, suggestions, adminMenu, userMenu, userPicDB, adminPicDB, adminJokeDB, userJokeDB, msgDB
 from header import mesg, shutil, os
 from config import PATH, KEYS
 from admin import *
@@ -28,11 +28,14 @@ def callWorker(call):
         del stats
     
     elif call.data == "BACK_ADMIN":
-        if new_suggestions.exist():
-            adminMenu.setMsg(new_suggestions.getMsg())
+        if suggestions.exist():
+            adminMenu.setMsg(suggestions.getMsg())
         else:
             adminMenu.setMsg("Админ меню")
-        bot.edit_message_text(text=adminMenu.getMsg(), chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=adminMenu.getInlineKeyboard())
+        if call.message.text == None:
+            bot.delete_message(call.message.id, call.message.message_id)
+        else:
+            bot.edit_message_text(text=adminMenu.getMsg(), chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=adminMenu.getInlineKeyboard())
     
     elif call.data == "STOP_BOT":
         bot.answer_callback_query(call.id, 'Бот остановлен')
@@ -81,7 +84,7 @@ def callWorker(call):
 
     elif call.data == "PIC_DELETE":    
         bot.delete_message(call.message.chat.id, call.message.message_id)
-        os.remove(PATH.RECIEVED_PHOTOS + userPicDB.getPicID(mesg.count))
+        os.remove(PATH.RECIEVED_PHOTOS + userPicDB.getRecord(mesg.count))
         userPicDB.delRecord(userPicDB.getRecord(mesg.count))
         see(call.message, type="pic", db=userPicDB, keys=KEYS.PIC_SEE)
 

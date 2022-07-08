@@ -24,7 +24,7 @@ userJokeDB = utils.JokeDB("userJokes")
 class mesg():
     count = 0
 
-new_suggestions = utils.new_suggestions()
+suggestions = utils.suggestions()
 shedule = utils.Shedule()
 
 #========================MENU===================================
@@ -44,4 +44,4 @@ userMenu.setInlineKeyboard(KEYS.USER)
 
 userSubMenu.setMsg(BOT_MESSAGE.USER_SUB_MENU)
 
-helpMenu.setMsg(BOT_MESSAGE.HELP)
+helpMenu.setMsg(BOT_MESSAGE.HELP(photo_count = adminPicDB.getRecCount(), joke_count = adminJokeDB.getRecCount()))

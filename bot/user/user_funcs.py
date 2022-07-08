@@ -1,4 +1,4 @@
-from header import bot, utils, msgDB, userDB, date, random, boarDB
+from header import bot, utils, msgDB, userDB, date, random, boarDB, suggestions
 from config import PATH, ADMIN_ID, FILTER
 
 
@@ -13,8 +13,14 @@ def uploadPicture(message):
             # Checking ID of user, if admin is adding, pics`ll be added to main folder "photos/
             # if not, bot send photo id to DB, after all admin`ll be able to save pics to "photos/
             # uploadPic('admin') is saving pics to main -- "photos/"; picDB saving photo id to accepted pics table
-            if id == ADMIN_ID: upPic = utils.UploadPic(PATH.PHOTOS); txt = "Сохранил"
-            else: upPic = utils.UploadPic(PATH.RECIEVED_PHOTOS); txt = "Добавлено на рассмотрение"; picDB.setTableName("pics")
+            if id == ADMIN_ID: 
+                upPic = utils.UploadPic(PATH.PHOTOS)
+                txt = "Сохранил"
+            else:
+                upPic = utils.UploadPic(PATH.RECIEVED_PHOTOS)
+                txt = "Добавлено на рассмотрение"
+                picDB.setTableName("pics")
+                suggestions.new_suggest()
             file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
             file = bot.download_file(file_info.file_path)
             # saving photo id to DB of pics, either accepted pics table or pics table
@@ -48,6 +54,7 @@ def uploadJoke(message):
                 else: 
                     jokeDB.setTableName('userJokes')
                     txt = "Добавлено на рассмотрение"
+                    suggestions.new_suggest()
                 jokeDB.newRecord(joke)
                 bot.send_message(message.chat.id, txt)
                 bot.send_message(message.chat.id, "Напиши анекдот. Для отмены нажми /brake")

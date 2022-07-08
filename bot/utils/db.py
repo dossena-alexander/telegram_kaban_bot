@@ -20,12 +20,18 @@ lock = threading.Lock()
 #      |               |joke:    STRING  |
 #      |boarsID________|_________________|
 #      |               |ID:      STRING  |
+#      |premiumBoarsID_|_________________|
+#      |               |ID:      STRING  |
 #      |msgs___________|_________________|
 #      |               |msg:     STRING  |
 #      |               |fileID:  STRING  |
 #      |users__________|_________________|
 #      |               |userID:  INTEGER |
-#      |               |wctID:   INTEGER |
+#      |               |wctID:   STRING  |
+#      |               |prevDay: INTEGER |
+#      |vk_users_______|_________________|
+#      |               |userID:  INTEGER |
+#      |               |wctID:   STRING  |
 #      |               |prevDay: INTEGER |
 #      +---------------------------------+
 
@@ -126,17 +132,17 @@ class DB():
 
 
 class UserDB(DB):
-    def __init__(self) -> None:
+    def __init__(self, table = "users", col = "userID") -> None:
         super().__init__()
-        self.table = "users"
-        self.col = 'userID'
+        self.table = table
+        self.col = col
 
     
     def getUsersList(self) -> list:
         try:
             lock.acquire(True)
             log.info("Getting users list")
-            info = self.bd_cursor.execute(f'SELECT userID FROM {self.table}')
+            info = self.bd_cursor.execute(f'SELECT {self.col} FROM {self.table}')
             records = self.bd_cursor.fetchall()
             records_listed = [record[0] for record in records]
             log.info("Успешно")
@@ -152,7 +158,7 @@ class UserDB(DB):
     def getWctForUser(self, userID: int) -> str:
         try:
             lock.acquire(True)
-            info = self.bd_cursor.execute(f'SELECT wctID FROM {self.table} WHERE userID={userID}')
+            info = self.bd_cursor.execute(f'SELECT wctID FROM {self.table} WHERE {self.col}={userID}')
             return self.bd_cursor.fetchall()[0][0] # list > tuple > string
         except Exception as e:
             log.error(e)
@@ -165,7 +171,7 @@ class UserDB(DB):
         try:
             lock.acquire(True)
             log.info("Установка wct для пользователя")
-            self.bd_cursor.execute(f'UPDATE {self.table} SET wctID = {boarID} WHERE userID={userID}')
+            self.bd_cursor.execute(f'UPDATE {self.table} SET wctID = {boarID} WHERE {self.col}={userID}')
             self.bd.commit()
             log.info("Успешно")
         except Exception as e:
@@ -178,7 +184,7 @@ class UserDB(DB):
     def getPrevDay(self, userID: int) -> int:
         try:
             lock.acquire(True)
-            info = self.bd_cursor.execute(f'SELECT prevDay FROM {self.table} WHERE userID={userID}')
+            info = self.bd_cursor.execute(f'SELECT prevDay FROM {self.table} WHERE {self.col}={userID}')
             return self.bd_cursor.fetchall()[0][0] # list > tuple > string
         except Exception as e:
             log.error(e)
@@ -191,7 +197,7 @@ class UserDB(DB):
         try:
             lock.acquire(True)
             log.info("Установка предыдущего дня")
-            self.bd_cursor.execute(f'UPDATE {self.table} SET prevDay = {day} WHERE userID={userID}')
+            self.bd_cursor.execute(f'UPDATE {self.table} SET prevDay = {day} WHERE {self.col}={userID}')
             self.bd.commit()
             log.info("Успешно")
         except Exception as e:
@@ -205,7 +211,7 @@ class UserDB(DB):
         try:
             lock.acquire(True)
             log.info("Auth -- Добавление пользователя в БД")
-            self.bd_cursor.execute(f'INSERT INTO {self.table} (userID) VALUES (?)', (userID, ) )
+            self.bd_cursor.execute(f'INSERT INTO {self.table} ({self.col}) VALUES (?)', (userID, ) )
             self.bd.commit()
             log.info("Успешно")
         except Exception as e:
@@ -340,20 +346,26 @@ class Statistics(DB):
         super().__init__()
         self.b = BoarDB()
         self.u = UserDB()
+        self.vk_u = UserDB("vk_users", "vk_id")
         self.j = JokeDB("adminJokes")
         self.p = PicDB("accPics")
 
 
     def get(self) -> str:
-        txt = f"<b>Статистика</b>\n•Кабаны: <b>{self.b.getRecCount()}</b>\n•Пользователи: <b>{self.u.getRecCount()}</b>\n•Анекдоты: <b>{self.j.getRecCount()}</b>\n•Картинки: <b>{self.p.getRecCount()}</b>"
+        txt = f"<b>Статистика</b>\n•Кабаны: <b>{self.b.getRecCount()}</b>\n•Пользователи: <b>{self.u.getRecCount()}</b>\n•ВК Пользователи: <b>{self.vk_u.getRecCount()}</b>\n•Анекдоты: <b>{self.j.getRecCount()}</b>\n•Картинки: <b>{self.p.getRecCount()}</b>"
         return txt
 
 
-class new_suggestions(DB):
+class suggestions(DB):
+    # when users upload photo or joke counter increases to the limit, then bot sends message to admin
+    limit = 5 
+    counter = 0
+
+
     def __init__(self) -> None:
         super().__init__()
         self.tables = ['pics', 'userJokes', 'msgs']
-    
+
 
     def exist(self) -> bool:
         exist = False
@@ -373,6 +385,18 @@ class new_suggestions(DB):
                 elif self.table == "msgs":
                     self.msgs = count
         return exist
+
+
+    def reachedLimit(self) -> bool:
+        if self.counter >= self.limit:
+            self.counter = 0
+            return True
+        else:
+            return False
+
+    
+    def new_suggest(self) -> None:
+        self.counter += 1
 
 
     def getMsg(self) -> str:
