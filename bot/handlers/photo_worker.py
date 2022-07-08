@@ -1,5 +1,6 @@
 from header import adminPicDB, random, bot, utils, suggestions
 from config import PATH, ADMIN_ID
+from user import premiumProcess
 
 
 def photoWorker(message): 
@@ -15,11 +16,13 @@ def photoWorker(message):
             if id == ADMIN_ID: 
                 upPic = utils.UploadPic(PATH.PHOTOS)
                 txt = "Сохранил"
+                premiumProcess(message)
             else:
                 upPic = utils.UploadPic(PATH.RECIEVED_PHOTOS)
                 txt = "Добавлено на рассмотрение"
                 picDB.setTableName("pics")
                 suggestions.new_suggest()
+                premiumProcess(message)
             file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
             file = bot.download_file(file_info.file_path)
             # saving photo id to DB of pics, either accepted pics table or pics table
