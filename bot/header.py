@@ -12,6 +12,7 @@ bot = telebot.TeleBot(token=API_TOKEN)
 
 userDB = utils.UserDB()
 boarDB = utils.BoarDB()
+premiumBoarDB = utils.PremiumBoarDB()
 msgDB = utils.MsgDB()
 
 adminJokeDB = utils.JokeDB("adminJokes")
