@@ -1,5 +1,5 @@
 from header import bot, utils 
-from header import userSubMenu, new_suggestions, adminMenu, userMenu, userPicDB, adminPicDB, adminJokeDB, userJokeDB, msgDB
+from header import userSubMenu, suggestions, adminMenu, userMenu, userPicDB, adminPicDB, adminJokeDB, userJokeDB, msgDB
 from header import mesg, shutil, os
 from config import PATH, KEYS
 from admin import *
@@ -28,8 +28,8 @@ def callWorker(call):
         del stats
     
     elif call.data == "BACK_ADMIN":
-        if new_suggestions.exist():
-            adminMenu.setMsg(new_suggestions.getMsg())
+        if suggestions.exist():
+            adminMenu.setMsg(suggestions.getMsg())
         else:
             adminMenu.setMsg("Админ меню")
         if call.message.text == None:
