@@ -1,4 +1,4 @@
-# v1.8.5
+# v1.8.7
 from handlers import *
 from header import *
 
@@ -7,6 +7,7 @@ bot.register_message_handler(commands=["start"], func=start, callback="none")
 bot.register_message_handler(commands=["auth"], func=auth, callback="none")
 bot.register_message_handler(commands=["help"], func=help, callback="none")
 bot.register_message_handler(content_types="text", func=textWorker, callback="none")
+bot.register_message_handler(content_types="photo", func=photoWorker, callback="none")
 
 
 @bot.callback_query_handler(func=lambda call: True)
@@ -18,7 +19,7 @@ if __name__ == "__main__":
     try:
         print("BOT STARTED")
         utils.log.info("BOT STARTED")
-        bot.polling()
+        bot.infinity_polling()
     except Exception as e:
         utils.log.error(e)
         bot.send_message(ADMIN_ID, "Bot stoped. Trouble occurred")
