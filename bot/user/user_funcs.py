@@ -1,4 +1,4 @@
-from header import bot, utils, msgDB, userDB, date, random, boarDB, suggestions
+from header import bot, utils, msgDB, userDB, date, random, boarDB, premiumBoarDB, suggestions
 from config import PATH, ADMIN_ID, FILTER
 
 
@@ -16,11 +16,13 @@ def uploadPicture(message):
             if id == ADMIN_ID: 
                 upPic = utils.UploadPic(PATH.PHOTOS)
                 txt = "Сохранил"
+                premiumProcess(message)
             else:
                 upPic = utils.UploadPic(PATH.RECIEVED_PHOTOS)
                 txt = "Добавлено на рассмотрение"
                 picDB.setTableName("pics")
                 suggestions.new_suggest()
+                premiumProcess(message)
             file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
             file = bot.download_file(file_info.file_path)
             # saving photo id to DB of pics, either accepted pics table or pics table
@@ -51,10 +53,12 @@ def uploadJoke(message):
                 jokeDB = utils.JokeDB("adminJokes")
                 if id == ADMIN_ID: 
                     txt = "Сохранил"
+                    premiumProcess(message)
                 else: 
                     jokeDB.setTableName('userJokes')
                     txt = "Добавлено на рассмотрение"
                     suggestions.new_suggest()
+                    premiumProcess(message)
                 jokeDB.newRecord(joke)
                 bot.send_message(message.chat.id, txt)
                 bot.send_message(message.chat.id, "Напиши анекдот. Для отмены нажми /brake")
@@ -112,13 +116,29 @@ def getWct(message):
         now = date.today()
         now_day = now.day
         prev_day = userDB.getPrevDay(id)
+        if userDB.checkPremium(id):
+            db = premiumBoarDB
+        else:
+            db = boarDB
         if now_day == prev_day:
             boarID = userDB.getWctForUser(id)
-            boar = boarDB.getID(boarID)
+            boar = db.getRecord(boarID)
             return open(PATH.WCT + boar, 'rb')
         else:
             userDB.setPrevDay(now_day, id)
-            boarID = random.randint(0, boarDB.getRecCount() - 1)
+            boarID = random.randint(0, db.getRecCount() - 1)
             userDB.setWctForUser(id, boarID)
-            boar = boarDB.getID(boarID)
+            boar = db.getRecord(boarID)
             return open(PATH.WCT + boar, 'rb')
+
+
+def premiumProcess(message):
+    id = message.chat.id
+    if userDB.checkPremium(id) == False:
+        userDB.newUpload(id)
+    if userDB.uploadsLimitReached(id):
+        userDB.setPremium(id)
+        boarID = random.randint(0, premiumBoarDB.getRecCount() - 1)
+        userDB.setWctForUser(id, boarID)
+        userDB.uploadsDel(id)
+        bot.send_message(message.chat.id, "Поздравляю! Ты премиальный кабан!\nПроверь, нажми кнопку)")
