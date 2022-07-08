@@ -1,4 +1,4 @@
-from header import boarDB, userDB, userPicDB, msgDB
+from header import boarDB, premiumBoarDB, userDB, userPicDB, msgDB
 from header import bot, utils, mesg
 from config import PATH, ADMIN_ID, FILTER
 
@@ -25,6 +25,30 @@ def uploadWct(message) -> None:
         else:      
             bot.send_message(message.chat.id, "Это не картинка, пришли фото или жми /brake")
             bot.register_next_step_handler(message, uploadWct)
+
+
+def uploadPremWct(message) -> None:
+    if message.content_type == 'photo':
+        if message.content_type == "media_group": # able to save not only one pic (in future)
+            bot.send_message(message.chat.id, "Пришли только одну картинку")
+            bot.register_next_step_handler(message, uploadPremWct)
+        else:
+            upPic = utils.UploadPic(PATH.WCT)
+            file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
+            file = bot.download_file(file_info.file_path)
+            premiumBoarDB.newRecord(file_info.file_path.replace('photos/', ''))
+            upPic.upload(file, file_info)
+            bot.send_message(message.chat.id, "Сохранил")
+    else:
+        if message.content_type == "text":
+            if message.text.lower() == "/brake":
+                bot.send_message(message.chat.id, "Отменено")  
+            else:
+                bot.send_message(message.chat.id, "Это не картинка, пришли фото или жми /brake")
+                bot.register_next_step_handler(message, uploadPremWct)    
+        else:      
+            bot.send_message(message.chat.id, "Это не картинка, пришли фото или жми /brake")
+            bot.register_next_step_handler(message, uploadPremWct)
 
 
 def notify(message) -> None:
