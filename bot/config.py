@@ -46,6 +46,7 @@ class KEYS():
         0: { "text": "Картинку",                  "call": "UPLOAD_PICTURE"    }, 
         1: { "text": "Анекдот",                   "call": "UPLOAD_JOKE"       },
         2: { "text": "Кабана",                    "call": "UPLOAD_BOAR"       }, 
+        3: { "text": "Премиум Кабана",            "call": "UPLOAD_PREM_BOAR"  }, 
     }
     JOKE_SEE = {
         0: { "text": "Выйти",                     "call": "BACK_ADMIN"        }, 
@@ -77,6 +78,10 @@ class LIMIT():
     JOKE = 10
     MESSAGE = 5
     PHOTO = 10
+
+
+class UPLOAD_LIMIT():
+    COUNT = 5
 
 #========================FILTER===================================
 
