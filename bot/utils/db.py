@@ -1,5 +1,5 @@
 import sqlite3
-from config import PATH
+from config import PATH, UPLOAD_LIMIT
 from utils.logger import log
 import threading
 
@@ -7,33 +7,35 @@ lock = threading.Lock()
 
 #      DB structure
 # 
-#      +---------------------------------+
-#      |TABLES         |COLUMNS          |
-#      |===============|=================|
-#      |accPics________|_________________|
-#      |               |fileID:  STRING  |
-#      |pics___________|_________________|
-#      |               |fileID:  STRING  |
-#      |adminJokes_____|_________________|
-#      |               |joke:    STRING  |
-#      |userJokes______|_________________|
-#      |               |joke:    STRING  |
-#      |boarsID________|_________________|
-#      |               |ID:      STRING  |
-#      |premiumBoarsID_|_________________|
-#      |               |ID:      STRING  |
-#      |msgs___________|_________________|
-#      |               |msg:     STRING  |
-#      |               |fileID:  STRING  |
-#      |users__________|_________________|
-#      |               |userID:  INTEGER |
-#      |               |wctID:   STRING  |
-#      |               |prevDay: INTEGER |
-#      |vk_users_______|_________________|
-#      |               |userID:  INTEGER |
-#      |               |wctID:   STRING  |
-#      |               |prevDay: INTEGER |
-#      +---------------------------------+
+#      +-------------------------------------+
+#      |TABLES         |COLUMNS              |
+#      |===============|=====================|
+#      |accPics________|_____________________|
+#      |               |fileID:      STRING  |
+#      |pics___________|_____________________|
+#      |               |fileID:      STRING  |
+#      |adminJokes_____|_____________________|
+#      |               |joke:        STRING  |
+#      |userJokes______|_____________________|
+#      |               |joke:        STRING  |
+#      |boarsID________|_____________________|
+#      |               |ID:          STRING  |
+#      |premiumBoarsID_|_____________________|
+#      |               |ID:          STRING  |
+#      |msgs___________|_____________________|
+#      |               |msg:         STRING  |
+#      |               |fileID:      STRING  |
+#      |users__________|_____________________|
+#      |               |userID:      INTEGER |
+#      |               |wctID:       STRING  |
+#      |               |prevDay:     INTEGER |
+#      |               |premium:     INTEGER |
+#      |               |uploadCount: INTEGER |
+#      |vk_users_______|_____________________|
+#      |               |userID:      INTEGER |
+#      |               |wctID:       STRING  |
+#      |               |prevDay:     INTEGER |
+#      +-------------------------------------+
 
 
 class DB():
@@ -221,6 +223,109 @@ class UserDB(DB):
             lock.release()
 
 
+    def checkPremium(self, userID) -> bool:
+        try:
+            lock.acquire(True)
+            info = self.bd_cursor.execute(f'SELECT premium FROM {self.table} WHERE {self.col}={userID}')
+            premium = self.bd_cursor.fetchall()[0][0] # list > tuple > string
+            if premium == 0:
+                return False
+            else:
+                return True
+        except Exception as e:
+            log.error(e)
+            print(e)
+        finally:
+            lock.release()
+
+
+    def setPremium(self, userID) -> None:
+        try:
+            lock.acquire(True)
+            log.info("Установка premium")
+            self.bd_cursor.execute(f'UPDATE {self.table} SET premium = 1 WHERE {self.col}={userID}')
+            self.bd.commit()
+            log.info("Успешно")
+        except Exception as e:
+            log.error(e)
+            print(e)
+        finally:
+            lock.release()
+
+
+    def loosePremium(self, userID) -> None:
+        try:
+            lock.acquire(True)
+            log.info("Потеря premium")
+            self.bd_cursor.execute(f'UPDATE {self.table} SET premium = 0 WHERE {self.col}={userID}')
+            self.bd.commit()
+            log.info("Успешно")
+        except Exception as e:
+            log.error(e)
+            print(e)
+        finally:
+            lock.release()
+
+
+    def newUpload(self, userID) -> None:
+        try:
+            lock.acquire(True)
+            log.info("Новая загрузка")
+            count = self.getUploadCount(userID) + 1
+            self.bd_cursor.execute(f'UPDATE {self.table} SET uploadCount = {count} WHERE {self.col}={userID}')
+            self.bd.commit()
+            log.info("Успешно")
+        except Exception as e:
+            log.error(e)
+            print(e)
+        finally:
+            lock.release()
+
+
+    def getUploadCount(self, userID) -> int:
+        try:
+            log.error("МОДУЛЬ БЕЗ БЛОКИРОВКИ ПОТОКА")
+            info = self.bd_cursor.execute(f'SELECT uploadCount FROM {self.table} WHERE {self.col}={userID}')
+            count = self.bd_cursor.fetchall()[0][0] # list > tuple > string
+            log.info(count)
+            log.error("УСПЕШНО")
+            return count
+        except Exception as e:
+            log.error(e)
+            print(e)
+
+    
+    def uploadsLimitReached(self, userID) -> bool:
+        try:
+            lock.acquire(True)
+            info = self.bd_cursor.execute(f'SELECT uploadCount FROM {self.table} WHERE {self.col}={userID}')
+            count = self.bd_cursor.fetchall()[0][0] # list > tuple > string
+            if count >= UPLOAD_LIMIT.COUNT:
+                return True
+            else:
+                return False
+        except Exception as e:
+            log.error(e)
+            print(e)
+        finally:
+            lock.release()
+
+
+    def uploadsDel(self, userID) -> None:
+        try:
+            lock.acquire(True)
+            log.info("Списывание счетчика загрузок")
+            count = self.getUploadCount(userID)
+            self.bd_cursor.execute(f'UPDATE {self.table} SET uploadCount = 0 WHERE {self.col}={userID}')
+            self.bd.commit()
+            log.info("Успешно")
+        except Exception as e:
+            log.error(e)
+            print(e)
+        finally:
+            lock.release()
+
+
 class JokeDB(DB):
     def __init__(self, table) -> None:
         super().__init__()
@@ -253,7 +358,6 @@ class MsgDB(DB):
         try:
             lock.acquire(True)
             log.info("Удаление записи БД в таблице: " + self.table + " Столбец: fileID")
-
             info = self.bd_cursor.execute(f'SELECT * FROM {self.table}')
             rec = self.bd_cursor.fetchall()[recNum]
             msg = rec[0]
@@ -324,6 +428,13 @@ class BoarDB(DB):
     def __init__(self) -> None:
         super().__init__()
         self.table = "boarsID"
+        self.col = "ID"
+
+
+class PremiumBoarDB(DB):
+    def __init__(self) -> None:
+        super().__init__()
+        self.table = "premiumBoarsID"
         self.col = "ID"
 
 
