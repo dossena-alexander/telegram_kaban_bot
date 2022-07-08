@@ -1,5 +1,5 @@
-from header import utils, bot, helpMenu, userDB, new_suggestions, adminMenu, userMenu
-from config import ADMIN_ID, KEYS
+from header import utils, bot, helpMenu, userDB, suggestions, adminMenu, userMenu, adminPicDB, adminJokeDB
+from config import ADMIN_ID, KEYS, BOT_MESSAGE
 
 
 def start(message):
@@ -21,16 +21,17 @@ def auth(message):
 
 
 def help(message):
+    helpMenu.setMsg(BOT_MESSAGE.HELP(photo_count = adminPicDB.getRecCount(), joke_count = adminJokeDB.getRecCount()))
     bot.send_message(message.chat.id, helpMenu.getMsg(), parse_mode="html")
 
 
 def admin(message):
-    if new_suggestions.exist():
-        adminMenu.setMsg(new_suggestions.getMsg())
+    if suggestions.exist():
+        adminMenu.setMsg(suggestions.getMsg())
     else:
         adminMenu.setMsg("Админ меню")
     bot.send_message(message.chat.id, adminMenu.getMsg(), reply_markup=adminMenu.getInlineKeyboard(), parse_mode="html")
 
 
 def user(message):
-    bot.send_message(message.chat.id, userMenu.getMsg(), reply_markup=userMenu.getInlineKeyboard()) 
+    bot.send_message(message.chat.id, userMenu.getMsg(), reply_markup=userMenu.getInlineKeyboard())
