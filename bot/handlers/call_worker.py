@@ -64,6 +64,10 @@ def callWorker(call):
         bot.edit_message_text(text="Отправь фото или нажми /brake", chat_id=call.message.chat.id, message_id=call.message.message_id)
         bot.register_next_step_handler(call.message, uploadWct)
 
+    elif call.data == "UPLOAD_PREM_BOAR":
+        bot.edit_message_text(text="Отправь фото или нажми /brake", chat_id=call.message.chat.id, message_id=call.message.message_id)
+        bot.register_next_step_handler(call.message, uploadPremWct)
+
 #========================ADMIN_SEE_PICS===================================
 
     elif call.data == "SEE_PICTURES":
@@ -78,7 +82,7 @@ def callWorker(call):
     elif call.data == "PIC_ACCEPT":
         bot.delete_message(call.message.chat.id, call.message.message_id)
         adminPicDB.newRecord(userPicDB.getRecord(mesg.count))
-        shutil.move(PATH.RECIEVED_PHOTOS + userPicDB.getPicID(mesg.count), PATH.PHOTOS)
+        shutil.move(PATH.RECIEVED_PHOTOS + userPicDB.getRecord(mesg.count), PATH.PHOTOS)
         userPicDB.delRecord(userPicDB.getRecord(mesg.count))
         see(call.message, type="pic", db=userPicDB, keys=KEYS.PIC_SEE)
 
