@@ -7,35 +7,51 @@ lock = threading.Lock()
 
 #      DB structure
 # 
-#      +-------------------------------------+
-#      |TABLES         |COLUMNS              |
-#      |===============|=====================|
-#      |accPics________|_____________________|
-#      |               |fileID:      STRING  |
-#      |pics___________|_____________________|
-#      |               |fileID:      STRING  |
-#      |adminJokes_____|_____________________|
-#      |               |joke:        STRING  |
-#      |userJokes______|_____________________|
-#      |               |joke:        STRING  |
-#      |boarsID________|_____________________|
-#      |               |ID:          STRING  |
-#      |premiumBoarsID_|_____________________|
-#      |               |ID:          STRING  |
-#      |msgs___________|_____________________|
-#      |               |msg:         STRING  |
-#      |               |fileID:      STRING  |
-#      |users__________|_____________________|
-#      |               |userID:      INTEGER |
-#      |               |wctID:       STRING  |
-#      |               |prevDay:     INTEGER |
-#      |               |premium:     INTEGER |
-#      |               |uploadCount: INTEGER |
-#      |vk_users_______|_____________________|
-#      |               |userID:      INTEGER |
-#      |               |wctID:       STRING  |
-#      |               |prevDay:     INTEGER |
-#      +-------------------------------------+
+#      +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~+
+#      |TABLES         |COLUMNS                                          |
+#      |===============|=================================================|
+#      |accPics--------|-------------------------------------------------|
+#      |               |fileID: |                                        |
+#      |               |STRING  |                                        |
+#      |pics-----------|-------------------------------------------------|
+#      |               |fileID: |                                        |
+#      |               |STRING  |                                        |
+#      |adminJokes-----|-------------------------------------------------|
+#      |               |joke:   |                                        |
+#      |               |STRING  |                                        |
+#      |userJokes------|-------------------------------------------------|
+#      |               |joke:   |                                        |
+#      |               |STRING  |                                        |
+#      |boarsID--------|-------------------------------------------------|
+#      |               |ID:     |                                        |
+#      |               |STRING  |                                        |
+#      |premiumBoarsID-|-------------------------------------------------|
+#      |               |ID:     |                                        |
+#      |               |STRING  |                                        |
+#      |msgs-----------|-------------------------------------------------|
+#      |               |msg:    |fileID:|                                |
+#      |               |STRING  |STRING |                                |
+#      |users------------------------------------------------------------|
+#      |               |userID: |wctID: |prevDay: |premium: |uploadCount:|
+#      |               |INTEGER |STRING |INTEGER  |INTEGER  |INTEGER     |
+#      |vk_users-------|-------------------------------------------------|
+#      |               |userID: |wctID: |prevDay: |                      |
+#      |               |INTEGER |STRING |INTEGER  |                      |
+#      +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~+
+
+
+def lock_thread(func):
+    def _wrapper(self, *args, **kwargs):
+        try:
+            lock.acquire(True)
+            return func(self, *args, **kwargs)
+        except Exception as e:
+            log.error(e)
+            print(e)
+        finally:
+            lock.release()
+    return _wrapper
+
 
 
 class DB():
@@ -46,75 +62,45 @@ class DB():
         self.col = ''
 
 
+    @lock_thread
     def delRecord(self, record) -> None:
-        try:
-            lock.acquire(True)
-            log.info("Удаление записи БД в таблице: " + self.table + " Столбец: " + self.col)
-            self.bd_cursor.execute( f'DELETE FROM {self.table} WHERE {self.col}=?', (record, ) )
-            self.bd.commit()
-        except Exception as e:
-            log.error(e)
-            print(e)
-        finally:
-            log.info("Успешно")
-            lock.release()
+        log.info("Удаление записи БД в таблице: " + self.table + " Столбец: " + self.col)
+        self.bd_cursor.execute( f'DELETE FROM {self.table} WHERE {self.col}=?', (record, ) )
+        self.bd.commit()
+        log.info("Успешно")
 
 
+    @lock_thread
     def newRecord(self, record: str) -> None:
-        try:
-            lock.acquire(True)
-            log.info("Новая запись БД в таблице: " + self.table + " Столбец: " + self.col)
-            self.bd_cursor.execute(f'INSERT INTO {self.table} ({self.col}) VALUES (?)', (record, ) ) 
-            self.bd.commit()
-        except Exception as e:
-            log.error(e)
-            print(e)
-        finally:
-            log.info("Успешно")
-            lock.release()
+        log.info("Новая запись БД в таблице: " + self.table + " Столбец: " + self.col)
+        self.bd_cursor.execute(f'INSERT INTO {self.table} ({self.col}) VALUES (?)', (record, ) ) 
+        self.bd.commit()
+        log.info("Успешно")
 
 
+    @lock_thread
     def hasRecords(self) -> bool:
-        try:
-            lock.acquire(True)
-            info = self.bd_cursor.execute(f'SELECT * FROM {self.table}')
-            record = self.bd_cursor.fetchall()
-            if len(record) == 0: return False
-            else: return True
-        except Exception as e:
-            log.error(e)
-            print(e)
-        finally:
-            lock.release()
+        info = self.bd_cursor.execute(f'SELECT * FROM {self.table}')
+        record = self.bd_cursor.fetchall()
+        if len(record) == 0: return False
+        else: return True
 
 
-    # in case of often uses recursive cursors, I had to use threading lock
+    @lock_thread
     def getRecCount(self) -> int:
-        try:
-            lock.acquire(True)
-            log.info("Количество записей БД в таблице: " + self.table)
-            info = self.bd_cursor.execute(f"SELECT * FROM {self.table}")
-            record = self.bd_cursor.fetchall()
-            return len(record)
-        except Exception as e:
-            log.error(e)
-            print(e)
-        finally:
-            lock.release()
+        log.info("Количество записей БД в таблице: " + self.table)
+        info = self.bd_cursor.execute(f"SELECT * FROM {self.table}")
+        record = self.bd_cursor.fetchall()
+        log.error(len(record))
+        return len(record)
 
 
+    @lock_thread
     def getRecord(self, recNum: int) -> str:
-        try:
-            lock.acquire(True)    
-            info = self.bd_cursor.execute(f'SELECT * FROM {self.table}')
-            record = self.bd_cursor.fetchall()
-            rec = record[recNum]
-            return rec[0]
-        except Exception as e:
-            log.error(e)
-            print(e)
-        finally:
-            lock.release()
+        info = self.bd_cursor.execute(f'SELECT * FROM {self.table}')
+        record = self.bd_cursor.fetchall()
+        rec = record[recNum]
+        return rec[0]
 
     
     def getTableName(self) -> str:
@@ -133,153 +119,95 @@ class DB():
         setattr(self, "col", colName)
 
 
+
+
 class UserDB(DB):
     def __init__(self, table = "users", col = "userID") -> None:
         super().__init__()
         self.table = table
         self.col = col
 
-    
+
+    @lock_thread
     def getUsersList(self) -> list:
-        try:
-            lock.acquire(True)
-            log.info("Getting users list")
-            info = self.bd_cursor.execute(f'SELECT {self.col} FROM {self.table}')
-            records = self.bd_cursor.fetchall()
-            records_listed = [record[0] for record in records]
-            log.info("Успешно")
-            # records_listed is integer list
-            return records_listed
-        except Exception as e:
-            log.error(e)
-            print(e)
-        finally:
-            lock.release()
+        log.info("Getting users list")
+        info = self.bd_cursor.execute(f'SELECT {self.col} FROM {self.table}')
+        records = self.bd_cursor.fetchall()
+        records_listed = [record[0] for record in records]
+        log.info("Успешно")
+        # records_listed is integer list
+        return records_listed
 
 
+    @lock_thread
     def getWctForUser(self, userID: int) -> str:
-        try:
-            lock.acquire(True)
-            info = self.bd_cursor.execute(f'SELECT wctID FROM {self.table} WHERE {self.col}={userID}')
-            return self.bd_cursor.fetchall()[0][0] # list > tuple > string
-        except Exception as e:
-            log.error(e)
-            print(e)
-        finally:
-            lock.release()
+        info = self.bd_cursor.execute(f'SELECT wctID FROM {self.table} WHERE {self.col}={userID}')
+        return self.bd_cursor.fetchall()[0][0] # list > tuple > string
 
 
+    @lock_thread
     def setWctForUser(self, userID: int, boarID: str) -> None:
-        try:
-            lock.acquire(True)
-            log.info("Установка wct для пользователя")
-            self.bd_cursor.execute(f'UPDATE {self.table} SET wctID = {boarID} WHERE {self.col}={userID}')
-            self.bd.commit()
-            log.info("Успешно")
-        except Exception as e:
-            log.error(e)
-            print(e)
-        finally:
-            lock.release()
+        log.info("Установка wct для пользователя")
+        self.bd_cursor.execute(f'UPDATE {self.table} SET wctID = {boarID} WHERE {self.col}={userID}')
+        self.bd.commit()
+        log.info("Успешно")
 
-    
+
+    @lock_thread    
     def getPrevDay(self, userID: int) -> int:
-        try:
-            lock.acquire(True)
-            info = self.bd_cursor.execute(f'SELECT prevDay FROM {self.table} WHERE {self.col}={userID}')
-            return self.bd_cursor.fetchall()[0][0] # list > tuple > string
-        except Exception as e:
-            log.error(e)
-            print(e)
-        finally:
-            lock.release()
+        info = self.bd_cursor.execute(f'SELECT prevDay FROM {self.table} WHERE {self.col}={userID}')
+        return self.bd_cursor.fetchall()[0][0] # list > tuple > string
 
     
+    @lock_thread
     def setPrevDay(self, day: int, userID: int) -> None:
-        try:
-            lock.acquire(True)
-            log.info("Установка предыдущего дня")
-            self.bd_cursor.execute(f'UPDATE {self.table} SET prevDay = {day} WHERE {self.col}={userID}')
-            self.bd.commit()
-            log.info("Успешно")
-        except Exception as e:
-            log.error(e)
-            print(e)
-        finally:
-            lock.release()
+        log.info("Установка предыдущего дня")
+        self.bd_cursor.execute(f'UPDATE {self.table} SET prevDay = {day} WHERE {self.col}={userID}')
+        self.bd.commit()
+        log.info("Успешно")
 
 
+    @lock_thread
     def addUser(self, userID: str) -> None:
-        try:
-            lock.acquire(True)
-            log.info("Auth -- Добавление пользователя в БД")
-            self.bd_cursor.execute(f'INSERT INTO {self.table} ({self.col}) VALUES (?)', (userID, ) )
-            self.bd.commit()
-            log.info("Успешно")
-        except Exception as e:
-            log.error(e)
-            print(e)
-        finally:
-            lock.release()
+        log.info("Auth -- Добавление пользователя в БД")
+        self.bd_cursor.execute(f'INSERT INTO {self.table} ({self.col}) VALUES (?)', (userID, ) )
+        self.bd.commit()
+        log.info("Успешно")
 
 
+    @lock_thread
     def checkPremium(self, userID) -> bool:
-        try:
-            lock.acquire(True)
-            info = self.bd_cursor.execute(f'SELECT premium FROM {self.table} WHERE {self.col}={userID}')
-            premium = self.bd_cursor.fetchall()[0][0] # list > tuple > string
-            if premium == 0:
-                return False
-            else:
-                return True
-        except Exception as e:
-            log.error(e)
-            print(e)
-        finally:
-            lock.release()
+        info = self.bd_cursor.execute(f'SELECT premium FROM {self.table} WHERE {self.col}={userID}')
+        premium = self.bd_cursor.fetchall()[0][0] # list > tuple > string
+        if premium == 0:
+            return False
+        else:
+            return True
 
 
+    @lock_thread
     def setPremium(self, userID) -> None:
-        try:
-            lock.acquire(True)
-            log.info("Установка premium")
-            self.bd_cursor.execute(f'UPDATE {self.table} SET premium = 1 WHERE {self.col}={userID}')
-            self.bd.commit()
-            log.info("Успешно")
-        except Exception as e:
-            log.error(e)
-            print(e)
-        finally:
-            lock.release()
+        log.info("Установка premium")
+        self.bd_cursor.execute(f'UPDATE {self.table} SET premium = 1 WHERE {self.col}={userID}')
+        self.bd.commit()
+        log.info("Успешно")
 
 
+    @lock_thread
     def loosePremium(self, userID) -> None:
-        try:
-            lock.acquire(True)
-            log.info("Потеря premium")
-            self.bd_cursor.execute(f'UPDATE {self.table} SET premium = 0 WHERE {self.col}={userID}')
-            self.bd.commit()
-            log.info("Успешно")
-        except Exception as e:
-            log.error(e)
-            print(e)
-        finally:
-            lock.release()
+        log.info("Потеря premium")
+        self.bd_cursor.execute(f'UPDATE {self.table} SET premium = 0 WHERE {self.col}={userID}')
+        self.bd.commit()
+        log.info("Успешно")
 
 
+    @lock_thread
     def newUpload(self, userID) -> None:
-        try:
-            lock.acquire(True)
             log.info("Новая загрузка")
             count = self.getUploadCount(userID) + 1
             self.bd_cursor.execute(f'UPDATE {self.table} SET uploadCount = {count} WHERE {self.col}={userID}')
             self.bd.commit()
             log.info("Успешно")
-        except Exception as e:
-            log.error(e)
-            print(e)
-        finally:
-            lock.release()
 
 
     def getUploadCount(self, userID) -> int:
@@ -287,43 +215,32 @@ class UserDB(DB):
             log.error("МОДУЛЬ БЕЗ БЛОКИРОВКИ ПОТОКА")
             info = self.bd_cursor.execute(f'SELECT uploadCount FROM {self.table} WHERE {self.col}={userID}')
             count = self.bd_cursor.fetchall()[0][0] # list > tuple > string
-            log.info(count)
             log.error("УСПЕШНО")
             return count
         except Exception as e:
             log.error(e)
             print(e)
 
-    
+
+    @lock_thread
     def uploadsLimitReached(self, userID) -> bool:
-        try:
-            lock.acquire(True)
-            info = self.bd_cursor.execute(f'SELECT uploadCount FROM {self.table} WHERE {self.col}={userID}')
-            count = self.bd_cursor.fetchall()[0][0] # list > tuple > string
-            if count >= UPLOAD_LIMIT.COUNT:
-                return True
-            else:
-                return False
-        except Exception as e:
-            log.error(e)
-            print(e)
-        finally:
-            lock.release()
+        info = self.bd_cursor.execute(f'SELECT uploadCount FROM {self.table} WHERE {self.col}={userID}')
+        count = self.bd_cursor.fetchall()[0][0] # list > tuple > string
+        if count >= UPLOAD_LIMIT.COUNT:
+            return True
+        else:
+            return False
 
 
+    @lock_thread
     def uploadsDel(self, userID) -> None:
-        try:
-            lock.acquire(True)
-            log.info("Списывание счетчика загрузок")
-            count = self.getUploadCount(userID)
-            self.bd_cursor.execute(f'UPDATE {self.table} SET uploadCount = 0 WHERE {self.col}={userID}')
-            self.bd.commit()
-            log.info("Успешно")
-        except Exception as e:
-            log.error(e)
-            print(e)
-        finally:
-            lock.release()
+        log.info("Списывание счетчика загрузок")
+        count = self.getUploadCount(userID)
+        self.bd_cursor.execute(f'UPDATE {self.table} SET uploadCount = 0 WHERE {self.col}={userID}')
+        self.bd.commit()
+        log.info("Успешно")
+
+
 
 
 class JokeDB(DB):
@@ -333,6 +250,8 @@ class JokeDB(DB):
         self.col = 'joke'
 
 
+
+
 class MsgDB(DB):
     def __init__(self) -> None:
         super().__init__()
@@ -340,81 +259,54 @@ class MsgDB(DB):
         self.col = 'msg'
 
 
+    @lock_thread
     def getFileID(self, recNum: int) -> str:
-        try:
-            lock.acquire(True)
-            info = self.bd_cursor.execute(f'SELECT fileID FROM {self.table}')
-            record = self.bd_cursor.fetchall()
-            msg = record[recNum]
-            return msg[0]
-        except Exception as e:
-            log.error(e)
-            print(e)
-        finally:
-            lock.release()
+        info = self.bd_cursor.execute(f'SELECT fileID FROM {self.table}')
+        record = self.bd_cursor.fetchall()
+        msg = record[recNum]
+        return msg[0]
 
 
+    @lock_thread
     def delAll(self, recNum: int) -> None:
-        try:
-            lock.acquire(True)
-            log.info("Удаление записи БД в таблице: " + self.table + " Столбец: fileID")
-            info = self.bd_cursor.execute(f'SELECT * FROM {self.table}')
-            rec = self.bd_cursor.fetchall()[recNum]
-            msg = rec[0]
-            fileID = rec[1]
-            self.bd_cursor.execute( f'DELETE FROM {self.table} WHERE msg=? OR fileID=?', (msg, fileID) )
-            self.bd.commit()
-        except Exception as e:
-            log.error(e)
-            print(e)
-        finally:
-            log.info("Успешно")
-            lock.release()
+        log.info("Удаление записи БД в таблице: " + self.table + " Столбец: fileID")
+        info = self.bd_cursor.execute(f'SELECT * FROM {self.table}')
+        rec = self.bd_cursor.fetchall()[recNum]
+        msg = rec[0]
+        fileID = rec[1]
+        self.bd_cursor.execute( f'DELETE FROM {self.table} WHERE msg=? OR fileID=?', (msg, fileID) )
+        self.bd.commit()
+        log.info("Успешно")
 
 
+    @lock_thread
     def msgHasFileID(self, recNum: int) -> bool:
-        try:
-            lock.acquire(True)
-            info = self.bd_cursor.execute(f'SELECT * FROM {self.table}')
-            record = self.bd_cursor.fetchall()
-            if record[recNum][1] == None:
-                return False
-            else:
-                return True
-        except Exception as e:
-            print(e)
-        finally:
-            lock.release()
+        info = self.bd_cursor.execute(f'SELECT * FROM {self.table}')
+        record = self.bd_cursor.fetchall()
+        if record[recNum][1] == None:
+            return False
+        else:
+            return True
 
 
     # new record with file id of photo sent to admin
+    @lock_thread
     def newFileID(self, record: str) -> None:
-        try:
-            lock.acquire(True)
-            log.info("Новая запись БД в таблице: " + self.table + " Столбец: fileID")
-            self.bd_cursor.execute(f'INSERT INTO {self.table} (fileID) VALUES (?)', (record, ) ) 
-            self.bd.commit()
-            log.info("Успешно")
-        except Exception as e:
-            log.error(e)
-            print(e)
-        finally:
-            lock.release()
+        log.info("Новая запись БД в таблице: " + self.table + " Столбец: fileID")
+        self.bd_cursor.execute(f'INSERT INTO {self.table} (fileID) VALUES (?)', (record, ) ) 
+        self.bd.commit()
+        log.info("Успешно")
 
 
+    @lock_thread
     # new record with caption below photo sent to admin
     def insertMsgForFileID(self, msg: str, fileID: str) -> None:
-        try:
-            lock.acquire(True)
-            log.info("Вставка сообщения для картинки")
-            self.bd_cursor.execute(f'UPDATE {self.table} SET msg=\'{msg}\' WHERE fileID=\'{fileID}\'')
-            self.bd.commit()
-            log.info("Успешно")
-        except Exception as e:
-            log.error(e)
-            print(e)
-        finally:
-            lock.release()
+        log.info("Вставка сообщения для картинки")
+        self.bd_cursor.execute(f'UPDATE {self.table} SET msg=\'{msg}\' WHERE fileID=\'{fileID}\'')
+        self.bd.commit()
+        log.info("Успешно")
+
+
 
 
 class PicDB(DB):
@@ -424,11 +316,15 @@ class PicDB(DB):
         self.col = 'fileID'
     
 
+
+
 class BoarDB(DB):
     def __init__(self) -> None:
         super().__init__()
         self.table = "boarsID"
         self.col = "ID"
+
+
 
 
 class PremiumBoarDB(DB):
@@ -438,18 +334,14 @@ class PremiumBoarDB(DB):
         self.col = "ID"
 
 
+    @lock_thread
     def getID(self, recNum: int) -> str:
-        try:
-            lock.acquire(True)
-            info = self.bd_cursor.execute(f'SELECT * FROM {self.table}')
-            record = self.bd_cursor.fetchall()
-            ID = record[recNum]
-            return ID[0]
-        except Exception as e:
-            log.error(e)
-            print(e)
-        finally:
-            lock.release()
+        info = self.bd_cursor.execute(f'SELECT * FROM {self.table}')
+        record = self.bd_cursor.fetchall()
+        ID = record[recNum]
+        return ID[0]
+
+
 
 
 class Statistics(DB):
@@ -467,9 +359,11 @@ class Statistics(DB):
         return txt
 
 
+
+
 class suggestions(DB):
     # when users upload photo or joke counter increases to the limit, then bot sends message to admin
-    limit = 5 
+    limit = UPLOAD_LIMIT.COUNT 
     counter = 0
 
 
