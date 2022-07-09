@@ -11,7 +11,9 @@ need to update readme)
 ----
 ## Contents:
 1. [Setup](#setup)
-2. [Usage](#usage)
+2. [Class Menu](#class-menu)
+3. [Keys and Keyboard](#keys-and-keyboard)
+4. [Menu](#menu)
 ----
 ----
 ## Setup
@@ -27,7 +29,7 @@ pip install telebot
 
 ----
 ----
-## Menu
+## Class Menu
 
 Menu is composite of message and keyboard bot send to user. Creating Menu object
 ```python
@@ -44,41 +46,50 @@ menu.setReplyKeyboard(keys_dict)
 ```
 To get message or keyboard you should use:
 ```python
-menu.getMsg() # returns str 
+menu.getMsg()            # returns str 
 menu.getInlineKeyboard() # returns types.InlineKeyboardMarkup
-menu.getReplyKeyboard() # returns types.ReplyKeyboardMarkup(resize_keyboard=True)
+menu.getReplyKeyboard()  # returns types.ReplyKeyboardMarkup(resize_keyboard=True)
 ```
+
+[:arrow_up:Contents](#contents)
+
+----
 ----
 ### Keys and keyboard
-Keys below will be rowed as you see. 
- In other words, in one row -- two buttons, or if you have three buttons, they will be rowed in two rows: two buttons up, one bottom.
- Keys is a button text and callback data in the same time. Keys must be rowed.    
+ In one row -- two buttons, or if you have three buttons, they will be rowed in two rows: two buttons in line upper, one bottom.
 **For example:**
 ```python
-keys = [
-  'key1', 'key2',
-  'key3', 'key4'
-]
+class KEYS():
+    USER = {
+        0: { "text": "Upload",                    "call": "UPLOAD_MENU_USER"  }, 
+        1: { "text": "Message to admin",          "call": "MESSAGE_TO_ADMIN"  },
+        2: { "text": "Boar translation telegram", "call": "TRANSLATE"         }, 
+    }
 
 adminMenu.setInlineKeyboard(keys)
-adminMenu.rowInlineKeyboard()
 ```
 If you do not want to use Menu() you could use composite of Menu() ReplyKeyboard() or InlineKeyboard(). They have methods:    
-1. get()
-2. add(keys: list)
-3. autoRow()
+| ReplyKeyboard            | InlineKeyboard                      |
+| :----------------------: | :---------------------------------: |
+| get()                    | get()                               |
+| set_keyboard(keys: dict) | set_keyboard(keys: dict)            |
+| add_button(text: str)    | add_button(text: str, call: str)    |
+|                          | add_url_button(text: str, url: str) |
 
 Or use standart types.ReplyKeyboardMarkup()
 
+[:arrow_up:Contents](#contents)
+
+----
 ----
 
 ### Menu
 **Instead of:**
 ```python
-def admin(message):
-    button1 = types.InlineKeyboardButton(text='button1', callback_data='call_1')
-    button2 = types.InlineKeyboardButton(text='button2', callback_data='call_2')
-    button3 = types.InlineKeyboardButton(text='button3', callback_data='call_3')
+def user(message):
+    button1 = types.InlineKeyboardButton(text='Upload', callback_data='UPLOAD_MENU_USER')
+    button2 = types.InlineKeyboardButton(text='Message to admin', callback_data='MESSAGE_TO_ADMIN')
+    button3 = types.InlineKeyboardButton(text='Boar translation telegram', callback_data='TRANSLATE')
     markup = types.InlineKeyboardMarkup()
     markup.row(button1, button2)
     markup.row(button3)
@@ -86,17 +97,18 @@ def admin(message):
 ```
 **I use:**
 ```python
-Keys = [
-    "Key one", "Key two",
-         "Key three"
-]
+class KEYS():
+    USER = {
+        0: { "text": "Upload",                    "call": "UPLOAD_MENU_USER"  }, 
+        1: { "text": "Message to admin",          "call": "MESSAGE_TO_ADMIN"  },
+        2: { "text": "Boar translation telegram", "call": "TRANSLATE"         }, 
+    }
 msg = "Hello!"
-adminMenu.setMsg(msg)
-adminMenu.setInlineKeyboard(Keys)
-adminMenu.rowInlineKeyboard()
+userMenu.setMsg(msg)
+userMenu.setInlineKeyboard(KEYS.USER)
 
-def admin(message):
-    bot.send_message(message.chat.id, adminMenu.getMsg(), reply_markup=adminMenu.getInlineKeyboard())
+def user(message):
+    bot.send_message(message.chat.id, userMenu.getMsg(), reply_markup=userMenu.getInlineKeyboard())
 ```
 [:arrow_up:Contents](#contents)
 
