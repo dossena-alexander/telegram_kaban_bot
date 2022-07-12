@@ -46,7 +46,7 @@ menu.set_reply_keyboard(keys_dict)
 ```
 To get message or keyboard you should use:
 ```python
-menu.message()            # returns str 
+menu.message()             # returns str 
 menu.get_inline_keyboard() # returns types.InlineKeyboardMarkup
 menu.get_reply_keyboard()  # returns types.ReplyKeyboardMarkup(resize_keyboard=True)
 ```
