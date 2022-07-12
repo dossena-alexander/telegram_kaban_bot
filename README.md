@@ -35,20 +35,20 @@ Menu is composite of message and keyboard bot send to user. Creating Menu object
 ```python
 menu = Menu()
 ```
-Set message. Method **.setMsg(msg: str)**:
+Set message. Method **.set_message(msg: str)**:
 ```python
-menu.setMsg("Hello there!")
+menu.set_message("Hello there!")
 ```
-Set keyboard. Methods **.setInlineKeyboard(keys: dict)** and **.setReplyKeyboard(keys: dict)**
+Set keyboard. Methods **.set_inline_keyboard(keys: dict)** and **.set_reply_keyboard(keys: dict)**
 ```python
-menu.setInlineKeyboard(keys_dict)
-menu.setReplyKeyboard(keys_dict)
+menu.set_inline_keyboard(keys_dict)
+menu.set_reply_keyboard(keys_dict)
 ```
 To get message or keyboard you should use:
 ```python
-menu.getMsg()            # returns str 
-menu.getInlineKeyboard() # returns types.InlineKeyboardMarkup
-menu.getReplyKeyboard()  # returns types.ReplyKeyboardMarkup(resize_keyboard=True)
+menu.message()            # returns str 
+menu.get_inline_keyboard() # returns types.InlineKeyboardMarkup
+menu.get_reply_keyboard()  # returns types.ReplyKeyboardMarkup(resize_keyboard=True)
 ```
 
 [:arrow_up:Contents](#contents)
@@ -66,7 +66,7 @@ class KEYS():
         2: { "text": "Boar translation telegram", "call": "TRANSLATE"         }, 
     }
 
-adminMenu.setInlineKeyboard(keys)
+adminMenu.set_inline_keyboard(keys)
 ```
 If you do not want to use Menu() you could use composite of Menu() ReplyKeyboard() or InlineKeyboard(). They have methods:    
 | ReplyKeyboard            | InlineKeyboard                      |
@@ -104,11 +104,11 @@ class KEYS():
         2: { "text": "Boar translation telegram", "call": "TRANSLATE"         }, 
     }
 msg = "Hello!"
-userMenu.setMsg(msg)
-userMenu.setInlineKeyboard(KEYS.USER)
+userMenu.set_message(msg)
+userMenu.set_inline_keyboard(KEYS.USER)
 
 def user(message):
-    bot.send_message(message.chat.id, userMenu.getMsg(), reply_markup=userMenu.getInlineKeyboard())
+    bot.send_message(message.chat.id, userMenu.message, reply_markup=userMenu.get_inline_keyboard())
 ```
 [:arrow_up:Contents](#contents)
 
