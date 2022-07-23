@@ -1,4 +1,4 @@
-import telebot, random
+import random
 from datetime import date
 import shutil, os
 
@@ -8,7 +8,7 @@ import utils
 
 #========================INSTANCE===================================
 
-bot = telebot.TeleBot(token=API_TOKEN)
+bot = utils.Ban_telebot(token=API_TOKEN)
 
 userDB = utils.UserDB()
 boarDB = utils.BoarDB()
