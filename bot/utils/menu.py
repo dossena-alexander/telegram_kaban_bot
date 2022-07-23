@@ -9,25 +9,25 @@ class Menu():
         self.inlineKeyboard = InlineKeyboard()
 
 
-    def setMsg(self, x: str):
+    def set_message(self, x: str):
         setattr(self, "msg", x)
 
-
-    def getMsg(self):
+    @property
+    def message(self):
         return self.msg
         
     
-    def getReplyKeyboard(self):
+    def get_reply_keyboard(self):
         return self.replyKeyboard.get()
 
 
-    def setReplyKeyboard(self, keys: dict):
+    def set_reply_keyboard(self, keys: dict):
         self.replyKeyboard.set_keyboard(keys)
 
 
-    def getInlineKeyboard(self):
+    def get_inline_keyboard(self):
         return self.inlineKeyboard.get()
 
 
-    def setInlineKeyboard(self, keys: dict):
+    def set_inline_keyboard(self, keys: dict):
         self.inlineKeyboard.set_keyboard(keys)
