@@ -14,24 +14,23 @@ def auth(message):
     if userID == ADMIN_ID:
         admin(message)
     else:
-        usersList = userDB.getUsersList()
+        usersList = userDB.get_users_list()
         if userID not in usersList:
-            userDB.addUser(userID)
+            userDB.add_user(userID)
         user(message)
 
 
 def help(message):
-    helpMenu.setMsg(BOT_MESSAGE.HELP(photo_count = adminPicDB.getRecCount(), joke_count = adminJokeDB.getRecCount()))
-    bot.send_message(message.chat.id, helpMenu.getMsg(), parse_mode="html")
+    helpMenu.set_message(BOT_MESSAGE.HELP(photo_count = adminPicDB.get_records_count(), joke_count = adminJokeDB.get_records_count()))
+    bot.send_message(message.chat.id, helpMenu.message, parse_mode="html")
 
 
 def admin(message):
+    adminMenu.set_message("Админ меню")
     if suggestions.exist():
-        adminMenu.setMsg(suggestions.getMsg())
-    else:
-        adminMenu.setMsg("Админ меню")
-    bot.send_message(message.chat.id, adminMenu.getMsg(), reply_markup=adminMenu.getInlineKeyboard(), parse_mode="html")
+        adminMenu.set_message(suggestions.get_message())
+    bot.send_message(message.chat.id, adminMenu.message, reply_markup=adminMenu.get_inline_keyboard(), parse_mode="html")
 
 
 def user(message):
-    bot.send_message(message.chat.id, userMenu.getMsg(), reply_markup=userMenu.getInlineKeyboard())
+    bot.send_message(message.chat.id, userMenu.message, reply_markup=userMenu.get_inline_keyboard())
