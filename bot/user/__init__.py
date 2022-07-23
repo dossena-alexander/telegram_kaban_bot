@@ -1,1 +1,2 @@
-from user.user_funcs import uploadJoke, uploadMsg, uploadPicture, getWct, premiumProcess
+# from user.user_funcs import *
+from user.user_menu import *
