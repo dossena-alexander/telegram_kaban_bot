@@ -1,1 +1,2 @@
-from admin.admin_funcs import uploadWct, uploadPremWct, notify, see, see_msg
+# from admin.admin_funcs import *
+from admin.admin_menu import *
