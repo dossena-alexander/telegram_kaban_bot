@@ -1,28 +1,37 @@
-from header import adminPicDB, random, adminJokeDB, bot, shedule, utils, suggestions
-from config import PATH, SHEDULE_SITE, ADMIN_ID
-from user import getWct
+from header import adminPicDB, random, adminJokeDB, bot, utils, suggestions
+from config import PATH, ADMIN_ID
+from user import get_wct_photo
 
 
-def textWorker(message):
+def reply_keyboard_worker(message):
     msg = message.text.lower()
     if msg == "фотокарточка":
-        if suggestions.reachedLimit():
-            bot.send_message(ADMIN_ID, f"Есть новые {suggestions.counter} предложений")
-        bot.send_photo(message.chat.id, 
-        open(PATH.PHOTOS + adminPicDB.getRecord(recNum=random.randint(0, adminPicDB.getRecCount() - 1)), "rb"))
+        _check_suggestions()
+        _send_photo(message)
     elif msg == "анекдот":
-        if suggestions.reachedLimit():
-            bot.send_message(ADMIN_ID, f"Есть новые {suggestions.counter} предложений")
-        bot.send_message(message.chat.id, 
-        adminJokeDB.getRecord(recNum=random.randint(0, adminJokeDB.getRecCount() - 1)))
+        _check_suggestions()
+        _send_joke(message)
     elif msg == "какой я кабан сегодня":
-        if suggestions.reachedLimit():
-            bot.send_message(ADMIN_ID, f"Есть новые {suggestions.counter} предложений")
-        if getWct(message) != None:
-            bot.send_photo(message.chat.id, getWct(message))
-    elif msg == "расписание":
-        key = utils.InlineKeyboard()
-        key.addUrlButton("Сайт с заменами", SHEDULE_SITE)
-        bot.send_photo(message.chat.id, shedule.getShedule(), shedule.currentDay(), reply_markup=key.get())
+        _check_suggestions()
+        _send_wct(message)
 
+
+def _send_wct(message):
+    if get_wct_photo(message) != None:
+        bot.send_photo(message.chat.id, get_wct_photo(message))
+
+
+def _send_joke(message):
+    bot.send_message(message.chat.id, 
+        adminJokeDB.get_record(row=random.randint(0, adminJokeDB.get_records_count() - 1)))
+
+
+def _send_photo(message):
+    bot.send_photo(message.chat.id, 
+        open(PATH.PHOTOS + adminPicDB.get_record(row=random.randint(0, adminPicDB.get_records_count() - 1)), "rb"))
+
+
+def _check_suggestions():
+    if suggestions.limit_reached():
+        bot.send_message(ADMIN_ID, f"Есть новые {suggestions.all_suggestions} предложений")
 
