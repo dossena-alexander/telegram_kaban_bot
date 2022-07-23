@@ -107,12 +107,11 @@ class FILTER():
 
 # path to folders
 class PATH():
-    WCT = '../wct/'
-    PHOTOS = '../photos/'
-    RECIEVED_PHOTOS = '../recieved_photos/'
+    WCT = '../materials/wct/'
+    PHOTOS = '../materials/photos/'
+    RECIEVED_PHOTOS = '../materials/recieved_photos/'
     DB = '../db/main.db'
     LOG = "../Logs/bot.log"
-    SHEDULE = "../Shedule/"
 
 #=================================================================
 
