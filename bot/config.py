@@ -17,7 +17,7 @@ class KEYS():
         0: { "text": "Предложения",               "call": "SUGGESTIONS"       }, 
         1: { "text": "Загрузка",                  "call": "UPLOAD_MENU_ADMIN" },
         2: { "text": "Сообщения",                 "call": "SEE_MESSAGES"      }, 
-        3: { "text": "Рассылка",                  "call": "NOTIFY"            },
+        3: { "text": "Рассылка",                  "call": "NOTIFY_MENU"       },
         4: { "text": "Остановить бота",           "call": "STOP_BOT"          },
         5: { "text": "Пользователь",              "call": "USER"              }, 
         6: { "text": "Статистика",                "call": "STATISTICS"        },
@@ -25,12 +25,18 @@ class KEYS():
     USER = {
         0: { "text": "Загрузить",                 "call": "UPLOAD_MENU_USER"  }, 
         1: { "text": "Сообщение админу",          "call": "MESSAGE_TO_ADMIN"  },
-        2: { "text": "Кабаний перевод телеграмм", "call": "TRANSLATE"         }, 
+        2: { "text": "Достижения",                "call": "ACHIEVEMENTS"      }, 
+        3: { "text": "Премиум",                   "call": "PREMIUM"           },
+        4: { "text": "Кабаний перевод телеграмм", "call": "TRANSLATE"         },  
     }
     START = {
         0: { "text": "Анекдот",                   "call": "None"              }, 
         1: { "text": "Фотокарточка",              "call": "None"              },
         2: { "text": "Какой я кабан сегодня",     "call": "None"              }, 
+    }
+    NOTIFY = {
+        0: { "text": "Как админ",                 "call": "NOTIFY"          }, 
+        1: { "text": "Как бот",                   "call": "NOTIFY_BOT"      },
     }
     USER_SUB_MENU = {
         0: { "text": "Русский",                   "call": "None"              }, 
@@ -70,6 +76,7 @@ class KEYS():
         1: { "text": "Анекдоты",                  "call": "SEE_JOKES"         },
         2: { "text": "Назад",                     "call": "BACK_ADMIN"        }, 
     }
+    
 
 #========================LIMITS===================================
 
@@ -80,8 +87,9 @@ class LIMIT():
     PHOTO = 10
 
 
-class UPLOAD_LIMIT():
-    COUNT = 5
+class PREMIUM_LIMIT():
+    UPLOADS_COUNT = 5
+    DAYS = 2
 
 #========================FILTER===================================
 
