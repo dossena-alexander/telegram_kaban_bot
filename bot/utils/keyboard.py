@@ -11,9 +11,12 @@ class ReplyKeyboard():
 
 
     def set_keyboard(self, keys: dict) -> None:
-        """
+        """        
         Keys as dictionary is rowing in two buttons grid.
         The parametred dict will used to set it up to tuples list for further rowing.
+
+        Args:
+            keys (dict): in form -> dict = {0: "text": "button-text", "call": "button-call-text"}
         """
         buttons_as_listed_tuples = []
 
@@ -51,9 +54,12 @@ class InlineKeyboard():
 
 
     def set_keyboard(self, keys: dict) -> None:
-        """
+        """        
         Keys as dictionary is rowing in two buttons grid.
         The parametred dict will used to set it up to tuples list for further rowing.
+
+        Args:
+            keys (dict): in form -> dict = {0: "text": "button-text", "call": "button-call-text"}
         """
         buttons_as_listed_tuples = []
 
