@@ -1,7 +1,8 @@
 from header import bot, utils, userDB, date, random, boarDB, premiumBoarDB, boarsCategories
 from header import PREMIUM_LIMIT
 
-def _new_wct(userID, db) -> None:
+
+def new_wct(userID, db) -> None:
     day = _actual_day()
     userDB.set_previous_day(day, userID)
     boarID = random.randint(0, db.get_records_count() - 1)
@@ -21,11 +22,12 @@ def _actual_day() -> int:
     return actual_day
 
 
-def check_day(userID, db):
+def new_day(userID) -> bool:
     day = _actual_day()
     previous_day = userDB.get_previous_day(userID)
-    if day != previous_day:
-        _new_wct(userID, db) # its new day
+    if day == previous_day:
+        return False
+    return True
 
 
 def _translate_category(category) -> str:
@@ -67,21 +69,23 @@ def check_new_boar(message, boar):
 
 
 def premium_process(message):
-    userID = message.chat.id
+    userID = message.from_user.id
     if userDB.is_premium(userID) and _actual_day() - userDB.get_premium_turned_on_day(userID) > PREMIUM_LIMIT.DAYS:
         userDB.disactivate_premium(userID)
-        boarID = random.randint(0, boarDB.get_records_count() - 1)
-        userDB.set_wct_for_user(userID, boarID)
+        new_wct(userID, boarDB)
         bot.send_message(message.chat.id, "Истек срок премиума!\nКак получить премиум читай в /auth -> Премиум")
 
 
 def new_upload_for_user(message):
-    userID = message.chat.id
+    userID = message.from_user.id
     if userDB.is_premium(userID) == False:
         userDB.new_upload(userID)
+    check_upload_limit(message, userID)
+
+
+def check_upload_limit(message, userID):
     if userDB.uploads_limit_reached(userID):
         userDB.activate_premium(userID, _actual_day())
         userDB.delete_uploads_count(userID)
-        boarID = random.randint(0, premiumBoarDB.get_records_count() - 1)
-        userDB.set_wct_for_user(userID, boarID)
+        new_wct(userID, premiumBoarDB)
         bot.send_message(message.chat.id, "Поздравляю! Ты премиальный кабан!\nПроверь, нажми кнопку)")
