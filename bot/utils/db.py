@@ -378,25 +378,12 @@ class BoarsCategories(DB):
         return boars_listed
 
 
-    def _check_boar_in_column(self, boarID: int, column: str, records_count: int) -> str:
-        for row in range(records_count):
-            boar_fileID = self._get_record_from_column(column, row)
-            if boar_fileID == boarID:
-                return column
-
-
-    def _check_column(self, boarID: int, column: str) -> str:
-        records_count = self.get_records_count()
-
-        return self._check_boar_in_column(boarID, column, records_count)
-
-
     def get_boar_category(self, boarID: str) -> str:
         columns = self._get_columns_names()
         for column in columns:
-            category = self._check_column(boarID, column)
-            if category != None:
-                return category
+            boars = self.get_boars_of_category(column)
+            if boarID in boars:
+                return column
 
 
     @lock_thread
