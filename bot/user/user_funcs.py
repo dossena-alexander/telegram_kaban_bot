@@ -116,10 +116,12 @@ def get_wct_photo(message):
         return None
     premium_process(message)
     db = choice_DB_by_premium(userID)
-    check_day(userID, db)
+    if new_day(userID):
+        new_wct(userID, db)
     boarID = userDB.get_wct_for_user(userID)
     boar = db.get_record(boarID)
     check_new_boar(message, boar)
+
     return open(PATH.WCT + boar, 'rb')
 
 
