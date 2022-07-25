@@ -5,10 +5,8 @@ class ReplyKeyboard():
     def __init__(self) -> None:
         self._keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
 
-
     def get(self) -> types.ReplyKeyboardMarkup:
         return self._keyboard
-
 
     def set_keyboard(self, keys: dict) -> None:
         """        
@@ -25,7 +23,6 @@ class ReplyKeyboard():
 
         self._row_buttons(buttons_as_listed_tuples)
 
-
     def _row_buttons(self, buttons):
         for j in range(len(buttons)//2 + len(buttons)%2):
             i = j*2
@@ -37,21 +34,16 @@ class ReplyKeyboard():
             else:
                 self._keyboard.row(a)
 
-
     def add_button(self, text) -> None:
         self._keyboard.add(text)
-
-
 
 
 class InlineKeyboard(): 
     def __init__(self) -> None:
         self._keyboard = types.InlineKeyboardMarkup()
 
-
     def get(self) -> types.InlineKeyboardMarkup:
         return self._keyboard
-
 
     def set_keyboard(self, keys: dict) -> None:
         """        
@@ -68,7 +60,6 @@ class InlineKeyboard():
             
         self._row_buttons(buttons_as_listed_tuples)
 
-    
     def _row_buttons(self, buttons):
         for j in range(len(buttons)//2 + len(buttons)%2):
             i = j*2
@@ -80,16 +71,13 @@ class InlineKeyboard():
             else:
                 self._keyboard.row(a)
 
-
     def add_url_button(self, key: str, url: str) -> None:
         button = types.InlineKeyboardButton(text=key, url=url)
         self._keyboard.add(button)
 
-
     def add_button(self, text: str, call: str) -> None:
         button = types.InlineKeyboardButton(text=text, callback_data=call)
         self._keyboard.add(button)
-
 
     # def row_button(self, text: str, call: str) -> None:
     #     button = types.InlineKeyboardButton(text=text, callback_data=call)

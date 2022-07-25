@@ -1,6 +1,7 @@
 import random
 from datetime import date
-import shutil, os
+import shutil
+import os
 
 from config import *
 import utils
