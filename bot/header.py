@@ -20,8 +20,8 @@ msgDB = utils.MsgDB()
 adminJokeDB = utils.JokeDB(table = "adminJokes")
 adminPicDB = utils.PicDB(table = "accPics")
 
-userPicDB = utils.PicDB(table = "pics")
 userJokeDB = utils.JokeDB(table = "userJokes")
+userPicDB = utils.PicDB(table = "pics")
 
 # records counter that`s used to see DB records in admin menu
 class mesg():
@@ -34,7 +34,7 @@ suggestions = utils.suggestions()
 adminMenu = utils.Menu()
 userMenu = utils.Menu()
 helpMenu = utils.Menu()
-userSubMenu = utils.Menu()
+user_translate_menu = utils.Menu()
 
 #========================MENU_SET-UP===================================
 
@@ -44,7 +44,4 @@ adminMenu.set_inline_keyboard(KEYS.ADMIN)
 userMenu.set_message(BOT_MESSAGE.USER)
 userMenu.set_inline_keyboard(KEYS.USER)
 
-userSubMenu.set_message(BOT_MESSAGE.USER_SUB_MENU)
-
-helpMenu.set_message( BOT_MESSAGE.HELP(photo_count = adminPicDB.get_records_count(), 
-                                       joke_count = adminJokeDB.get_records_count()) )
+user_translate_menu.set_message(BOT_MESSAGE.USER_SUB_MENU)
