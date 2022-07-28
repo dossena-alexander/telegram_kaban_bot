@@ -1,6 +1,7 @@
-import telebot, random
+import random
 from datetime import date
-import shutil, os
+import shutil
+import os
 
 from config import *
 import utils
@@ -8,40 +9,39 @@ import utils
 
 #========================INSTANCE===================================
 
-bot = telebot.TeleBot(token=API_TOKEN)
+bot = utils.Ban_telebot(token=API_TOKEN)
 
 userDB = utils.UserDB()
 boarDB = utils.BoarDB()
+premiumBoarDB = utils.PremiumBoarDB()
+boarsCategories = utils.BoarsCategories()
 msgDB = utils.MsgDB()
 
-adminJokeDB = utils.JokeDB("adminJokes")
-adminPicDB = utils.PicDB("accPics")
+adminJokeDB = utils.JokeDB(table = "adminJokes")
+adminPicDB = utils.PicDB(table = "accPics")
 
-userPicDB = utils.PicDB("pics")
-userJokeDB = utils.JokeDB("userJokes")
+userJokeDB = utils.JokeDB(table = "userJokes")
+userPicDB = utils.PicDB(table = "pics")
 
 # records counter that`s used to see DB records in admin menu
 class mesg():
     count = 0
 
 suggestions = utils.suggestions()
-shedule = utils.Shedule()
 
 #========================MENU===================================
 
 adminMenu = utils.Menu()
 userMenu = utils.Menu()
 helpMenu = utils.Menu()
-userSubMenu = utils.Menu()
+user_translate_menu = utils.Menu()
 
 #========================MENU_SET-UP===================================
 
-adminMenu.setMsg(BOT_MESSAGE.ADMIN)
-adminMenu.setInlineKeyboard(KEYS.ADMIN)
+adminMenu.set_message(BOT_MESSAGE.ADMIN)
+adminMenu.set_inline_keyboard(KEYS.ADMIN)
 
-userMenu.setMsg(BOT_MESSAGE.USER)
-userMenu.setInlineKeyboard(KEYS.USER)
+userMenu.set_message(BOT_MESSAGE.USER)
+userMenu.set_inline_keyboard(KEYS.USER)
 
-userSubMenu.setMsg(BOT_MESSAGE.USER_SUB_MENU)
-
-helpMenu.setMsg(BOT_MESSAGE.HELP(photo_count = adminPicDB.getRecCount(), joke_count = adminJokeDB.getRecCount()))
+user_translate_menu.set_message(BOT_MESSAGE.USER_SUB_MENU)

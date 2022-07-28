@@ -7,7 +7,14 @@ class BOT_MESSAGE():
     ADMIN = "Админ меню"
     USER_SUB_MENU = "Кабаний перевод телеграмм для настоящих кабанов, просто нажми на кнопку, чтобы установить"
     def HELP(photo_count: int = 1000, joke_count: int = 1000) -> str:
-        msg = f"<b>Что я умею</b>\n <i>Мои команды:</i>\n • /start - Запуск\n • /help - Помощь\n • /auth - Аутентификация\n <i>Мои возможности:</i>\n • <b>Какой ты кабан сегодня</b>\n • <b>Фотокарточка</b> –– Смешная картинка из {photo_count}\n • <b>Анекдот</b> –– Рандомный анекдот из {joke_count}"
+        msg = ("<b>Что я умею</b>\n <i>Мои команды:</i>\n"
+            + "• /start - Запуск\n"
+            + "• /help - Помощь\n"
+            + "• /auth - Аутентификация\n" 
+            + "<i>Мои возможности:</i>\n" 
+            + "• <b>Какой ты кабан сегодня</b>\n"
+            + f"• <b>Фотокарточка</b> –– Смешная картинка из {photo_count}\n"
+            + f"• <b>Анекдот</b> –– Рандомный анекдот из {joke_count}")
         return msg
 
 #========================KEYS=====================================
@@ -17,7 +24,7 @@ class KEYS():
         0: { "text": "Предложения",               "call": "SUGGESTIONS"       }, 
         1: { "text": "Загрузка",                  "call": "UPLOAD_MENU_ADMIN" },
         2: { "text": "Сообщения",                 "call": "SEE_MESSAGES"      }, 
-        3: { "text": "Рассылка",                  "call": "NOTIFY"            },
+        3: { "text": "Рассылка",                  "call": "NOTIFY_MENU"       },
         4: { "text": "Остановить бота",           "call": "STOP_BOT"          },
         5: { "text": "Пользователь",              "call": "USER"              }, 
         6: { "text": "Статистика",                "call": "STATISTICS"        },
@@ -25,12 +32,18 @@ class KEYS():
     USER = {
         0: { "text": "Загрузить",                 "call": "UPLOAD_MENU_USER"  }, 
         1: { "text": "Сообщение админу",          "call": "MESSAGE_TO_ADMIN"  },
-        2: { "text": "Кабаний перевод телеграмм", "call": "TRANSLATE"         }, 
+        2: { "text": "Достижения",                "call": "ACHIEVEMENTS"      }, 
+        3: { "text": "Премиум",                   "call": "PREMIUM"           },
+        4: { "text": "Кабаний перевод телеграмм", "call": "TRANSLATE"         },  
     }
     START = {
         0: { "text": "Анекдот",                   "call": "None"              }, 
         1: { "text": "Фотокарточка",              "call": "None"              },
         2: { "text": "Какой я кабан сегодня",     "call": "None"              }, 
+    }
+    NOTIFY = {
+        0: { "text": "Как админ",                 "call": "NOTIFY"            }, 
+        1: { "text": "Как бот",                   "call": "NOTIFY_BOT"        },
     }
     USER_SUB_MENU = {
         0: { "text": "Русский",                   "call": "None"              }, 
@@ -46,6 +59,7 @@ class KEYS():
         0: { "text": "Картинку",                  "call": "UPLOAD_PICTURE"    }, 
         1: { "text": "Анекдот",                   "call": "UPLOAD_JOKE"       },
         2: { "text": "Кабана",                    "call": "UPLOAD_BOAR"       }, 
+        3: { "text": "Премиум Кабана",            "call": "UPLOAD_PREM_BOAR"  }, 
     }
     JOKE_SEE = {
         0: { "text": "Выйти",                     "call": "BACK_ADMIN"        }, 
@@ -69,6 +83,7 @@ class KEYS():
         1: { "text": "Анекдоты",                  "call": "SEE_JOKES"         },
         2: { "text": "Назад",                     "call": "BACK_ADMIN"        }, 
     }
+    
 
 #========================LIMITS===================================
 
@@ -78,6 +93,11 @@ class LIMIT():
     MESSAGE = 5
     PHOTO = 10
 
+
+class PREMIUM_LIMIT():
+    UPLOADS_COUNT = 5
+    DAYS = 2
+
 #========================FILTER===================================
 
 # text-worker filter
@@ -86,21 +106,15 @@ class FILTER():
             "Фотокарточка", 
             "Анекдот", 
             "Какой я кабан сегодня", 
-            "Расписание"
             "/auth", "/help", "/start"
-]
+    ]
 
 #========================PATHS====================================
 
 # path to folders
 class PATH():
-    WCT = '../wct/'
-    PHOTOS = '../photos/'
-    RECIEVED_PHOTOS = '../recieved_photos/'
+    WCT = '../materials/wct/'
+    PHOTOS = '../materials/photos/'
+    RECIEVED_PHOTOS = '../materials/recieved_photos/'
     DB = '../db/main.db'
     LOG = "../Logs/bot.log"
-    SHEDULE = "../Shedule/"
-
-#=================================================================
-
-SHEDULE_SITE = ""

@@ -1,8 +1,9 @@
 from header import adminPicDB, random, bot, utils, suggestions
 from config import PATH, ADMIN_ID
+from user import new_upload_for_user
 
 
-def photoWorker(message): 
+def upload_photo_in_private_chat(message): 
     if message.chat.type == 'private':
         if message.media_group_id != None: # able to save not only one pic
             bot.send_message(message.chat.id, "Я могу сохранить только одну картинку")
@@ -18,12 +19,13 @@ def photoWorker(message):
             else:
                 upPic = utils.UploadPic(PATH.RECIEVED_PHOTOS)
                 txt = "Добавлено на рассмотрение"
-                picDB.setTableName("pics")
+                picDB.set_table("pics")
                 suggestions.new_suggest()
+            new_upload_for_user(message)
             file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
             file = bot.download_file(file_info.file_path)
             # saving photo id to DB of pics, either accepted pics table or pics table
-            picDB.newRecord(file_info.file_path.replace('photos/', ''))
+            picDB.new_record(file_info.file_path.replace('photos/', ''))
             upPic.upload(file, file_info)
             bot.send_message(message.chat.id, txt)
             del picDB
