@@ -5,6 +5,9 @@ from telebot import types
 from banned_users.banned import BannedDB
 
 
+banned = BannedDB()
+
+
 class Ban_telebot(TeleBot):
     def get_updates(self, *args, **kwargs):
         json_updates = apihelper.get_updates(self.token, *args, **kwargs)
@@ -19,7 +22,6 @@ class Ban_telebot(TeleBot):
 
     
     def _banned_users(self) -> list[int]:
-        banned = BannedDB()
         banned_users = banned.get_users()
         if not banned_users:
             banned_users = [0]
