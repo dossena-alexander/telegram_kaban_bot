@@ -1,7 +1,7 @@
-from header import msgDB, suggestions
+from header import utils
+from header import bot, msgDB, userDB, suggestions
 from config import PATH, ADMIN_ID, FILTER
-
-from user.user_utils import *
+from user.user_utils import funcs, premium, achievements
 
 
 def upload_photo(message): 
@@ -10,20 +10,20 @@ def upload_photo(message):
             bot.send_message(message.chat.id, "Пришли только одну картинку")
             bot.register_next_step_handler(message, upload_photo)
         else:
-            id = message.from_user.id
+            user_id = message.from_user.id
             picDB = utils.PicDB("accPics")
             # Checking ID of user, if admin is adding, pics`ll be added to main folder "photos/
             # if not, bot send photo id to DB, after all admin`ll be able to save pics to "photos/
             # uploadPic('admin') is saving pics to main -- "photos/"; picDB saving photo id to accepted pics table
             txt = "Сохранил"
-            if id == ADMIN_ID: 
+            if user_id == ADMIN_ID: 
                 upPic = utils.UploadPic(PATH.PHOTOS)
             else:
                 upPic = utils.UploadPic(PATH.RECIEVED_PHOTOS)
                 txt = "Добавлено на рассмотрение"
                 picDB.set_table("pics")
                 suggestions.new_suggest()
-            new_upload_for_user(message)
+            premium.new_upload_for_user(message)
             file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
             file = bot.download_file(file_info.file_path)
             # saving photo id to DB of pics, either accepted pics table or pics table
@@ -50,15 +50,15 @@ def upload_joke(message):
         if message.text.lower() != "/brake":
             if message.text not in FILTER.COMMANDS:
                 joke = message.text
-                id = message.from_user.id 
+                user_id = message.from_user.id 
                 table = "adminJokes"
                 userMessage = "Сохранил"
-                if id != ADMIN_ID: 
+                if user_id != ADMIN_ID: 
                     table = "userJokes"
                     userMessage = "Добавлено на рассмотрение"
                     suggestions.new_suggest()
                 jokeDB = utils.JokeDB(table)
-                new_upload_for_user(message)
+                premium.new_upload_for_user(message)
                 jokeDB.new_record(joke)
                 bot.send_message(message.chat.id, userMessage)
                 bot.send_message(message.chat.id, "Напиши анекдот.\nДля отмены нажми /brake")
@@ -108,19 +108,20 @@ def get_wct_photo(message):
     if user in one day, when he used function in bot, will use wct again, wct give the same "boar id"
     """
     
-    userID = message.from_user.id 
+    user_id = message.from_user.id 
     users = userDB.get_users_list()
 
-    if userID != ADMIN_ID and userID not in users:
+    if user_id != ADMIN_ID and user_id not in users:
         bot.send_message(message.chat.id, "Ты не зарегистрировался. Нажми /auth, чтобы зарегистрироваться")
         return None
-    premium_process(message)
-    db = choice_DB_by_premium(userID)
-    if new_day(userID):
-        new_wct(userID, db)
-    boarID = userDB.get_wct_for_user(userID)
+    premium.check_premium_is_over(message)
+    db = premium.choice_DB_by_premium(user_id)
+    if funcs.new_day(user_id):
+        funcs.new_wct(user_id, db)
+
+    boarID = userDB.get_wct_for_user(user_id)
     boar = db.get_record(boarID)
-    check_new_boar(message, boar)
+    achievements.check_new_boar(message, boar)
 
     return open(PATH.WCT + boar, 'rb')
 
