@@ -24,8 +24,6 @@ userPicDB = utils.PicDB(table = "pics")
 class mesg():
     count = 0
 
-suggestions = utils.suggestions()
-
 #========================MENU===================================
 
 adminMenu = utils.Menu()
