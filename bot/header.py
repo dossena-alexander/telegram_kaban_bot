@@ -12,9 +12,6 @@ import utils
 bot = utils.Ban_telebot(token=API_TOKEN)
 
 userDB = utils.UserDB()
-boarDB = utils.BoarDB()
-premiumBoarDB = utils.PremiumBoarDB()
-boarsCategories = utils.BoarsCategories()
 msgDB = utils.MsgDB()
 
 adminJokeDB = utils.JokeDB(table = "adminJokes")
