@@ -7,6 +7,6 @@ from user import *
 def call_work(call):
     bot.answer_callback_query(call.id)
 
-    Admin.admin_menu(call)
+    admin_menu(call)
 
-    User.user_menu(call)
+    user_menu(call)

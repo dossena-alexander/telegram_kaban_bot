@@ -1,8 +1,7 @@
 from header import utils
-from header import msgDB, suggestions, userDB
+from header import bot, msgDB, userDB, suggestions
 from config import PATH, ADMIN_ID, FILTER
 from user.user_utils import funcs, premium, achievements
-from user.user_utils import bot
 
 
 def upload_photo(message): 

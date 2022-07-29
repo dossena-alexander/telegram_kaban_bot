@@ -1,6 +1,13 @@
-from header import boarDB, premiumBoarDB, userDB, msgDB, boarsCategories
-from header import bot, utils, mesg
-from config import PATH, ADMIN_ID, FILTER
+from header import utils
+from header import mesg
+from header import bot, userDB, msgDB
+from config import PATH, FILTER, ADMIN_ID
+
+
+boarDB = utils.BoarDB()
+premiumBoarDB = utils.PremiumBoarDB()
+boarsCategories = utils.BoarsCategories()
+
 
 def choose_boar_category(message):
     if message.content_type == "text":
