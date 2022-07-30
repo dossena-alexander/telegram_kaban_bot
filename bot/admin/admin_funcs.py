@@ -38,7 +38,7 @@ def _upload_wct(message, boar_category) -> None:
             boar = file_info.file_path.replace('photos/', '')
             boarDB.new_record(boar)
             boarsCategories.new_boar(boar_category, boar)
-            upPic.upload(file, file_info)
+            upPic.upload(file, boar)
             bot.send_message(message.chat.id, "Сохранил")
     else:
         if message.content_type == "text":
@@ -64,7 +64,7 @@ def upload_premium_wct(message) -> None:
             boar = file_info.file_path.replace('photos/', '')
             premiumBoarDB.new_record(boar)
             boarsCategories.new_boar("premium", boar)
-            upPic.upload(file, file_info)
+            upPic.upload(file, boar)
             bot.send_message(message.chat.id, "Сохранил")
     else:
         if message.content_type == "text":
