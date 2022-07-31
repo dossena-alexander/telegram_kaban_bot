@@ -1,10 +1,9 @@
-from bot.admin.admin_utils.suggestions import suggestions
 from header import shutil, os
 from header import adminMenu, userMenu
 from header import userPicDB, adminPicDB, adminJokeDB, userJokeDB
 from config import KEYS
 
-import admin_utils 
+import admin.admin_utils as admin_utils
 from admin.admin_funcs import *
 
 

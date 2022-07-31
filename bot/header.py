@@ -9,7 +9,8 @@ import utils
 
 #========================INSTANCE===================================
 
-bot = utils.Ban_telebot(token=API_TOKEN)
+bot = utils.ban.Ban_telebot(token=API_TOKEN)
+
 
 userDB = utils.UserDB()
 msgDB = utils.MsgDB()

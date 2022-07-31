@@ -1,6 +1,7 @@
-from header import adminPicDB, random, bot, utils, suggestions
+from header import adminPicDB, userPicDB, bot, utils
 from config import PATH, ADMIN_ID
-from user import new_upload_for_user
+from admin.admin_utils import suggestions
+from user.user_utils import new_upload_for_user
 
 
 def upload_photo_in_private_chat(message): 
@@ -8,18 +9,18 @@ def upload_photo_in_private_chat(message):
         if message.media_group_id != None: # able to save not only one pic
             bot.send_message(message.chat.id, "Я могу сохранить только одну картинку")
         else:
-            id = message.from_user.id
-            picDB = utils.PicDB("accPics")
+            user_id = message.from_user.id
+            picDB = adminPicDB
             # Checking ID of user, if admin is adding, pics`ll be added to main folder "photos/
             # if not, bot send photo id to DB, after all admin`ll be able to save pics to "photos/
             # uploadPic('admin') is saving pics to main -- "photos/"; picDB saving photo id to accepted pics table
-            if id == ADMIN_ID: 
+            if user_id == ADMIN_ID: 
                 upPic = utils.UploadPic(PATH.PHOTOS)
                 txt = "Сохранил"
             else:
                 upPic = utils.UploadPic(PATH.RECIEVED_PHOTOS)
                 txt = "Добавлено на рассмотрение"
-                picDB.set_table("pics")
+                picDB = userPicDB
                 suggestions.new_suggest()
             new_upload_for_user(message)
             file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)

@@ -1,1 +1,1 @@
-from admin_utils.suggestions import *
+from admin.admin_utils.suggestions import *

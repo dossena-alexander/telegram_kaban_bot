@@ -1,6 +1,7 @@
 from header import utils
-from header import bot, msgDB, userDB, suggestions
+from header import bot, msgDB, userDB
 from config import PATH, ADMIN_ID, FILTER
+from admin.admin_utils import suggestions
 from user.user_utils import funcs, premium, achievements
 
 

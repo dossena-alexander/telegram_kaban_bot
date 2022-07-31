@@ -1,6 +1,7 @@
-from header import adminPicDB, random, adminJokeDB, bot, utils, suggestions
+from header import adminPicDB, random, adminJokeDB, bot
 from config import PATH, ADMIN_ID
-from user import get_wct_photo
+from admin.admin_utils import suggestions
+from user.user_funcs import get_wct_photo
 
 
 def reply_keyboard_worker(message):

@@ -1,5 +1,5 @@
 from utils.logger import log
-from config import PATH
+
 
 class UploadPic():
     __src: str 

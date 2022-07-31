@@ -1,4 +1,4 @@
-# v1.8.8.4
+# v1.8.8.5
 from handlers import *
 from header import *
 
@@ -36,4 +36,5 @@ if __name__ == "__main__":
         bot.infinity_polling()
     except Exception as e:
         utils.log.error(e)
+        print(e)
         bot.send_message(ADMIN_ID, "Bot stoped. Trouble occurred")

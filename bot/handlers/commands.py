@@ -1,5 +1,6 @@
-from header import utils, bot, helpMenu, userDB, suggestions, adminMenu, userMenu, adminPicDB, adminJokeDB
+from header import utils, bot, helpMenu, userDB, adminMenu, userMenu, adminPicDB, adminJokeDB
 from config import ADMIN_ID, KEYS, BOT_MESSAGE
+from admin.admin_utils import suggestions
 
 
 def start(message):
