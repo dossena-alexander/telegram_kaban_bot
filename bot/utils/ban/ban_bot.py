@@ -19,11 +19,13 @@ class Ban_telebot(TeleBot):
                     self.last_update_id = update['update_id']
                 else:
                     ret.append(types.Update.de_json(update))
-            if 'callback_query' in update:
+            elif 'callback_query' in update:
                 if update['callback_query']['from']['id'] in banned_users:
                     self.last_update_id = update['update_id']
                 else:
-                    ret.append(types.Update.de_json(update))
+                    ret.append(types.Update.de_json(update)) 
+            else:
+                ret.append(types.Update.de_json(update))     
         return ret
         
 
