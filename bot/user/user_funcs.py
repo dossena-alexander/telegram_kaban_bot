@@ -27,9 +27,10 @@ def upload_photo(message):
             premium.new_upload_for_user(message)
             file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
             file = bot.download_file(file_info.file_path)
+            file_name = file_info.file_path.replace('photos/', '')
             # saving photo id to DB of pics, either accepted pics table or pics table
-            picDB.new_record(file_info.file_path.replace('photos/', ''))
-            upPic.upload(file, file_info)
+            picDB.new_record(file_name)
+            upPic.upload(file, file_name)
             bot.send_message(message.chat.id, txt)
             bot.send_message(message.chat.id, "Пришли еще картинку.\nДля отмены нажми /brake")
             del picDB
@@ -90,7 +91,7 @@ def upload_message_to_admin(message):
         file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
         file = bot.download_file(file_info.file_path)
         fileID = file_info.file_path.replace('photos/', '')
-        upPic.upload(file, file_info)
+        upPic.upload(file, fileID)
         msgDB.new_file_id(fileID)
         if message.caption != None:
             caption = message.caption

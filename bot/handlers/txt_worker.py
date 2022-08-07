@@ -1,6 +1,6 @@
 from header import adminPicDB, random, adminJokeDB, bot
 from config import PATH, ADMIN_ID
-from admin.admin_utils import suggestions
+from admin.admin_utils.suggestions import Suggestions
 from user.user_funcs import get_wct_photo
 
 
@@ -33,6 +33,7 @@ def _send_photo(message):
 
 
 def _check_suggestions():
+    suggestions = Suggestions()
     if suggestions.limit_reached():
         bot.send_message(ADMIN_ID, f"Есть новые {suggestions.all_suggestions} предложений")
 

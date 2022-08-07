@@ -1,6 +1,7 @@
 from header import bot, userMenu, user_translate_menu
 from header import utils
 from config import KEYS
+from user.user_utils import *
 import user.user_funcs as user_funcs
 
 
@@ -23,7 +24,7 @@ def user_menu(call):
         bot.edit_message_text(text=user_translate_menu.message, chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard.get())
     
     elif call.data == "ACHIEVEMENTS":
-        achievements = utils.Achievements(call.message.chat.id)
+        achievements = Achievements(call.message.chat.id)
         keyboard = utils.InlineKeyboard()
         keyboard.add_button(text="Назад", call="BACK_USER")
         bot.edit_message_text(text=achievements.get_message(), chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard.get(), parse_mode="html")

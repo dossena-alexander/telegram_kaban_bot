@@ -12,13 +12,20 @@ class Ban_telebot(TeleBot):
     def get_updates(self, *args, **kwargs):
         json_updates = apihelper.get_updates(self.token, *args, **kwargs)
         ret = []
+        banned_users = self._banned_users()
         for update in json_updates:
-            if update['message']['from']['id'] in self._banned_users():
-                self.last_update_id = update['update_id']
-            else:
-                ret.append(types.Update.de_json(update))
-
+            if 'message' in update:
+                if update['message']['from']['id'] in banned_users:
+                    self.last_update_id = update['update_id']
+                else:
+                    ret.append(types.Update.de_json(update))
+            if 'callback_query' in update:
+                if update['callback_query']['from']['id'] in banned_users:
+                    self.last_update_id = update['update_id']
+                else:
+                    ret.append(types.Update.de_json(update))
         return ret
+        
 
     
     def _banned_users(self) -> list[int]:

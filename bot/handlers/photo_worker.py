@@ -25,8 +25,9 @@ def upload_photo_in_private_chat(message):
             new_upload_for_user(message)
             file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
             file = bot.download_file(file_info.file_path)
+            file_name = file_info.file_path.replace('photos/', '')
             # saving photo id to DB of pics, either accepted pics table or pics table
-            picDB.new_record(file_info.file_path.replace('photos/', ''))
-            upPic.upload(file, file_info)
+            picDB.new_record(file_name)
+            upPic.upload(file, file_name)
             bot.send_message(message.chat.id, txt)
             del picDB

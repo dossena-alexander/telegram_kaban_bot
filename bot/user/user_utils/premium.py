@@ -61,22 +61,25 @@ def choice_DB_by_premium(user_id: int):
     return db
 
 
-def check_premium_is_over(chat_id: int, user_id: int) -> None:
+def check_premium_is_over(message) -> None:
+    user_id = message.from_user.id
     if userDB.is_premium(user_id) and funcs.actual_day() - userDB.get_premium_turned_on_day(user_id) > PREMIUM_LIMIT.DAYS:
         userDB.disactivate_premium(user_id)
         funcs.new_wct(user_id, boarDB)
-        bot.send_message(chat_id, "Истек срок премиума!\nКак получить премиум читай в /auth -> Премиум")
+        bot.send_message(message.chat.id, "Истек срок премиума!\nКак получить премиум читай в /auth -> Премиум")
 
 
-def new_upload_for_user(chat_id: int, user_id: int) -> None:
+def new_upload_for_user(message) -> None:
+    user_id = message.from_user.id
     if userDB.is_premium(user_id) == False:
         userDB.new_upload(user_id)
-    check_upload_limit(chat_id, user_id)
+    check_upload_limit(message)
 
 
-def check_upload_limit(chat_id: int, user_id: int) -> None:
+def check_upload_limit(message) -> None:
+    user_id = message.from_user.id
     if userDB.uploads_limit_reached(user_id):
         userDB.activate_premium(user_id, funcs.actual_day())
         userDB.delete_uploads_count(user_id)
         funcs.new_wct(user_id, premiumBoarDB)
-        bot.send_message(chat_id, "Поздравляю! Ты премиальный кабан!\nПроверь, нажми кнопку)")
+        bot.send_message(message.chat.id, "Поздравляю! Ты премиальный кабан!\nПроверь, нажми кнопку)")

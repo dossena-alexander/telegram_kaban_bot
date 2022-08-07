@@ -83,6 +83,18 @@ class KEYS():
         1: { "text": "Анекдоты",                  "call": "SEE_JOKES"         },
         2: { "text": "Назад",                     "call": "BACK_ADMIN"        }, 
     }
+    CATEGORY = {
+        0: { "text": "emotions",                  "call": "1"                  }, 
+        1: { "text": "interesting",               "call": "2"                  },
+        2: { "text": "game",                      "call": "3"                  }, 
+        3: { "text": "world",                     "call": "4"                  }, 
+        4: { "text": "trap",                      "call": "5"                  },
+        5: { "text": "big",                       "call": "6"                  }, 
+        6: { "text": "small",                     "call": "7"                  }, 
+        7: { "text": "phylosophy",                "call": "8"                  },
+        8: { "text": "upper_stratum",             "call": "9"                  }, 
+        9: { "text": "sub_culture",               "call": "10"                 }, 
+    }
     
 
 #========================LIMITS===================================
