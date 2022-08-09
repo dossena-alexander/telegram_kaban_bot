@@ -1,7 +1,10 @@
 from header import adminPicDB, userPicDB, bot, utils
 from config import PATH, ADMIN_ID
-from admin.admin_utils import suggestions
+from admin.admin_utils.suggestions import Suggestions
 from user.user_utils import new_upload_for_user
+
+
+suggestions = Suggestions()
 
 
 def upload_photo_in_private_chat(message): 
