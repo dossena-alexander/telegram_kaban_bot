@@ -17,9 +17,9 @@ def empty_query(query):
         r = types.InlineQueryResultArticle(
                 id='1',
                 title="Кабан бот",
-                description="Пришли друзьям анекдот или смешную картинку)",
+                description="Пришли друзьям анекдот)",
                 input_message_content=types.InputTextMessageContent(
-                message_text="Кабан бот - Пришли друзьям анекдот или смешную картинку)")
+                message_text="Кабан бот - Пришли друзьям анекдот)")
         )
         bot.answer_inline_query(query.id, [r])
     except Exception as e:
