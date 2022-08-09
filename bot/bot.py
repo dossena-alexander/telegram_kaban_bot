@@ -1,7 +1,6 @@
 # v1.8.8.6
 from handlers import *
 from header import *
-from telebot import types
 
 
 bot.register_message_handler(commands=["start"], 
@@ -10,7 +9,8 @@ bot.register_message_handler(commands=["start"],
 
 bot.register_message_handler(commands=["auth"], 
                              func=auth, 
-                             callback="none")
+                             callback="none",
+                             chat_types='private')
 
 bot.register_message_handler(commands=["help"], 
                              func=help, 
