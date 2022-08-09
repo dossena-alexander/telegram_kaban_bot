@@ -33,6 +33,7 @@ def user_menu(call):
         premiumMenu = utils.PremiumMenu(call.message.chat.id)
         keyboard = utils.InlineKeyboard()
         keyboard.add_button(text="О премиум", call="ABOUT_PREMIUM")
+        keyboard.add_button(text="Отключить премиум", call="DIS_PREMIUM")
         keyboard.add_button(text="Назад", call="BACK_USER")
         bot.edit_message_text(text=premiumMenu.get_message(), chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard.get(), parse_mode="html")
     
@@ -54,7 +55,14 @@ def _user_premium_menu(call):
         keyboard = utils.InlineKeyboard()
         keyboard.add_button(text="Назад", call="BACK_USER")
         bot.edit_message_text(text=text, chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard.get(), parse_mode="html")
-
+    elif call.data == "DIS_PREMIUM":
+        if userDB.is_premium(call.message.chat.id):
+            boarDB = utils.BoarDB()
+            userDB.disactivate_premium(call.message.chat.id)
+            funcs.new_wct(call.message.chat.id, boarDB)
+        keyboard = utils.InlineKeyboard()
+        keyboard.add_button(text="Назад", call="BACK_USER")
+        bot.edit_message_text(text="<b>Премиум отключен</b>", chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard.get(), parse_mode="html")
 
 def _user_upload_menu(call):
     if call.data == 'UPLOAD_PICTURE':
