@@ -9,7 +9,6 @@ class Achievements():
 
 
     def __init__(self, userID) -> None:
-        super().__init__()
         self.boarsCategories = boarsCategories
         self._categories = self.boarsCategories.get_all_categories()
         self.count_achievements(userID)
