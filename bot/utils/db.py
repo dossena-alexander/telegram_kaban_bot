@@ -283,6 +283,13 @@ class PicDB(DB):
         super().__init__()
         self._table = table
         self._column = 'fileID'
+        self._column_2 = 'tg_id'
+
+
+    @lock_thread
+    def insert(self, file_name: str, file_id: str) -> None:
+        self._bd_cursor.execute(f'INSERT INTO {self._table} ({self._column}, {self._column_2}) VALUES (?, ?)', (file_name, file_id) ) 
+        self._bd.commit()
 
 
 class BoarDB(DB):
