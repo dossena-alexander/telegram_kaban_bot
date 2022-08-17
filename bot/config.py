@@ -1,5 +1,6 @@
 API_TOKEN = ""
 ADMIN_ID = 0
+PHOTO_CHANNEL = 0
 #========================MSG======================================
 
 class BOT_MESSAGE():
@@ -109,6 +110,8 @@ class LIMIT():
 class PREMIUM_LIMIT():
     UPLOADS_COUNT = 5
     DAYS = 2
+
+UPLOAD_LOCK = False
 
 #========================FILTER===================================
 
