@@ -126,9 +126,16 @@ def _new_boar(message, userID, boar_category, boar):
     userDB.new_boar_for_user(userID, boar, boar_category)
 
 
+def _record_boar() -> None:
+    db = utils.Statistics()
+    db.update_boar()
+    del db
+
+
 def check_new_boar(message, boar):
     userID = message.from_user.id
     category = boarsCategories.get_boar_category(boar)
     if userDB.user_unlocked_new_boar(userID, category, boar):
         _new_boar(message, userID, category, boar)
+        _record_boar()
 
