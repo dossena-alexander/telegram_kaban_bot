@@ -88,9 +88,9 @@ class DB():
         return length
 
     @lock_thread
-    def get_record(self, row: int) -> str:
+    def get_record(self, row: int, col: int = 0) -> str:
         info = self._bd_cursor.execute(f'SELECT * FROM {self._table}')
-        record = self._bd_cursor.fetchall()[row][0]
+        record = self._bd_cursor.fetchall()[row][col]
         return record
 
     def get_table(self) -> str:
