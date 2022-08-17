@@ -8,7 +8,6 @@ class BannedDB(DB):
         self._table = "banned"
         self._column = "id"
 
-
     @lock_thread
     def get_users(self) -> list[int]:
         info = self._bd_cursor.execute(f'SELECT {self._column} FROM {self._table}')

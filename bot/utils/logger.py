@@ -1,6 +1,6 @@
-from cgitb import handler
-from config import PATH
 import logging
+from config import PATH
+
 
 log = logging.getLogger("bot.py")
 log.setLevel(logging.INFO)

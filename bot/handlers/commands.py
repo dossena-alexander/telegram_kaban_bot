@@ -1,5 +1,6 @@
-from header import utils, bot, helpMenu, userDB, suggestions, adminMenu, userMenu, adminPicDB, adminJokeDB
+from header import utils, bot, helpMenu, userDB, adminMenu, userMenu, adminPicDB, adminJokeDB
 from config import ADMIN_ID, KEYS, BOT_MESSAGE
+from admin.admin_utils.suggestions import Suggestions
 
 
 def start(message):
@@ -27,6 +28,7 @@ def help(message):
 
 def admin(message):
     adminMenu.set_message("Админ меню")
+    suggestions = Suggestions()
     if suggestions.exist():
         adminMenu.set_message(suggestions.get_message())
     bot.send_message(message.chat.id, adminMenu.message, reply_markup=adminMenu.get_inline_keyboard(), parse_mode="html")

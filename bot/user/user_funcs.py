@@ -1,7 +1,11 @@
 from header import utils
-from header import bot, msgDB, userDB, suggestions
-from config import PATH, ADMIN_ID, FILTER
+from header import bot, msgDB, userDB
+from config import PATH, ADMIN_ID, FILTER, PHOTO_CHANNEL
+from admin.admin_utils.suggestions import Suggestions
 from user.user_utils import funcs, premium, achievements
+
+
+suggestions = Suggestions()
 
 
 def upload_photo(message): 
@@ -12,13 +16,12 @@ def upload_photo(message):
         else:
             user_id = message.from_user.id
             picDB = utils.PicDB("accPics")
+            upPic = utils.UploadPic(PATH.PHOTOS)
+            txt = "Сохранил"
             # Checking ID of user, if admin is adding, pics`ll be added to main folder "photos/
             # if not, bot send photo id to DB, after all admin`ll be able to save pics to "photos/
             # uploadPic('admin') is saving pics to main -- "photos/"; picDB saving photo id to accepted pics table
-            txt = "Сохранил"
-            if user_id == ADMIN_ID: 
-                upPic = utils.UploadPic(PATH.PHOTOS)
-            else:
+            if user_id != ADMIN_ID:     
                 upPic = utils.UploadPic(PATH.RECIEVED_PHOTOS)
                 txt = "Добавлено на рассмотрение"
                 picDB.set_table("pics")
@@ -26,12 +29,15 @@ def upload_photo(message):
             premium.new_upload_for_user(message)
             file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
             file = bot.download_file(file_info.file_path)
+            file_name = file_info.file_path.replace('photos/', '')
             # saving photo id to DB of pics, either accepted pics table or pics table
-            picDB.new_record(file_info.file_path.replace('photos/', ''))
-            upPic.upload(file, file_info)
+            picDB.insert(file_name, file_info.file_id)
+            upPic.upload(file, file_name)
             bot.send_message(message.chat.id, txt)
             bot.send_message(message.chat.id, "Пришли еще картинку.\nДля отмены нажми /brake")
             del picDB
+            if user_id == ADMIN_ID:
+                bot.send_photo(PHOTO_CHANNEL, file_info.file_id)
             bot.register_next_step_handler(message, upload_photo)
     else:
         if message.content_type == "text":
@@ -89,7 +95,7 @@ def upload_message_to_admin(message):
         file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
         file = bot.download_file(file_info.file_path)
         fileID = file_info.file_path.replace('photos/', '')
-        upPic.upload(file, file_info)
+        upPic.upload(file, fileID)
         msgDB.new_file_id(fileID)
         if message.caption != None:
             caption = message.caption
@@ -109,11 +115,7 @@ def get_wct_photo(message):
     """
     
     user_id = message.from_user.id 
-    users = userDB.get_users_list()
 
-    if user_id != ADMIN_ID and user_id not in users:
-        bot.send_message(message.chat.id, "Ты не зарегистрировался. Нажми /auth, чтобы зарегистрироваться")
-        return None
     premium.check_premium_is_over(message)
     db = premium.choice_DB_by_premium(user_id)
     if funcs.new_day(user_id):

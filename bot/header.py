@@ -1,3 +1,4 @@
+import imp
 import random
 from datetime import date
 import shutil
@@ -9,7 +10,8 @@ import utils
 
 #========================INSTANCE===================================
 
-bot = utils.Ban_telebot(token=API_TOKEN)
+bot = utils.ban.Ban_telebot(token=API_TOKEN)
+
 
 userDB = utils.UserDB()
 msgDB = utils.MsgDB()
@@ -23,8 +25,6 @@ userPicDB = utils.PicDB(table = "pics")
 # records counter that`s used to see DB records in admin menu
 class mesg():
     count = 0
-
-suggestions = utils.suggestions()
 
 #========================MENU===================================
 

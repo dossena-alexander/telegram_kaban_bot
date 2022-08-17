@@ -18,8 +18,8 @@ class ReplyKeyboard():
         """
         buttons_as_listed_tuples = []
 
-        for item in keys.values():
-            buttons_as_listed_tuples.append(item["text"])
+        for button in keys.values():
+            buttons_as_listed_tuples.append(button["text"])
 
         self._row_buttons(buttons_as_listed_tuples)
 
@@ -55,8 +55,8 @@ class InlineKeyboard():
         """
         buttons_as_listed_tuples = []
 
-        for item in keys.values():
-            buttons_as_listed_tuples.append((item["text"], item["call"]))
+        for button in keys.values():
+            buttons_as_listed_tuples.append((button["text"], button["call"]))
             
         self._row_buttons(buttons_as_listed_tuples)
 
@@ -79,6 +79,6 @@ class InlineKeyboard():
         button = types.InlineKeyboardButton(text=text, callback_data=call)
         self._keyboard.add(button)
 
-    # def row_button(self, text: str, call: str) -> None:
-    #     button = types.InlineKeyboardButton(text=text, callback_data=call)
-    #     self.keyboard.row(button)
+    def row_button(self, text: str, call: str) -> None:
+        button = types.InlineKeyboardButton(text=text, callback_data=call)
+        self.keyboard.row(button)
