@@ -45,7 +45,7 @@ def create_photos(offset):
     i = 0
     photos = []
     while i <= size:
-        photos.append(adminPicDB.get_record(row=i, col=1))
+        photos.append(adminPicDB.get_record(row=random.randint(0, adminPicDB.get_records_count() - 1), col=1))
         i += 1
     i = 0
     results = [types.InlineQueryResultCachedPhoto(
