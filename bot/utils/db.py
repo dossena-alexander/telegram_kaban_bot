@@ -347,6 +347,8 @@ class BoarsCategories(DB):
 class Statistics(DB):
     def __init__(self) -> None:
         super().__init__()
+
+    def get(self) -> str:
         self.b    = BoarDB()
         self.p_b  = PremiumBoarDB()
         self.u    = UserDB()
@@ -354,12 +356,53 @@ class Statistics(DB):
         self.j    = JokeDB("adminJokes")
         self.p    = PicDB("accPics")
 
-    def get(self) -> str:
         boars = self.b.get_records_count()
         premium_boars = self.p_b.get_records_count()
         users = self.u.get_records_count()
         vk_users = self.vk_u.get_records_count()
         jokes = self.j.get_records_count()
         photos = self.p.get_records_count()
-        txt = (f"<b>Статистика</b>\n•Кабаны: <b>{boars}</b>\n•Премиум кабаны: {premium_boars}\n•Пользователи: <b>{users}</b>\n•ВК Пользователи: <b>{vk_users}</b>\n•Анекдоты: <b>{jokes}</b>\n•Картинки: <b>{photos}</b>")
+
+        txt = (f'<b>Статистика</b>\n'
+        + f'•Кабаны: <b>{boars}</b>\n'
+        + f'•Премиум кабаны: {premium_boars}\n'
+        + f'•Пользователи: <b>{users}</b>\n'
+        + f'•ВК Пользователи: <b>{vk_users}</b>\n'
+        + f'•Анекдоты: <b>{jokes}</b>\n'
+        + f'•Картинки: <b>{photos}</b>')
         return txt
+    
+    def get_counts(self) -> str:
+        self.set_table('stats')
+        cursor = self._bd_cursor.execute(f'SELECT * FROM {self._table}')
+        cols = list(map(lambda x: x[0], cursor.description))
+        counts = []
+        for i in len(cols):
+            counts.append(self.get_record(row=0, col=i))
+        txt = (f'<b>Статистика</b>\n'
+        + f'•Кол-во всех открытых кабанов: <b>{counts[0]}</b>\n'
+        + f'•Кол-во нажатий \"какой я кабан сегодня\": {counts[1]}\n'
+        + f'•Кол-во нажатий \"анекдот\": {counts[2]}\n'
+        + f'•Кол-во нажатий \"фотокарточка\": {counts[3]}\n')
+        return txt
+
+    def update_boar(self) -> None:
+        new = self.get_record(row=0, col=0) + 1
+        self._bd_cursor.execute(f'UPDATE stats SET boars = {new}')
+        self._bd.commit()
+
+    def update_wct(self) -> None:
+        new = self.get_record(row=0, col=1) + 1
+        self._bd_cursor.execute(f'UPDATE stats SET wct_button = {new}')
+        self._bd.commit()
+
+    def update_joke(self) -> None:
+        new = self.get_record(row=0, col=2) + 1
+        self._bd_cursor.execute(f'UPDATE stats SET joke_button = {new}')
+        self._bd.commit()
+
+    def update_photo(self) -> None:
+        new = self.get_record(row=0, col=3) + 1
+        self._bd_cursor.execute(f'UPDATE stats SET photo_button = {new}')
+        self._bd.commit()
+
