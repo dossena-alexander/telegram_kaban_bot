@@ -1,7 +1,7 @@
 from header import shutil, os
 from header import adminMenu, userMenu
 from header import userPicDB, adminPicDB, adminJokeDB, userJokeDB
-from config import KEYS
+from config import KEYS, PHOTO_CHANNEL
 
 import admin.admin_utils as admin_utils
 from admin.admin_funcs import *
@@ -97,10 +97,15 @@ def _admin_see_pictures_suggestions(call):
         see_suggestions(call.message, type="pic", db=userPicDB, keys=KEYS.PIC_SEE)
 
     elif call.data == "PIC_ACCEPT":
+        photo_name = userPicDB.get_record(mesg.count)
+        photo_id = userPicDB.get_record(mesg.count, col=1)
         bot.delete_message(call.message.chat.id, call.message.message_id)
-        adminPicDB.new_record(userPicDB.get_record(mesg.count))
-        shutil.move(PATH.RECIEVED_PHOTOS + userPicDB.get_record(mesg.count), PATH.PHOTOS)
-        userPicDB.delete_record(userPicDB.get_record(mesg.count))
+
+        adminPicDB.insert(photo_name, photo_id)
+        bot.send_photo(PHOTO_CHANNEL, photo_id)
+        userPicDB.delete_record(photo_name)
+        shutil.move(PATH.RECIEVED_PHOTOS + photo_name, PATH.PHOTOS)
+        
         see_suggestions(call.message, type="pic", db=userPicDB, keys=KEYS.PIC_SEE)
 
     elif call.data == "PIC_DELETE":    
