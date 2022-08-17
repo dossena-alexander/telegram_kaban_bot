@@ -1,4 +1,4 @@
-from header import adminPicDB, random, adminJokeDB, bot, userDB
+from header import adminPicDB, random, adminJokeDB, bot, userDB, utils
 from config import PATH, ADMIN_ID
 from admin.admin_utils.suggestions import Suggestions
 from user.user_funcs import get_wct_photo
@@ -6,15 +6,20 @@ from user.user_funcs import get_wct_photo
 
 def reply_keyboard_worker(message):
     msg = message.text.lower()
+    stats = utils.Statistics()
     if msg == "фотокарточка":
         _check_suggestions()
         _send_photo(message)
+        stats.update_photo()
     elif msg == "анекдот":
         _check_suggestions()
         _send_joke(message)
+        stats.update_joke()
     elif msg == "какой я кабан сегодня":
         _check_suggestions()
         _send_wct(message)
+        stats.update_wct()
+    del stats
 
 
 def _send_wct(message):
