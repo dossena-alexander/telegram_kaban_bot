@@ -44,7 +44,7 @@ if __name__ == "__main__":
     try:
         print("BOT STARTED")
         utils.log.info("BOT STARTED")
-        bot.polling()
+        bot.infinity_polling()
     except Exception as e:
         utils.log.error(e)
         print(e)
