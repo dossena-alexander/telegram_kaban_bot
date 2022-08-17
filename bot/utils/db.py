@@ -347,6 +347,7 @@ class BoarsCategories(DB):
 class Statistics(DB):
     def __init__(self) -> None:
         super().__init__()
+        self.set_table('stats')
 
     def get(self) -> str:
         self.b    = BoarDB()
@@ -365,25 +366,24 @@ class Statistics(DB):
 
         txt = (f'<b>Статистика</b>\n'
         + f'•Кабаны: <b>{boars}</b>\n'
-        + f'•Премиум кабаны: {premium_boars}\n'
+        + f'•Премиум кабаны: <b>{premium_boars}</b>\n'
         + f'•Пользователи: <b>{users}</b>\n'
         + f'•ВК Пользователи: <b>{vk_users}</b>\n'
         + f'•Анекдоты: <b>{jokes}</b>\n'
-        + f'•Картинки: <b>{photos}</b>')
+        + f'•Картинки: <b>{photos}</b>\n')
         return txt
     
     def get_counts(self) -> str:
-        self.set_table('stats')
         cursor = self._bd_cursor.execute(f'SELECT * FROM {self._table}')
         cols = list(map(lambda x: x[0], cursor.description))
         counts = []
-        for i in len(cols):
+        for i in range(len(cols)):
             counts.append(self.get_record(row=0, col=i))
-        txt = (f'<b>Статистика</b>\n'
+        txt = (f'<b>Количественная</b>\n'
         + f'•Кол-во всех открытых кабанов: <b>{counts[0]}</b>\n'
-        + f'•Кол-во нажатий \"какой я кабан сегодня\": {counts[1]}\n'
-        + f'•Кол-во нажатий \"анекдот\": {counts[2]}\n'
-        + f'•Кол-во нажатий \"фотокарточка\": {counts[3]}\n')
+        + f'•Кол-во нажатий \"какой я кабан сегодня\": <b>{counts[1]}</b>\n'
+        + f'•Кол-во нажатий \"анекдот\": <b>{counts[2]}</b>\n'
+        + f'•Кол-во нажатий \"фотокарточка\": <b>{counts[3]}</b>\n')
         return txt
 
     def update_boar(self) -> None:

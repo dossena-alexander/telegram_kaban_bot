@@ -15,7 +15,7 @@ def admin_menu(call):
         stats = utils.Statistics()
         back = utils.InlineKeyboard()
         back.add_button(text="Назад", call="BACK_ADMIN")
-        bot.edit_message_text(text=stats.get(), chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=back.get(), parse_mode="html")
+        bot.edit_message_text(text=stats.get() + stats.get_counts(), chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=back.get(), parse_mode="html")
         del stats
     
     elif call.data == "STOP_BOT":
