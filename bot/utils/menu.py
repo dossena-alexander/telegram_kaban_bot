@@ -22,7 +22,7 @@ class Menu():
 
 
     def set_reply_keyboard(self, keys: dict):
-        self.replyKeyboard.set_keyboard(keys)
+        self.replyKeyboard.set(keys)
 
 
     def get_inline_keyboard(self):
@@ -30,4 +30,4 @@ class Menu():
 
 
     def set_inline_keyboard(self, keys: dict):
-        self.inlineKeyboard.set_keyboard(keys)
+        self.inlineKeyboard.set(keys)

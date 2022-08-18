@@ -1,14 +1,25 @@
 from telebot import types
 
 
-class ReplyKeyboard():
+class Keyboard():
     def __init__(self) -> None:
         self._keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+
+    def get(self):
+        pass
+
+    def set(self, keys: dict) -> None:
+        pass
+
+
+class ReplyKeyboard(Keyboard):
+    def __init__(self) -> None:
+        super().__init__()
 
     def get(self) -> types.ReplyKeyboardMarkup:
         return self._keyboard
 
-    def set_keyboard(self, keys: dict) -> None:
+    def set(self, keys: dict) -> None:
         """        
         Keys as dictionary is rowing in two buttons grid.
         The parametred dict will used to set it up to tuples list for further rowing.
@@ -38,14 +49,14 @@ class ReplyKeyboard():
         self._keyboard.add(text)
 
 
-class InlineKeyboard(): 
+class InlineKeyboard(Keyboard): 
     def __init__(self) -> None:
-        self._keyboard = types.InlineKeyboardMarkup()
-
+        super().__init__()
+        
     def get(self) -> types.InlineKeyboardMarkup:
         return self._keyboard
 
-    def set_keyboard(self, keys: dict) -> None:
+    def set(self, keys: dict) -> None:
         """        
         Keys as dictionary is rowing in two buttons grid.
         The parametred dict will used to set it up to tuples list for further rowing.
@@ -78,7 +89,3 @@ class InlineKeyboard():
     def add_button(self, text: str, call: str) -> None:
         button = types.InlineKeyboardButton(text=text, callback_data=call)
         self._keyboard.add(button)
-
-    def row_button(self, text: str, call: str) -> None:
-        button = types.InlineKeyboardButton(text=text, callback_data=call)
-        self.keyboard.row(button)

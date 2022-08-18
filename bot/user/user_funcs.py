@@ -1,6 +1,6 @@
 from header import utils
 from header import bot, msgDB, userDB
-from config import PATH, ADMIN_ID, FILTER, PHOTO_CHANNEL
+from config import PATH, ADMIN_ID, FILTER, PHOTO_CHANNEL, JOKE_CHANNEL
 from admin.admin_utils.suggestions import Suggestions
 from user.user_utils import funcs, premium, achievements
 
@@ -67,6 +67,8 @@ def upload_joke(message):
                 premium.new_upload_for_user(message)
                 jokeDB.new_record(joke)
                 bot.send_message(message.chat.id, userMessage)
+                if user_id == ADMIN_ID:
+                    bot.send_message(JOKE_CHANNEL, joke)
                 bot.send_message(message.chat.id, "Напиши анекдот.\nДля отмены нажми /brake")
                 bot.register_next_step_handler(message, upload_joke)
             else:

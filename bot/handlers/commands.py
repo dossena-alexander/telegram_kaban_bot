@@ -1,3 +1,4 @@
+from telebot import types
 from header import utils, bot, helpMenu, userDB, adminMenu, userMenu, adminPicDB, adminJokeDB
 from config import ADMIN_ID, KEYS, BOT_MESSAGE
 from admin.admin_utils.suggestions import Suggestions
@@ -5,9 +6,19 @@ from admin.admin_utils.suggestions import Suggestions
 
 def start(message):
     keyboard = utils.ReplyKeyboard()
-    keyboard.set_keyboard(KEYS.START)
-    bot.send_message(message.chat.id, "Вечер в хату, кабан {0.first_name}!"
+    keyboard.set(KEYS.START)
+    bot.send_message(message.chat.id, "Хрю хрю, кабан {0.first_name}!"
         .format(message.from_user, bot.get_me()), reply_markup=keyboard.get())
+
+
+def keys(message):
+    keyboard = utils.ReplyKeyboard()
+    keyboard.set(KEYS.START)
+    bot.reply_to(message, "Активировал клавиатуру", reply_markup=keyboard.get())
+
+
+def hide(message):
+    bot.reply_to(message, "Убрал клавиатуру", reply_markup=types.ReplyKeyboardRemove())
 
 
 def auth(message):

@@ -9,7 +9,7 @@ premiumBoarDB = utils.PremiumBoarDB()
 boarsCategories = utils.BoarsCategories()
 
 start_keyboard = utils.ReplyKeyboard()
-start_keyboard.set_keyboard(KEYS.START)
+start_keyboard.set(KEYS.START)
 
 def choose_boar_category(message):
     if message.content_type == "text":
@@ -119,7 +119,7 @@ def bot_notify(message) -> None:
 
 def see_suggestions(message, type: str, db: utils.DB, keys: dict) -> None:
     stand_keyboard = utils.InlineKeyboard()
-    stand_keyboard.set_keyboard(keys)
+    stand_keyboard.set(keys)
 
     back_keyboard = utils.InlineKeyboard()
     back_keyboard.add_button(text="Назад", call="BACK_ADMIN")
@@ -150,7 +150,7 @@ def see_suggestions(message, type: str, db: utils.DB, keys: dict) -> None:
 
 def see_messages_to_admin(message, keys: dict) -> None:
     stand_keyboard = utils.InlineKeyboard()
-    stand_keyboard.set_keyboard(keys)
+    stand_keyboard.set(keys)
 
     back_keyboard = utils.InlineKeyboard()
     back_keyboard.add_button(text="Назад", call="BACK_ADMIN")
