@@ -1,7 +1,7 @@
 from header import shutil, os
 from header import adminMenu, userMenu
 from header import userPicDB, adminPicDB, adminJokeDB, userJokeDB
-from config import KEYS, PHOTO_CHANNEL
+from config import KEYS, PHOTO_CHANNEL, JOKE_CHANNEL
 
 import admin.admin_utils as admin_utils
 from admin.admin_funcs import *
@@ -126,9 +126,13 @@ def _admin_see_jokes_suggestions(call):
         see_suggestions(call.message, "txt", userJokeDB, KEYS.JOKE_SEE)
 
     elif call.data == "JOKE_ACCEPT":
+        joke = userJokeDB.get_record(mesg.count)
         bot.delete_message(call.message.chat.id, call.message.message_id)
-        adminJokeDB.new_record(userJokeDB.get_record(mesg.count))
-        userJokeDB.delete_record(userJokeDB.get_record(mesg.count))
+
+        adminJokeDB.new_record(joke)
+        bot.send_message(JOKE_CHANNEL, joke)
+
+        userJokeDB.delete_record(joke)
         see_suggestions(call.message, "txt", userJokeDB, KEYS.JOKE_SEE)
 
     elif call.data == "JOKE_DELETE":

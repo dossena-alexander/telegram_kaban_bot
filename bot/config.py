@@ -1,6 +1,7 @@
 API_TOKEN = ""
 ADMIN_ID = 0
 PHOTO_CHANNEL = 0
+JOKE_CHANNEL = 0
 #========================MSG======================================
 
 class BOT_MESSAGE():
