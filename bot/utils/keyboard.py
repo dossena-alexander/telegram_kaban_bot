@@ -8,7 +8,7 @@ class ReplyKeyboard():
     def get(self) -> types.ReplyKeyboardMarkup:
         return self._keyboard
 
-    def set_keyboard(self, keys: dict) -> None:
+    def set(self, keys: dict) -> None:
         """        
         Keys as dictionary is rowing in two buttons grid.
         The parametred dict will used to set it up to tuples list for further rowing.
@@ -45,7 +45,7 @@ class InlineKeyboard():
     def get(self) -> types.InlineKeyboardMarkup:
         return self._keyboard
 
-    def set_keyboard(self, keys: dict) -> None:
+    def set(self, keys: dict) -> None:
         """        
         Keys as dictionary is rowing in two buttons grid.
         The parametred dict will used to set it up to tuples list for further rowing.
