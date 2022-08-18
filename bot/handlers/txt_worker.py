@@ -27,10 +27,10 @@ def _send_wct(message):
     users = userDB.get_users_list()
 
     if user_id != ADMIN_ID and user_id not in users:
-        bot.send_message(message.chat.id, "Ты не зарегистрировался. Нажми /auth, чтобы зарегистрироваться")
+        bot.send_message(message.chat.id, "Ты не зарегистрировался. Нажми /auth, чтобы зарегистрироваться", reply_to_message_id=message.message_id)
         return None
     else:
-        bot.send_photo(message.chat.id, get_wct_photo(message))
+        bot.send_photo(message.chat.id, get_wct_photo(message), reply_to_message_id=message.message_id)
 
 
 def _send_joke(message):
