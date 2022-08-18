@@ -24,12 +24,12 @@ def admin_menu(call):
 
     elif call.data == "SUGGESTIONS":
         keyboard = utils.InlineKeyboard()
-        keyboard.set_keyboard(KEYS.SUGGESTIONS)
+        keyboard.set(KEYS.SUGGESTIONS)
         bot.edit_message_text(text="Предложения", chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard.get())
     
     elif call.data == "UPLOAD_MENU_ADMIN":
         keyboard = utils.InlineKeyboard()
-        keyboard.set_keyboard(KEYS.UPLOAD_MENU_ADMIN)
+        keyboard.set(KEYS.UPLOAD_MENU_ADMIN)
         keyboard.add_button(text="Назад", call="BACK_ADMIN")
         bot.edit_message_text(text="Загрузить", chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard.get())
 
@@ -60,7 +60,7 @@ def _admin_escape(call):
 def _admin_notify_menu(call):
     if call.data == "NOTIFY_MENU": 
         keyboard = utils.InlineKeyboard()
-        keyboard.set_keyboard(KEYS.NOTIFY)
+        keyboard.set(KEYS.NOTIFY)
         keyboard.add_button("Назад", "BACK_ADMIN")
         bot.edit_message_text(text="Рассылка", chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard.get())
     
@@ -76,7 +76,7 @@ def _admin_notify_menu(call):
 def _admin_upload_boars_menu(call):
     if call.data == "UPLOAD_BOAR":
         keyboard = utils.ReplyKeyboard()
-        keyboard.set_keyboard(KEYS.CATEGORY)
+        keyboard.set(KEYS.CATEGORY)
         bot.delete_message(call.message.chat.id, call.message.message_id)
         bot.send_message(text="Выбери категорию кабана\nДля отмены нажми /brake", chat_id=call.message.chat.id, reply_markup=keyboard.get())
         bot.register_next_step_handler(call.message, choose_boar_category)

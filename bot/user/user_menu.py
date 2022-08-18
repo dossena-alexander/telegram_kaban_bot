@@ -59,7 +59,7 @@ def _user_premium_menu(call):
 def _user_upload_menu(call):
     if call.data == "UPLOAD_MENU_USER":
         keyboard = utils.InlineKeyboard()
-        keyboard.set_keyboard(KEYS.UPLOAD_MENU_USER)
+        keyboard.set(KEYS.UPLOAD_MENU_USER)
         bot.edit_message_text(text="Загрузить", chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard.get())
     elif call.data == 'UPLOAD_PICTURE':
         bot.edit_message_text(text="Пришли картинку, или нажми /brake", chat_id=call.message.chat.id, message_id=call.message.message_id)
