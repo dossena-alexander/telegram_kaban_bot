@@ -7,6 +7,14 @@ bot.register_message_handler(commands=["start"],
                              func=start, 
                              callback="none")
 
+bot.register_message_handler(commands=["keys"], 
+                             func=keys, 
+                             callback="none")
+
+bot.register_message_handler(commands=["hide"], 
+                             func=hide, 
+                             callback="none")
+
 bot.register_message_handler(commands=["auth"], 
                              func=auth, 
                              callback="none",
