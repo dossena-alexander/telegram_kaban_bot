@@ -1,20 +1,9 @@
 from telebot import types
 
 
-class Keyboard():
+class ReplyKeyboard():
     def __init__(self) -> None:
         self._keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-
-    def get(self):
-        pass
-
-    def set(self, keys: dict) -> None:
-        pass
-
-
-class ReplyKeyboard(Keyboard):
-    def __init__(self) -> None:
-        super().__init__()
 
     def get(self) -> types.ReplyKeyboardMarkup:
         return self._keyboard
@@ -49,10 +38,10 @@ class ReplyKeyboard(Keyboard):
         self._keyboard.add(text)
 
 
-class InlineKeyboard(Keyboard): 
+class InlineKeyboard(): 
     def __init__(self) -> None:
-        super().__init__()
-        
+        self._keyboard = types.InlineKeyboardMarkup()
+
     def get(self) -> types.InlineKeyboardMarkup:
         return self._keyboard
 
