@@ -1,7 +1,8 @@
 from header import utils
 from header import mesg
 from header import bot, userDB, msgDB
-from config import PATH, FILTER, ADMIN_ID, KEYS
+from config import PATH, FILTER, ADMIN_ID, KEYS, WCT_CHANNEL
+from user.user_utils.achievements import translate_category
 
 
 boarDB = utils.BoarDB()
@@ -41,6 +42,7 @@ def _upload_wct(message, boar_category) -> None:
             boarDB.new_record(boar)
             boarsCategories.new_boar(boar_category, boar)
             upPic.upload(file, boar)
+            bot.send_photo(WCT_CHANNEL, file_info.file_id, translate_category(boar_category))
             bot.send_message(message.chat.id, "Сохранил", reply_markup=start_keyboard.get())
     else:
         if message.content_type == "text":

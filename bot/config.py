@@ -1,5 +1,6 @@
 API_TOKEN = ""
 ADMIN_ID = 0
+WCT_CHANNEL = 0
 PHOTO_CHANNEL = 0
 JOKE_CHANNEL = 0
 #========================MSG======================================

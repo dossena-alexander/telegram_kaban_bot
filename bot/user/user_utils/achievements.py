@@ -93,7 +93,7 @@ class Achievements():
         self._set_categoria_count(userID, self._categories)
 
 
-def _translate_category(category) -> str:
+def translate_category(category) -> str:
     if category == "emotions":
         return "Эмотивные"
     elif category == "game":
@@ -121,7 +121,7 @@ def _translate_category(category) -> str:
 
 
 def _new_boar(message, userID, boar_category, boar):
-    translated_category = _translate_category(boar_category)
+    translated_category = translate_category(boar_category)
     bot.send_message(message.chat.id, f"Ты открыл нового кабана из категории <i>{translated_category}</i>", parse_mode="html")
     userDB.new_boar_for_user(userID, boar, boar_category)
 
