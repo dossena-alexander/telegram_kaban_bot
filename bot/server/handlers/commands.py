@@ -25,8 +25,11 @@ def hide(message):
 
 def ban(message):
     if message.from_user.id == ADMIN_ID:
-        admin_funcs.ban_user(message)
-        bot.reply_to(message, "Забанил пользователя")
+        err = admin_funcs.ban_user(message)
+        if err != None:
+            bot.reply_to(message, err)
+        else:
+            bot.reply_to(message, "Забанил пользователя")
 
 
 def unban(message):
