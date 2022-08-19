@@ -1,4 +1,4 @@
-from utils.logger import log
+from server.utils.logger import log
 from config import UPLOAD_LOCK
 
 

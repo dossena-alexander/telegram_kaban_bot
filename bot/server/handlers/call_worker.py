@@ -1,7 +1,7 @@
 from header import bot
 
-from admin import *
-from user import *
+from client.admin_menu import admin_menu
+from client.user_menu import user_menu
 
 
 def call_work(call):

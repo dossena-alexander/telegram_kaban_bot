@@ -1,4 +1,4 @@
-from utils.keyboard import ReplyKeyboard, InlineKeyboard
+from server.utils.keyboard import ReplyKeyboard, InlineKeyboard
 
 
 class Menu():

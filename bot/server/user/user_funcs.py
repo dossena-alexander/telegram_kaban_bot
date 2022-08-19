@@ -1,8 +1,8 @@
 from header import utils
 from header import bot, msgDB, userDB
 from config import PATH, ADMIN_ID, FILTER, PHOTO_CHANNEL, JOKE_CHANNEL
-from admin.admin_utils.suggestions import Suggestions
-from user.user_utils import funcs, premium, achievements
+from server.admin.admin_utils.suggestions import Suggestions
+from server.user.user_utils import funcs, premium, achievements
 
 
 suggestions = Suggestions()

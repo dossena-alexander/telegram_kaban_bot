@@ -1,4 +1,4 @@
-from user.user_funcs import upload_photo
+from server.user.user_funcs import upload_photo
 
 
 def upload_photo_in_private_chat(message): 

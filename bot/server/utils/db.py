@@ -2,7 +2,7 @@ import sqlite3
 import threading # thread_lock for DB cursor
 
 from config import PATH, PREMIUM_LIMIT
-from utils.logger import log
+from server.utils.logger import log
 
 
 lock = threading.Lock()

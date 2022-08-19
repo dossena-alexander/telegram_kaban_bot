@@ -1,5 +1,6 @@
+import random
 from telebot import types
-from header import adminPicDB, random, adminJokeDB, bot
+from header import adminPicDB, adminJokeDB, bot
 
 
 def query_text(query):

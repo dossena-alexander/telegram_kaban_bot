@@ -1,10 +1,10 @@
-from header import shutil, os
+import shutil, os
 from header import adminMenu, userMenu
 from header import userPicDB, adminPicDB, adminJokeDB, userJokeDB
 from config import KEYS, PHOTO_CHANNEL, JOKE_CHANNEL
 
-import admin.admin_utils as admin_utils
-from admin.admin_funcs import *
+import server.admin.admin_utils as admin_utils
+from server.admin.admin_funcs import *
 
 
 suggestions = admin_utils.Suggestions()

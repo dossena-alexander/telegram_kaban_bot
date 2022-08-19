@@ -2,7 +2,7 @@ from header import utils
 from header import mesg
 from header import bot, userDB, msgDB
 from config import PATH, FILTER, ADMIN_ID, KEYS, WCT_CHANNEL
-from user.user_utils.achievements import translate_category
+from server.user.user_utils.achievements import translate_category
 
 
 boarDB = utils.BoarDB()

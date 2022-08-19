@@ -1,5 +1,5 @@
-from utils.db import DB
-from utils.db import lock_thread
+from server.utils.db import DB
+from server.utils.db import lock_thread
 
 
 class BannedDB(DB):

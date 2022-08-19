@@ -1,9 +1,10 @@
 from header import bot, userMenu, user_translate_menu
 from header import utils
 from config import KEYS
-from user.user_utils import *
-from user.user_utils import premium
-import user.user_funcs as user_funcs
+
+from server.user.user_utils import *
+from server.user.user_utils import premium
+import server.user.user_funcs as user_funcs
 
 
 def user_menu(call):

@@ -2,7 +2,7 @@ from telebot import TeleBot
 from telebot import apihelper
 from telebot import types
 
-from utils.ban.banned import BannedDB
+from server.utils.ban.banned import BannedDB
 
 
 banned = BannedDB()

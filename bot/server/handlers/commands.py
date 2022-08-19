@@ -1,7 +1,7 @@
 from telebot import types
 from header import utils, bot, helpMenu, userDB, adminMenu, userMenu, adminPicDB, adminJokeDB
 from config import ADMIN_ID, KEYS, BOT_MESSAGE
-from admin.admin_utils.suggestions import Suggestions
+from server.admin.admin_utils.suggestions import Suggestions
 
 
 def start(message):
