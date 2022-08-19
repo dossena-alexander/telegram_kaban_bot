@@ -207,10 +207,13 @@ def see_messages_to_admin(message, keys: dict) -> None:
 def ban_user(message):
     txt = message.text
     id_slice = int(txt[5:])
-    user_name = bot.get_chat_member(id_slice, id_slice).user.username
-    banDB = BannedDB()
-    banDB.ban(id_slice, user_name)
-    del banDB
+    try:
+        user_name = bot.get_chat_member(id_slice, id_slice).user.username
+        banDB = BannedDB()
+        banDB.ban(id_slice, user_name)
+        del banDB
+    except:
+        bot.reply_to(message, "Такого пользователя нет")
     
 
 def unban_user(message):
