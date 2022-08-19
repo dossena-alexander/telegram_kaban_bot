@@ -2,6 +2,7 @@ from header import bot, userMenu, user_translate_menu
 from header import utils
 from config import KEYS
 from user.user_utils import *
+from user.user_utils import premium
 import user.user_funcs as user_funcs
 
 
@@ -36,7 +37,7 @@ def _user_escape(call):
 
 def _user_premium_menu(call):
     if call.data == "PREMIUM":
-        premiumMenu = utils.PremiumMenu(call.message.chat.id)
+        premiumMenu = premium.PremiumMenu(call.message.chat.id)
         keyboard = utils.InlineKeyboard()
         keyboard.add_button(text="О премиум", call="ABOUT_PREMIUM")
         keyboard.add_button(text="Отключить премиум", call="DIS_PREMIUM")
