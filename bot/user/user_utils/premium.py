@@ -1,12 +1,10 @@
-from header import utils
+from header import utils, date
 from header import bot, userDB
 from config import PREMIUM_LIMIT
 from user.user_utils import funcs
 
-
 boarDB = utils.BoarDB()
 premiumBoarDB = utils.PremiumBoarDB()
-
 
 class PremiumMenu():
     _message: str
@@ -30,8 +28,8 @@ class PremiumMenu():
     def _calculate_premium_days(self, userID) -> int:
         premium_toggled_on_day = self.userDB.get_premium_turned_on_day(userID)
         disactivate_day = premium_toggled_on_day + PREMIUM_LIMIT.DAYS
-        date = date.today()
-        day = date.day
+        now = date.today()
+        day = now.day
         days_left = disactivate_day - day
         if days_left == 0:
             return "<b>0</b> <i>(завтра отключение)</i>"
