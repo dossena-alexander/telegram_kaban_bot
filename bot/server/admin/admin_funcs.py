@@ -3,6 +3,7 @@ from header import mesg
 from header import bot, userDB, msgDB
 from config import PATH, FILTER, ADMIN_ID, KEYS, WCT_CHANNEL
 from server.user.user_utils.achievements import translate_category
+from server.utils.ban import BannedDB
 
 
 boarDB = utils.BoarDB()
@@ -201,3 +202,13 @@ def see_messages_to_admin(message, keys: dict) -> None:
                 reply_markup=back_keyboard.get())
     else:
         bot.send_message(message.chat.id, "Сообщений нет", reply_markup=back_keyboard.get())
+
+
+def ban_user(message):
+    txt = message.text
+    id_slice = int(txt[5:])
+    user_name = bot.get_chat_member(id_slice, id_slice).user.username
+    banDB = BannedDB()
+    banDB.ban(id_slice, user_name)
+    del banDB
+    

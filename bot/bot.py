@@ -15,6 +15,14 @@ bot.register_message_handler(commands=["hide"],
                              func=hide, 
                              callback="none")
 
+bot.register_message_handler(commands=["ban"], 
+                             func=ban, 
+                             callback="none")
+
+bot.register_message_handler(commands=["banlist"], 
+                             func=ban_list, 
+                             callback="none")
+
 bot.register_message_handler(commands=["auth"], 
                              func=auth, 
                              callback="none",
