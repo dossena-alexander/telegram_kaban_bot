@@ -32,7 +32,7 @@ def ban(message):
 def unban(message):
     if message.from_user.id == ADMIN_ID:
         admin_funcs.unban_user(message)
-        bot.reply_to(message, "Разабанил пользователя")
+        bot.reply_to(message, "Разбанил пользователя")
 
 
 def ban_list(message):
