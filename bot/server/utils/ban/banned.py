@@ -27,6 +27,9 @@ class BannedDB(DB):
     def ban(self, user_id: int, user_name: str) -> None:
         self._bd_cursor.execute(f'INSERT INTO {self._table} ({self._column}, user_name) VALUES (?, ?)', (user_id, user_name))
         self._bd.commit()
+
+    def unban(self, user_id: int) -> None:
+        self.delete_record(user_id)
     
     @lock_thread
     def get_users_idName_list(self) -> str:

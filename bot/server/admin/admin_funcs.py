@@ -212,3 +212,10 @@ def ban_user(message):
     banDB.ban(id_slice, user_name)
     del banDB
     
+
+def unban_user(message):
+    txt = message.text
+    id_slice = int(txt[5:])
+    banDB = BannedDB()
+    banDB.unban(id_slice)
+    del banDB

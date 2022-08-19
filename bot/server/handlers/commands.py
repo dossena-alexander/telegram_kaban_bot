@@ -26,7 +26,13 @@ def hide(message):
 def ban(message):
     if message.from_user.id == ADMIN_ID:
         admin_funcs.ban_user(message)
-        bot.reply_to(message, "Забанил пользователя", reply_markup=types.ReplyKeyboardRemove())
+        bot.reply_to(message, "Забанил пользователя")
+
+
+def unban(message):
+    if message.from_user.id == ADMIN_ID:
+        admin_funcs.unban_user(message)
+        bot.reply_to(message, "Разабанил пользователя")
 
 
 def ban_list(message):
