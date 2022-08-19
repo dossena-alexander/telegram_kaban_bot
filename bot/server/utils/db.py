@@ -233,12 +233,22 @@ class JokeDB(DB):
         self._table = table
         self._column = 'joke'
 
+    @lock_thread
+    def insert(self, joke: str, user_id: int, user_name: str) -> None:
+        self._bd_cursor.execute(f'INSERT INTO {self._table} ({self._column}, user_id, user_name) VALUES (?, ?, ?)', (joke, user_id, user_name) ) 
+        self._bd.commit()
+
 
 class MsgDB(DB):
     def __init__(self) -> None:
         super().__init__()
         self._table = "msgs"
         self._column = 'msg'
+
+    @lock_thread
+    def insert(self, message: str, user_id: int, user_name: str) -> None:
+        self._bd_cursor.execute(f'INSERT INTO {self._table} ({self._column}, user_id, user_name) VALUES (?, ?, ?)', (message, user_id, user_name) ) 
+        self._bd.commit()
 
     @lock_thread
     def get_file_id(self, row: int) -> str:
@@ -267,13 +277,13 @@ class MsgDB(DB):
 
     # new record with file id of photo sent to admin
     @lock_thread
-    def new_file_id(self, record: str) -> None:
-        self._bd_cursor.execute(f'INSERT INTO {self._table} (fileID) VALUES (?)', (record, ) ) 
+    def new_file_id(self, record: str, user_id: int, user_name: str) -> None:
+        self._bd_cursor.execute(f'INSERT INTO {self._table} (fileID, user_id, user_name) VALUES (?, ?, ?)', (record, user_id, user_name) ) 
         self._bd.commit()
 
     # new record with caption below photo sent to admin
     @lock_thread
-    def insert_msg_for_file_id(self, msg: str, fileID: str) -> None:
+    def update_msg_for_file_id(self, msg: str, fileID: str) -> None:
         self._bd_cursor.execute(f'UPDATE {self._table} SET msg=\'{msg}\' WHERE fileID=\'{fileID}\'')
         self._bd.commit()
 
@@ -284,11 +294,13 @@ class PicDB(DB):
         self._table = table
         self._column = 'fileID'
         self._column_2 = 'tg_id'
+        self._column_3 = 'user_id'
+        self._column_4 = 'user_name'
 
 
     @lock_thread
-    def insert(self, file_name: str, file_id: str) -> None:
-        self._bd_cursor.execute(f'INSERT INTO {self._table} ({self._column}, {self._column_2}) VALUES (?, ?)', (file_name, file_id) ) 
+    def insert(self, file_name: str, file_id: str, user_id: int, user_name: str) -> None:
+        self._bd_cursor.execute(f'INSERT INTO {self._table} ({self._column}, {self._column_2}, {self._column_3}, {self._column_4}) VALUES (?, ?, ?, ?)', (file_name, file_id, user_id, user_name) ) 
         self._bd.commit()
 
 

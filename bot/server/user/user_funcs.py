@@ -1,4 +1,4 @@
-from header import utils
+from server import utils
 from header import bot, msgDB, userDB
 from config import PATH, ADMIN_ID, FILTER, PHOTO_CHANNEL, JOKE_CHANNEL
 from server.admin.admin_utils.suggestions import Suggestions
@@ -15,6 +15,7 @@ def upload_photo(message):
             bot.register_next_step_handler(message, upload_photo)
         else:
             user_id = message.from_user.id
+            user_name = message.from_user.username
             picDB = utils.PicDB("accPics")
             upPic = utils.UploadPic(PATH.PHOTOS)
             txt = "Сохранил"
@@ -31,7 +32,7 @@ def upload_photo(message):
             file = bot.download_file(file_info.file_path)
             file_name = file_info.file_path.replace('photos/', '')
             # saving photo id to DB of pics, either accepted pics table or pics table
-            picDB.insert(file_name, file_info.file_id)
+            picDB.insert(file_name, file_info.file_id, user_id, user_name)
             upPic.upload(file, file_name)
             bot.send_message(message.chat.id, txt)
             bot.send_message(message.chat.id, "Пришли еще картинку.\nДля отмены нажми /brake")
@@ -57,6 +58,7 @@ def upload_joke(message):
             if message.text not in FILTER.COMMANDS:
                 joke = message.text
                 user_id = message.from_user.id 
+                user_name = message.from_user.username 
                 table = "adminJokes"
                 userMessage = "Сохранил"
                 if user_id != ADMIN_ID: 
@@ -65,7 +67,7 @@ def upload_joke(message):
                     suggestions.new_suggest()
                 jokeDB = utils.JokeDB(table)
                 premium.new_upload_for_user(message)
-                jokeDB.new_record(joke)
+                jokeDB.insert(joke, user_id, user_name)
                 bot.send_message(message.chat.id, userMessage)
                 if user_id == ADMIN_ID:
                     bot.send_message(JOKE_CHANNEL, joke)
@@ -82,10 +84,12 @@ def upload_joke(message):
 
 
 def upload_message_to_admin(message): 
+    user_id = message.from_user.id
+    user_name = message.from_user.username
     if message.content_type == "text":
         if message.text.lower() != "/brake":
             if message.text not in FILTER.COMMANDS:
-                msgDB.new_record(message.text)
+                msgDB.insert(message.text, user_id, user_name)
                 bot.send_message(message.chat.id, "Отправлено")
             else:
                 bot.send_message(message.chat.id, "Это не то, но я жду твое сообщение.\nДля отмены нажми /brake")
@@ -98,10 +102,10 @@ def upload_message_to_admin(message):
         file = bot.download_file(file_info.file_path)
         fileID = file_info.file_path.replace('photos/', '')
         upPic.upload(file, fileID)
-        msgDB.new_file_id(fileID)
+        msgDB.new_file_id(fileID, user_id, user_name)
         if message.caption != None:
             caption = message.caption
-            msgDB.insert_msg_for_file_id(caption, fileID)
+            msgDB.update_msg_for_file_id(caption, fileID)
         bot.send_message(message.chat.id, "Отправил")
         del upPic
     else:

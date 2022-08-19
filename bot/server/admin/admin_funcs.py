@@ -1,8 +1,9 @@
-from header import utils
+from server import utils
 from header import mesg
 from header import bot, userDB, msgDB
 from config import PATH, FILTER, ADMIN_ID, KEYS, WCT_CHANNEL
 from server.user.user_utils.achievements import translate_category
+from server.utils.ban import BannedDB
 
 
 boarDB = utils.BoarDB()
@@ -130,16 +131,27 @@ def see_suggestions(message, type: str, db: utils.DB, keys: dict) -> None:
     record_len = db.get_records_count()
     if record_len != 0:
         if mesg.count < record_len: # msgCounter is counter which increase and count every each record 
+            id = db.get_record(mesg.count, 2)
+            user_name = db.get_record(mesg.count, 3)
             if type == "txt":
+                id = db.get_record(mesg.count, 1)
+                user_name = db.get_record(mesg.count, 2)
                 bot.send_message(message.chat.id,
-                    f"{record_len} записей\n" +
-                    f"{db.get_record(row=mesg.count)}",
-                    reply_markup=stand_keyboard.get())
+                    f"{mesg.count+1} из {record_len} записей\n"
+                    + f"ID: {id}\n"
+                    + f"Имя: <a href=\"https://t.me/{user_name}\">{user_name}</a>\n"
+                    + "\n"
+                    + f"{db.get_record(row=mesg.count)}",
+                    reply_markup=stand_keyboard.get(),
+                    parse_mode='html')
             else:
                 bot.send_photo(message.chat.id, 
                     open(PATH.RECIEVED_PHOTOS + db.get_record(mesg.count), "rb"),
                     reply_markup=stand_keyboard.get(),
-                    caption=f"{record_len} записей")
+                    caption=f"{mesg.count+1} из {record_len} записей\n"
+                            + f"ID: {id}\n"
+                            + f"Имя: <a href=\"https://t.me/{user_name}\">{user_name}</a>\n",
+                    parse_mode='html')
         else:
             mesg.count = 0
             bot.send_message(
@@ -161,16 +173,27 @@ def see_messages_to_admin(message, keys: dict) -> None:
     record_len = msgDB.get_records_count()
     if record_len != 0:
         if mesg.count < record_len: # msgCounter is counter which increase and count every each record 
+            id = msgDB.get_record(mesg.count, 2)
+            user_name = msgDB.get_record(mesg.count, 3)
             if msgDB.msg_has_file_id(mesg.count):
                 bot.send_photo(message.chat.id, 
                     open(PATH.RECIEVED_PHOTOS + msgDB.get_file_id(mesg.count), "rb"),
                     reply_markup=stand_keyboard.get(),
-                    caption=f"{record_len} записей\n{msgDB.get_record(mesg.count)}")
+                    caption=f"{mesg.count+1} из {record_len} записей\n"
+                        + f"<b>ID</b>: {id}\n"
+                        + f"<b>Имя</b>: <a href=\"https://t.me/{user_name}\">{user_name}</a>\n"
+                        + "\n"
+                        + f"{msgDB.get_record(mesg.count)}",
+                    parse_mode='html')
             else:
                 bot.send_message(message.chat.id,
-                    f"{record_len} записей\n" +
-                    f"{msgDB.get_record(row=mesg.count)}",
-                    reply_markup=stand_keyboard.get())
+                    f"{mesg.count+1} из {record_len} записей\n"
+                    + f"<b>ID</b>: {id}\n"
+                    + f"<b>Имя</b>: <a href=\"https://t.me/{user_name}\">{user_name}</a>\n"
+                    + "\n"
+                    + f"{msgDB.get_record(row=mesg.count)}",
+                    reply_markup=stand_keyboard.get(),
+                    parse_mode='html')
         else:
             mesg.count = 0
             bot.send_message(
@@ -179,3 +202,20 @@ def see_messages_to_admin(message, keys: dict) -> None:
                 reply_markup=back_keyboard.get())
     else:
         bot.send_message(message.chat.id, "Сообщений нет", reply_markup=back_keyboard.get())
+
+
+def ban_user(message):
+    txt = message.text
+    id_slice = int(txt[5:])
+    user_name = bot.get_chat_member(id_slice, id_slice).user.username
+    banDB = BannedDB()
+    banDB.ban(id_slice, user_name)
+    del banDB
+    
+
+def unban_user(message):
+    txt = message.text
+    id_slice = int(txt[5:])
+    banDB = BannedDB()
+    banDB.unban(id_slice)
+    del banDB
