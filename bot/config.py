@@ -66,21 +66,27 @@ class KEYS():
         3: { "text": "Премиум Кабана",            "call": "UPLOAD_PREM_BOAR"  }, 
     }
     JOKE_SEE = {
-        0: { "text": "Выйти",                     "call": "BACK_ADMIN"        }, 
-        1: { "text": "Далее",                     "call": "JOKE_FURTHER"      },
-        2: { "text": "Принять",                   "call": "JOKE_ACCEPT"       }, 
-        3: { "text": "Удалить",                   "call": "JOKE_DELETE"       }, 
+        0: { "text": "❌",                   "call": "JOKE_DELETE"       }, 
+        1: { "text": "Выйти",                     "call": "BACK_ADMIN"        }, 
+        2: { "text": "✅",                   "call": "JOKE_ACCEPT"       }, 
+        3: { "text": "◀",                         "call": "JOKE_PREV"         },
+        4: { "text": "0/0",                       "call": "COUNTER"           },
+        5: { "text": "▶",                         "call": "JOKE_FURTHER"      },
     }
     PIC_SEE = {
-        0: { "text": "Выйти",                     "call": "BACK_ADMIN"        }, 
-        1: { "text": "Далее",                     "call": "PIC_FURTHER"       },
-        2: { "text": "Принять",                   "call": "PIC_ACCEPT"        }, 
-        3: { "text": "Удалить",                   "call": "PIC_DELETE"        }, 
+        0: { "text": "❌",                   "call": "PIC_DELETE"        }, 
+        1: { "text": "Выйти",                     "call": "BACK_ADMIN"        }, 
+        2: { "text": "✅",                   "call": "PIC_ACCEPT"        }, 
+        3: { "text": "◀",                         "call": "PIC_PREV"          },
+        4: { "text": "0/0",                       "call": "COUNTER"           },
+        5: { "text": "▶",                         "call": "PIC_FURTHER"       },
     }
     MSG_SEE = {
         0: { "text": "Выйти",                     "call": "BACK_ADMIN"        }, 
-        1: { "text": "Далее",                     "call": "MSG_FURTHER"       },
-        2: { "text": "Удалить",                   "call": "MSG_DELETE"        }, 
+        1: { "text": "❌",                   "call": "MSG_DELETE"        }, 
+        2: { "text": "◀",                         "call": "MSG_PREV"          },
+        3: { "text": "0/0",                       "call": "COUNTER"           },
+        4: { "text": "▶",                         "call": "MSG_FURTHER"       },
     }
     SUGGESTIONS = {
         0: { "text": "Картинки",                  "call": "SEE_PICTURES"      }, 
