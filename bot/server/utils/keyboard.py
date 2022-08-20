@@ -38,12 +38,9 @@ class ReplyKeyboard():
         self._keyboard.add(text)
 
 
-class InlineKeyboard(): 
-    def __init__(self) -> None:
-        self._keyboard = types.InlineKeyboardMarkup()
-
+class InlineKeyboard(types.InlineKeyboardMarkup): 
     def get(self) -> types.InlineKeyboardMarkup:
-        return self._keyboard
+        return self
 
     def set(self, keys: dict) -> None:
         """        
@@ -67,14 +64,23 @@ class InlineKeyboard():
             a = types.InlineKeyboardButton(text=result[0][0], callback_data=result[0][1])
             if len(result) == 2: 
                 b = types.InlineKeyboardButton(text=result[1][0], callback_data=result[1][1])
-                self._keyboard.row(a, b)
+                self.row(a, b)
             else:
-                self._keyboard.row(a)
+                self.row(a)
 
     def add_url_button(self, key: str, url: str) -> None:
         button = types.InlineKeyboardButton(text=key, url=url)
-        self._keyboard.add(button)
+        self.add(button)
 
     def add_button(self, text: str, call: str) -> None:
         button = types.InlineKeyboardButton(text=text, callback_data=call)
-        self._keyboard.add(button)
+        self.add(button)
+
+
+def build_buttons(keys: dict):
+    buttons = []
+    for button in keys.values():
+        inlineButton = types.InlineKeyboardButton(text=button["text"], callback_data=button["call"])
+        buttons.append(inlineButton)
+        
+    return buttons
