@@ -38,7 +38,7 @@ def unban(message):
         bot.reply_to(message, "Разбанил пользователя")
 
 
-def ban_list(message):
+def banList(message):
     if message.from_user.id == ADMIN_ID:
         banDB = BannedDB()
         banList = banDB.get_users_idName_list()

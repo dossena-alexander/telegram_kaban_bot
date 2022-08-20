@@ -20,7 +20,7 @@ bot.register_message_handler(commands=["ban"],
                              callback="none")
 
 bot.register_message_handler(commands=["banlist"], 
-                             func=ban_list, 
+                             func=banList, 
                              callback="none")
 
 bot.register_message_handler(commands=["auth"], 
