@@ -32,12 +32,12 @@ class ReplyKeyboard(types.ReplyKeyboardMarkup):
             a = result[0]
             if len(result) == 2: 
                 b = result[1]
-                self._keyboard.row(a, b)
+                self.row(a, b)
             else:
-                self._keyboard.row(a)
+                self.row(a)
 
     def add_button(self, text) -> None:
-        self._keyboard.add(text)
+        self.add(text)
 
 
 class InlineKeyboard(types.InlineKeyboardMarkup): 
