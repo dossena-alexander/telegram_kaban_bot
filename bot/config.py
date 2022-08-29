@@ -9,7 +9,7 @@ class BOT_MESSAGE():
     USER = "Меню пользователя"
     ADMIN = "Админ меню"
     USER_SUB_MENU = "Кабаний перевод телеграмм для настоящих кабанов, просто нажми на кнопку, чтобы установить"
-    def HELP(photo_count: int = 1000, joke_count: int = 1000) -> str:
+    def HELP(photo_count: int = 1000, joke_count: int = 5000) -> str:
         msg = ("<b>Что я умею</b>\n <i>Мои команды:</i>\n"
             + "• /auth - Аутентификация\n" 
             + "• /help - Помощь\n"
@@ -66,24 +66,24 @@ class KEYS():
         3: { "text": "Премиум Кабана",            "call": "UPLOAD_PREM_BOAR"  }, 
     }
     JOKE_SEE = {
-        0: { "text": "❌",                   "call": "JOKE_DELETE"       }, 
+        0: { "text": "❌",                        "call": "JOKE_DELETE"        }, 
         1: { "text": "Выйти",                     "call": "BACK_ADMIN"        }, 
-        2: { "text": "✅",                   "call": "JOKE_ACCEPT"       }, 
+        2: { "text": "✅",                        "call": "JOKE_ACCEPT"        }, 
         3: { "text": "◀",                         "call": "JOKE_PREV"         },
         4: { "text": "0/0",                       "call": "COUNTER"           },
         5: { "text": "▶",                         "call": "JOKE_FURTHER"      },
     }
     PIC_SEE = {
-        0: { "text": "❌",                   "call": "PIC_DELETE"        }, 
+        0: { "text": "❌",                        "call": "PIC_DELETE"         }, 
         1: { "text": "Выйти",                     "call": "BACK_ADMIN"        }, 
-        2: { "text": "✅",                   "call": "PIC_ACCEPT"        }, 
+        2: { "text": "✅",                        "call": "PIC_ACCEPT"         }, 
         3: { "text": "◀",                         "call": "PIC_PREV"          },
         4: { "text": "0/0",                       "call": "COUNTER"           },
         5: { "text": "▶",                         "call": "PIC_FURTHER"       },
     }
     MSG_SEE = {
         0: { "text": "Выйти",                     "call": "BACK_ADMIN"        }, 
-        1: { "text": "❌",                   "call": "MSG_DELETE"        }, 
+        1: { "text": "❌",                        "call": "MSG_DELETE"        }, 
         2: { "text": "◀",                         "call": "MSG_PREV"          },
         3: { "text": "0/0",                       "call": "COUNTER"           },
         4: { "text": "▶",                         "call": "MSG_FURTHER"       },
@@ -94,16 +94,16 @@ class KEYS():
         2: { "text": "Назад",                     "call": "BACK_ADMIN"        }, 
     }
     CATEGORY = {
-        0: { "text": "emotions",                  "call": "1"                  }, 
-        1: { "text": "interesting",               "call": "2"                  },
-        2: { "text": "game",                      "call": "3"                  }, 
-        3: { "text": "world",                     "call": "4"                  }, 
-        4: { "text": "trap",                      "call": "5"                  },
-        5: { "text": "big",                       "call": "6"                  }, 
-        6: { "text": "small",                     "call": "7"                  }, 
-        7: { "text": "phylosophy",                "call": "8"                  },
-        8: { "text": "upper_stratum",             "call": "9"                  }, 
-        9: { "text": "sub_culture",               "call": "10"                 }, 
+        0: { "text": "emotions",                  "call": "1"                 }, 
+        1: { "text": "interesting",               "call": "2"                 },
+        2: { "text": "game",                      "call": "3"                 }, 
+        3: { "text": "world",                     "call": "4"                 }, 
+        4: { "text": "trap",                      "call": "5"                 },
+        5: { "text": "big",                       "call": "6"                 }, 
+        6: { "text": "small",                     "call": "7"                 }, 
+        7: { "text": "phylosophy",                "call": "8"                 },
+        8: { "text": "upper_stratum",             "call": "9"                 }, 
+        9: { "text": "sub_culture",               "call": "10"                }, 
     }
     
 
@@ -117,7 +117,7 @@ class LIMIT():
 
 
 class PREMIUM_LIMIT():
-    UPLOADS_COUNT = 5
+    UPLOADS_COUNT = 10
     DAYS = 2
 
 UPLOAD_LOCK = False
