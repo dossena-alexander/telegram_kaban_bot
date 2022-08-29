@@ -10,17 +10,17 @@ def start(message):
     keyboard = utils.ReplyKeyboard()
     keyboard.set(KEYS.START)
     bot.send_message(message.chat.id, "Хрю хрю, кабан {0.first_name}!"
-        .format(message.from_user, bot.get_me()), reply_markup=keyboard.get())
+        .format(message.from_user, bot.get_me()), reply_markup=keyboard)
 
 
 def keys(message):
-    keyboard = utils.ReplyKeyboard()
+    keyboard = utils.ReplyKeyboard(selective=True)
     keyboard.set(KEYS.START)
-    bot.reply_to(message, "Активировал клавиатуру", reply_markup=keyboard.get())
+    bot.reply_to(message, "Активировал клавиатуру", reply_markup=keyboard)
 
 
 def hide(message):
-    bot.reply_to(message, "Убрал клавиатуру", reply_markup=types.ReplyKeyboardRemove())
+    bot.reply_to(message, "Убрал клавиатуру", reply_markup=types.ReplyKeyboardRemove(selective=True))
 
 
 def ban(message):

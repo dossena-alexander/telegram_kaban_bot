@@ -1,12 +1,14 @@
 from telebot import types
 
 
-class ReplyKeyboard():
-    def __init__(self) -> None:
-        self._keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+class ReplyKeyboard(types.ReplyKeyboardMarkup):
+    def __init__(self, resize_keyboard=True, row_width=1, selective=False) -> None:
+        super().__init__(resize_keyboard=resize_keyboard,
+                       row_width=row_width,
+                       selective=selective)
 
     def get(self) -> types.ReplyKeyboardMarkup:
-        return self._keyboard
+        return self
 
     def set(self, keys: dict) -> None:
         """        
