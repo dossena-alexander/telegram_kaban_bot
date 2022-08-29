@@ -91,8 +91,13 @@ def admin_notify(message) -> None:
                 users = userDB.get_users_list()
                 if len(users) != 0:
                     for id in users:
-                        bot.send_message(id, 
-                        "<b>Сообщение от админа:</b>\n" + msg, parse_mode="html")
+                        try:
+                            bot.send_message(id, 
+                                            "<b>Сообщение от админа:</b>\n"
+                                            + msg, 
+                                            parse_mode="html")
+                        except Exception:
+                            userDB.delete_record(id)
                 else:
                     bot.send_message(ADMIN_ID, "Пользователей для рассылки нет")
             else:
@@ -105,7 +110,12 @@ def admin_notify(message) -> None:
         users = userDB.get_users_list()
         if len(users) != 0:
             for id in users:
-                bot.send_photo(id, file_info.file_id, caption= "<b>Сообщение от админа:</b>", parse_mode='html')
+                try:
+                    bot.send_photo(id, file_info.file_id, 
+                                   caption="<b>Сообщение от админа:</b>", 
+                                   parse_mode='html')
+                except Exception:
+                    userDB.delete_record(id)
         else:
             bot.send_message(ADMIN_ID, "Пользователей для рассылки нет")
 
@@ -118,7 +128,10 @@ def bot_notify(message) -> None:
                 users = userDB.get_users_list()
                 if len(users) != 0:
                     for id in users:
-                        bot.send_message(id, msg, parse_mode="html")
+                        try:
+                            bot.send_message(id, msg, parse_mode="html")
+                        except Exception:
+                            userDB.delete_record(id)
                 else:
                     bot.send_message(ADMIN_ID, "Пользователей для рассылки нет")
             else:
@@ -131,7 +144,10 @@ def bot_notify(message) -> None:
         users = userDB.get_users_list()
         if len(users) != 0:
             for id in users:
-                bot.send_photo(id, file_info.file_id)
+                try:
+                    bot.send_photo(id, file_info.file_id)
+                except Exception:
+                    userDB.delete_record(id)
         else:
             bot.send_message(ADMIN_ID, "Пользователей для рассылки нет")
 
