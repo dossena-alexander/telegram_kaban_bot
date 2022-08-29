@@ -100,6 +100,14 @@ def admin_notify(message) -> None:
                 bot.register_next_step_handler(message, admin_notify)
         else:
             bot.send_message(ADMIN_ID, "Отменено")
+    elif message.content_type == 'photo':
+        file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
+        users = userDB.get_users_list()
+        if len(users) != 0:
+            for id in users:
+                bot.send_photo(id, file_info.file_id, caption= "<b>Сообщение от админа:</b>", parse_mode='html')
+        else:
+            bot.send_message(ADMIN_ID, "Пользователей для рассылки нет")
 
 
 def bot_notify(message) -> None:
@@ -118,6 +126,14 @@ def bot_notify(message) -> None:
                 bot.register_next_step_handler(message, bot_notify)
         else:
             bot.send_message(ADMIN_ID, "Отменено")
+    elif message.content_type == 'photo':
+        file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
+        users = userDB.get_users_list()
+        if len(users) != 0:
+            for id in users:
+                bot.send_photo(id, file_info.file_id)
+        else:
+            bot.send_message(ADMIN_ID, "Пользователей для рассылки нет")
 
 
 def see_suggestions(message, type: str, db: utils.DB, keys: dict) -> None:
