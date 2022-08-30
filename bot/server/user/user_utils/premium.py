@@ -27,8 +27,8 @@ class PremiumMenu():
         return "<b>Не активен</b>"
 
     def _calculate_premium_days(self, userID) -> int:
-        premium_toggled_on_day = self.userDB.get_premium_turned_on_day(userID)
-        disactivate_day = premium_toggled_on_day + PREMIUM_LIMIT.DAYS
+        premium_turned_day = self.userDB.get_premium_turned_day(userID)
+        disactivate_day = premium_turned_day + PREMIUM_LIMIT.DAYS
         now = date.today()
         day = now.day
         days_left = disactivate_day - day
@@ -62,7 +62,7 @@ def choice_DB_by_premium(user_id: int):
 
 def check_premium_is_over(message) -> None:
     user_id = message.from_user.id
-    if userDB.is_premium(user_id) and funcs.actual_day() - userDB.get_premium_turned_on_day(user_id) > PREMIUM_LIMIT.DAYS:
+    if userDB.is_premium(user_id) and funcs.actual_day() - userDB.get_premium_turned_day(user_id) > PREMIUM_LIMIT.DAYS:
         userDB.disactivate_premium(user_id)
         funcs.new_wct(user_id, boarDB)
         bot.send_message(message.chat.id, "Истек срок премиума!\nКак получить премиум читай в /auth -> Премиум")

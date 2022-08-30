@@ -93,7 +93,15 @@ class Achievements():
         self._set_categoria_count(userID, self._categories)
 
 
-def translate_category(category) -> str:
+def translate_category(category: str) -> str:
+    """Translate boar category from Eng to Rus
+
+    Args:
+        category str: Eng vers of category from original DB
+
+    Returns:
+        str: Rus vers of category
+    """
     if category == "emotions":
         return "Эмотивные"
     elif category == "game":

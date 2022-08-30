@@ -96,6 +96,11 @@ def _admin_see_pictures_suggestions(call):
         bot.delete_message(call.message.chat.id, call.message.message_id)
         see_suggestions(call.message, type="pic", db=userPicDB, keys=KEYS.PIC_SEE)
 
+    elif call.data == "PIC_PREV":
+        mesg.count -= 1
+        bot.delete_message(call.message.chat.id, call.message.message_id)
+        see_suggestions(call.message, type="pic", db=userPicDB, keys=KEYS.PIC_SEE)
+
     elif call.data == "PIC_ACCEPT":
         photo_name = userPicDB.get_record(mesg.count)
         photo_id = userPicDB.get_record(mesg.count, col=1)
@@ -125,6 +130,11 @@ def _admin_see_jokes_suggestions(call):
         bot.delete_message(call.message.chat.id, call.message.message_id)
         see_suggestions(call.message, "txt", userJokeDB, KEYS.JOKE_SEE)
 
+    elif call.data == "JOKE_PREV":
+        mesg.count -= 1
+        bot.delete_message(call.message.chat.id, call.message.message_id)
+        see_suggestions(call.message, "txt", userJokeDB, KEYS.JOKE_SEE)
+
     elif call.data == "JOKE_ACCEPT":
         joke = userJokeDB.get_record(mesg.count)
         bot.delete_message(call.message.chat.id, call.message.message_id)
@@ -148,6 +158,11 @@ def _admin_see_messages_from_users(call):
 
     elif call.data == "MSG_FURTHER":
         mesg.count += 1
+        bot.delete_message(call.message.chat.id, call.message.message_id)
+        see_messages_to_admin(call.message, KEYS.MSG_SEE)
+
+    elif call.data == "MSG_PREV":
+        mesg.count -= 1
         bot.delete_message(call.message.chat.id, call.message.message_id)
         see_messages_to_admin(call.message, KEYS.MSG_SEE)
 

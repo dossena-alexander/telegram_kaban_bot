@@ -45,7 +45,7 @@ def _user_premium_menu(call):
         keyboard.add_button(text="Назад", call="BACK_USER")
         bot.edit_message_text(text=premiumMenu.get_message(), chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard.get(), parse_mode="html")
     elif call.data == "ABOUT_PREMIUM":
-        text = utils.PremiumMenu.get_text_about()
+        text = premium.PremiumMenu.get_text_about()
         keyboard = utils.InlineKeyboard()
         keyboard.add_button(text="Назад", call="BACK_USER")
         bot.edit_message_text(text=text, chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard.get(), parse_mode="html")

@@ -1,4 +1,4 @@
-# v1.8.9
+# v1.8.9.3
 from server.handlers import *
 from header import *
 
@@ -7,20 +7,13 @@ bot.register_message_handler(commands=["start"],
                              func=start, 
                              callback="none")
 
-bot.register_message_handler(commands=["keys"], 
-                             func=keys, 
-                             callback="none")
-
-bot.register_message_handler(commands=["hide"], 
-                             func=hide, 
-                             callback="none")
 
 bot.register_message_handler(commands=["ban"], 
                              func=ban, 
                              callback="none")
 
 bot.register_message_handler(commands=["banlist"], 
-                             func=ban_list, 
+                             func=banList, 
                              callback="none")
 
 bot.register_message_handler(commands=["auth"], 
@@ -32,9 +25,18 @@ bot.register_message_handler(commands=["help"],
                              func=help, 
                              callback="none")
 
-bot.register_message_handler(content_types="text", 
-                             func=reply_keyboard_worker, 
+bot.register_message_handler(commands=["wct"], 
+                             func=send_wct, 
                              callback="none")
+
+bot.register_message_handler(commands=["photo"], 
+                             func=send_photo, 
+                             callback="none")
+
+bot.register_message_handler(commands=["joke"], 
+                             func=send_joke, 
+                             callback="none")
+
 
 bot.register_message_handler(content_types="photo", 
                              func=upload_photo_in_private_chat, 

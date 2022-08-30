@@ -91,8 +91,13 @@ def admin_notify(message) -> None:
                 users = userDB.get_users_list()
                 if len(users) != 0:
                     for id in users:
-                        bot.send_message(id, 
-                        "<b>Сообщение от админа:</b>\n" + msg, parse_mode="html")
+                        try:
+                            bot.send_message(id, 
+                                            "<b>Сообщение от админа:</b>\n"
+                                            + msg, 
+                                            parse_mode="html")
+                        except Exception:
+                            userDB.delete_record(id)
                 else:
                     bot.send_message(ADMIN_ID, "Пользователей для рассылки нет")
             else:
@@ -100,6 +105,19 @@ def admin_notify(message) -> None:
                 bot.register_next_step_handler(message, admin_notify)
         else:
             bot.send_message(ADMIN_ID, "Отменено")
+    elif message.content_type == 'photo':
+        file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
+        users = userDB.get_users_list()
+        if len(users) != 0:
+            for id in users:
+                try:
+                    bot.send_photo(id, file_info.file_id, 
+                                   caption="<b>Сообщение от админа:</b>", 
+                                   parse_mode='html')
+                except Exception:
+                    userDB.delete_record(id)
+        else:
+            bot.send_message(ADMIN_ID, "Пользователей для рассылки нет")
 
 
 def bot_notify(message) -> None:
@@ -110,7 +128,10 @@ def bot_notify(message) -> None:
                 users = userDB.get_users_list()
                 if len(users) != 0:
                     for id in users:
-                        bot.send_message(id, msg, parse_mode="html")
+                        try:
+                            bot.send_message(id, msg, parse_mode="html")
+                        except Exception:
+                            userDB.delete_record(id)
                 else:
                     bot.send_message(ADMIN_ID, "Пользователей для рассылки нет")
             else:
@@ -118,27 +139,40 @@ def bot_notify(message) -> None:
                 bot.register_next_step_handler(message, bot_notify)
         else:
             bot.send_message(ADMIN_ID, "Отменено")
+    elif message.content_type == 'photo':
+        file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
+        users = userDB.get_users_list()
+        if len(users) != 0:
+            for id in users:
+                try:
+                    bot.send_photo(id, file_info.file_id)
+                except Exception:
+                    userDB.delete_record(id)
+        else:
+            bot.send_message(ADMIN_ID, "Пользователей для рассылки нет")
 
 
 def see_suggestions(message, type: str, db: utils.DB, keys: dict) -> None:
+    record_len = db.get_records_count()
+    counter = f"{mesg.count + 1}/{record_len}"
+    keys[4]["text"] = counter
+    button_array = utils.build_buttons(keys)
+    
     stand_keyboard = utils.InlineKeyboard()
-    stand_keyboard.set(keys)
-
+    stand_keyboard.add(button_array[0], button_array[1], button_array[2])
+    stand_keyboard.add(button_array[3], button_array[4], button_array[5])
     back_keyboard = utils.InlineKeyboard()
     back_keyboard.add_button(text="Назад", call="BACK_ADMIN")
 
-    # get records len with DB method
-    record_len = db.get_records_count()
     if record_len != 0:
-        if mesg.count < record_len: # msgCounter is counter which increase and count every each record 
+        if mesg.count < record_len and mesg.count >= 0: # msgCounter is counter which increase and count every each record 
             id = db.get_record(mesg.count, 2)
             user_name = db.get_record(mesg.count, 3)
             if type == "txt":
                 id = db.get_record(mesg.count, 1)
                 user_name = db.get_record(mesg.count, 2)
                 bot.send_message(message.chat.id,
-                    f"{mesg.count+1} из {record_len} записей\n"
-                    + f"ID: {id}\n"
+                    f"ID: {id}\n"
                     + f"Имя: <a href=\"https://t.me/{user_name}\">{user_name}</a>\n"
                     + "\n"
                     + f"{db.get_record(row=mesg.count)}",
@@ -148,8 +182,7 @@ def see_suggestions(message, type: str, db: utils.DB, keys: dict) -> None:
                 bot.send_photo(message.chat.id, 
                     open(PATH.RECIEVED_PHOTOS + db.get_record(mesg.count), "rb"),
                     reply_markup=stand_keyboard.get(),
-                    caption=f"{mesg.count+1} из {record_len} записей\n"
-                            + f"ID: {id}\n"
+                    caption=f"ID: {id}\n"
                             + f"Имя: <a href=\"https://t.me/{user_name}\">{user_name}</a>\n",
                     parse_mode='html')
         else:
@@ -163,32 +196,33 @@ def see_suggestions(message, type: str, db: utils.DB, keys: dict) -> None:
 
 
 def see_messages_to_admin(message, keys: dict) -> None:
-    stand_keyboard = utils.InlineKeyboard()
-    stand_keyboard.set(keys)
+    record_len = msgDB.get_records_count()
+    counter = f"{mesg.count + 1}/{record_len}"
+    keys[3]["text"] = counter
+    button_array = utils.build_buttons(keys)
 
+    stand_keyboard = utils.InlineKeyboard()
+    stand_keyboard.add(button_array[0], button_array[1])
+    stand_keyboard.add(button_array[2], button_array[3], button_array[4])
     back_keyboard = utils.InlineKeyboard()
     back_keyboard.add_button(text="Назад", call="BACK_ADMIN")
 
-    # get records len with DB method
-    record_len = msgDB.get_records_count()
     if record_len != 0:
-        if mesg.count < record_len: # msgCounter is counter which increase and count every each record 
+        if mesg.count < record_len and mesg.count >= 0: # msgCounter is counter which increase and count every each record 
             id = msgDB.get_record(mesg.count, 2)
             user_name = msgDB.get_record(mesg.count, 3)
             if msgDB.msg_has_file_id(mesg.count):
                 bot.send_photo(message.chat.id, 
                     open(PATH.RECIEVED_PHOTOS + msgDB.get_file_id(mesg.count), "rb"),
                     reply_markup=stand_keyboard.get(),
-                    caption=f"{mesg.count+1} из {record_len} записей\n"
-                        + f"<b>ID</b>: {id}\n"
+                    caption=f"<b>ID</b>: {id}\n"
                         + f"<b>Имя</b>: <a href=\"https://t.me/{user_name}\">{user_name}</a>\n"
                         + "\n"
                         + f"{msgDB.get_record(mesg.count)}",
                     parse_mode='html')
             else:
                 bot.send_message(message.chat.id,
-                    f"{mesg.count+1} из {record_len} записей\n"
-                    + f"<b>ID</b>: {id}\n"
+                    f"<b>ID</b>: {id}\n"
                     + f"<b>Имя</b>: <a href=\"https://t.me/{user_name}\">{user_name}</a>\n"
                     + "\n"
                     + f"{msgDB.get_record(row=mesg.count)}",
@@ -206,11 +240,17 @@ def see_messages_to_admin(message, keys: dict) -> None:
 
 def ban_user(message):
     txt = message.text
-    id_slice = int(txt[5:])
-    user_name = bot.get_chat_member(id_slice, id_slice).user.username
-    banDB = BannedDB()
-    banDB.ban(id_slice, user_name)
-    del banDB
+    try:
+        id_slice = int(txt[5:])
+    except:
+        return "Неправильная команда"
+    try:
+        user_name = bot.get_chat_member(id_slice, id_slice).user.username
+        banDB = BannedDB()
+        banDB.ban(id_slice, user_name)
+        del banDB
+    except:
+        return "Такого пользователя нет"
     
 
 def unban_user(message):
