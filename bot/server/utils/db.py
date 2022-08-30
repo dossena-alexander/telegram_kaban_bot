@@ -344,6 +344,14 @@ class BoarsCategories(DB):
         return boars_listed
 
     def get_boar_category(self, boarID: str) -> str:
+        """Needs a name of boar from DB. Returns category of boar
+
+        Args:
+            boarID (str): For example: file_231.jpg
+
+        Returns:
+            str: Category of boar you sent to method
+        """
         columns = self._get_columns_names()
         for column in columns:
             boars = self.get_boars_of_category(column)
