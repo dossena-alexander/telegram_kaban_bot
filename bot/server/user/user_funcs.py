@@ -1,14 +1,17 @@
+from io import BufferedReader
 from server import utils
 from header import bot, msgDB, userDB
 from config import PATH, ADMIN_ID, FILTER, PHOTO_CHANNEL, JOKE_CHANNEL
+from server.utils.db import BoarsCategories
 from server.admin.admin_utils.suggestions import Suggestions
 from server.user.user_utils import funcs, premium, achievements
+from server.user.user_utils.achievements import translate_category
 
 
 suggestions = Suggestions()
 
 
-def upload_photo(message): 
+def upload_photo(message) -> None: 
     if message.content_type == 'photo':
         if message.media_group_id != None: # able to save not only one pic
             bot.send_message(message.chat.id, "Пришли только одну картинку")
@@ -52,7 +55,7 @@ def upload_photo(message):
             bot.register_next_step_handler(message, upload_photo)
 
 
-def upload_joke(message):
+def upload_joke(message) -> None:
     if message.content_type == "text":
         if message.text.lower() != "/brake":
             if message.text not in FILTER.COMMANDS:
@@ -83,7 +86,7 @@ def upload_joke(message):
         bot.register_next_step_handler(message, upload_joke)
 
 
-def upload_message_to_admin(message): 
+def upload_message_to_admin(message) -> None: 
     user_id = message.from_user.id
     user_name = message.from_user.username
     if message.content_type == "text":
@@ -113,7 +116,7 @@ def upload_message_to_admin(message):
         bot.register_next_step_handler(message, upload_message_to_admin)
 
 
-def get_wct_photo(message):
+def get_wct_photo(message) -> tuple[BufferedReader, str]:
     """
     WCT is "Which Caban (boar) you Today is"
     every day user changes his "board id"
@@ -130,7 +133,8 @@ def get_wct_photo(message):
     boarID = userDB.get_wct_for_user(user_id)
     boar = db.get_record(boarID)
     achievements.check_new_boar(message, boar)
+    caption = translate_category(BoarsCategories.get_boar_category(boar))
 
-    return open(PATH.WCT + boar, 'rb')
+    return open(PATH.WCT + boar, 'rb'), caption
 
 
