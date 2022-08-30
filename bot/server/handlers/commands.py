@@ -1,26 +1,16 @@
-from telebot import types
+import random
 from header import utils, bot, helpMenu, userDB, adminMenu, userMenu, adminPicDB, adminJokeDB
 from config import ADMIN_ID, KEYS, BOT_MESSAGE
 from server.admin.admin_utils.suggestions import Suggestions
 import server.admin.admin_funcs as admin_funcs
 from server.utils.ban import BannedDB
-
+from server.user.user_funcs import get_wct_photo
 
 def start(message):
     keyboard = utils.ReplyKeyboard()
     keyboard.set(KEYS.START)
     bot.send_message(message.chat.id, "Хрю хрю, кабан {0.first_name}!"
         .format(message.from_user, bot.get_me()), reply_markup=keyboard)
-
-
-def keys(message):
-    keyboard = utils.ReplyKeyboard(selective=True)
-    keyboard.set(KEYS.START)
-    bot.reply_to(message, "Активировал клавиатуру", reply_markup=keyboard)
-
-
-def hide(message):
-    bot.reply_to(message, "Убрал клавиатуру", reply_markup=types.ReplyKeyboardRemove(selective=True))
 
 
 def ban(message):
@@ -74,3 +64,34 @@ def admin(message):
 
 def user(message):
     bot.send_message(message.chat.id, userMenu.message, reply_markup=userMenu.get_inline_keyboard())
+
+
+def send_wct(message):
+    check_suggestions()
+    user_id = message.from_user.id
+    users = userDB.get_users_list()
+
+    if user_id != ADMIN_ID and user_id not in users:
+        bot.send_message(message.chat.id, "Ты не зарегистрировался. Нажми /auth, чтобы зарегистрироваться", reply_to_message_id=message.message_id)
+        return None
+    else:
+        boar, caption = get_wct_photo(message)
+        bot.send_photo(message.chat.id, boar, reply_to_message_id=message.message_id, caption=caption)
+
+
+def send_joke(message):
+    check_suggestions()
+    bot.send_message(message.chat.id, 
+        adminJokeDB.get_record(row=random.randint(0, adminJokeDB.get_records_count() - 1)))
+
+
+def send_photo(message): # by file_id
+    check_suggestions()
+    bot.send_photo(message.chat.id, 
+        adminPicDB.get_record(row=random.randint(0, adminPicDB.get_records_count() - 1), col=1))
+
+
+def check_suggestions():
+    suggestions = Suggestions()
+    if suggestions.limit_reached():
+        bot.send_message(ADMIN_ID, f"Есть новые {suggestions.all_suggestions} предложений")
