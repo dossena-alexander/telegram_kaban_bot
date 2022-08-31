@@ -6,6 +6,11 @@ import server.admin.admin_funcs as admin_funcs
 from server.utils.ban import BannedDB
 from server.user.user_funcs import get_wct_photo
 
+from server.admin.admin_utils.statistics import Statistics
+from server.utils.charts.collector import Collector
+
+stats = Statistics()
+
 def start(message):
     keyboard = utils.ReplyKeyboard()
     keyboard.set(KEYS.START)
@@ -68,6 +73,7 @@ def user(message):
 
 def send_wct(message):
     check_suggestions()
+    stats.update_wct()
     user_id = message.from_user.id
     users = userDB.get_users_list()
 
@@ -81,12 +87,16 @@ def send_wct(message):
 
 def send_joke(message):
     check_suggestions()
+    stats.update_joke()
+    collector = Collector('joke_click')
+    collector.new()
     bot.send_message(message.chat.id, 
         adminJokeDB.get_record(row=random.randint(0, adminJokeDB.get_records_count() - 1)))
 
 
 def send_photo(message): # by file_id
     check_suggestions()
+    stats.update_photo()
     bot.send_photo(message.chat.id, 
         adminPicDB.get_record(row=random.randint(0, adminPicDB.get_records_count() - 1), col=1))
 

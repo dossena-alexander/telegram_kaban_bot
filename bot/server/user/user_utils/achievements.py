@@ -1,5 +1,6 @@
 from header import utils
 from header import bot, userDB
+from server.admin.admin_utils.statistics import Statistics
 
 
 boarsCategories = utils.BoarsCategories()
@@ -135,7 +136,7 @@ def _new_boar(message, userID, boar_category, boar):
 
 
 def _record_boar() -> None:
-    db = utils.Statistics()
+    db = Statistics()
     db.update_boar()
     del db
 
