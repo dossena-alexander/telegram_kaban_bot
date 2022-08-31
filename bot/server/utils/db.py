@@ -1,45 +1,11 @@
 import sqlite3
-import threading # thread_lock for DB cursor
+import threading
 
 from config import PATH, PREMIUM_LIMIT
 from server.utils.logger import log
 
 
-lock = threading.Lock()
-
-#      DB structure
-# 
-#      +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~+
-#      |TABLES         |COLUMNS                                                   |
-#      |===============|==========================================================|
-#      |accPics--------|----------------------------------------------------------|
-#      |               |fileID: |                                                 |
-#      |               |STRING  |                                                 |
-#      |pics-----------|----------------------------------------------------------|
-#      |               |fileID: |                                                 |
-#      |               |STRING  |                                                 |
-#      |adminJokes-----|----------------------------------------------------------|
-#      |               |joke:   |                                                 |
-#      |               |STRING  |                                                 |
-#      |userJokes------|----------------------------------------------------------|
-#      |               |joke:   |                                                 |
-#      |               |STRING  |                                                 |
-#      |boarsID--------|----------------------------------------------------------|
-#      |               |ID:     |                                                 |
-#      |               |STRING  |                                                 |
-#      |premiumBoarsID-|----------------------------------------------------------|
-#      |               |ID:     |                                                 |
-#      |               |STRING  |                                                 |
-#      |msgs-----------|----------------------------------------------------------|
-#      |               |msg:    |fileID:|                                         |
-#      |               |STRING  |STRING |                                         |
-#      |users---------------------------------------------------------------------|
-#      |               |userID: |wctID: |prevDay: |status_premium:   |uploadCount:|
-#      |               |INTEGER |STRING |INTEGER  |INTEGER  |INTEGER |INTEGER     |
-#      |vk_users-------|----------------------------------------------------------|
-#      |               |userID: |wctID: |prevDay: |                               |
-#      |               |INTEGER |STRING |INTEGER  |                               |
-#      +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~+
+lock = threading.Lock() # thread_lock for DB cursor
 
 
 def lock_thread(func):
@@ -174,13 +140,12 @@ class UserDB(DB):
 
     def get_uploads_count(self, userID: int) -> int:
         try:
-            log.error("МОДУЛЬ БЕЗ БЛОКИРОВКИ ПОТОКА")
             info = self._bd_cursor.execute(f'SELECT uploadCount FROM {self._table} WHERE {self._column}={userID}')
             uploads_count = self._bd_cursor.fetchall()[0][0] # list > tuple > string
             return uploads_count
         except Exception as e:
-            log.error(e)
-            print(e)
+            log.error('Method userDB.get_uploads_count' + e)
+            print('Method userDB.get_uploads_count' + e)
 
     @lock_thread
     def uploads_limit_reached(self, userID: int) -> bool:
@@ -212,9 +177,13 @@ class UserDB(DB):
         return True
 
     def _all_boars(self, userID: int, boar_category: str) -> str:
-        self._bd_cursor.execute(f'SELECT {boar_category} FROM {self._table} WHERE {self._column}={userID}')
-        boars = self._bd_cursor.fetchall()[0][0] # list > tuple > string
-        return boars
+        try:
+            self._bd_cursor.execute(f'SELECT {boar_category} FROM {self._table} WHERE {self._column}={userID}')
+            boars = self._bd_cursor.fetchall()[0][0] # list > tuple > string
+            return boars
+        except Exception as e:
+            print('Method userDB._all_boars' + e)
+            log.error('Method userDB._all_boars' + e)
 
     @lock_thread
     def get_user_boars(self, userID: int, boar_category: str) -> str:
@@ -224,6 +193,53 @@ class UserDB(DB):
     def new_boar_for_user(self, userID: int, boar: str, boar_category: str) -> None:
         new_boar = f"{self._all_boars(userID, boar_category)}, {boar}"
         self._bd_cursor.execute(f'UPDATE {self._table} SET {boar_category} = \'{new_boar}\' WHERE {self._column}={userID}')
+        self._bd.commit()
+
+    def _get_upload_count(self, column: str, user_id: int) -> None:
+        self._bd_cursor.execute(f'SELECT {column} FROM {self._table} WHERE {self._column}={user_id}')
+        upload = self._bd_cursor.fetchall()[0][0] # list > tuple > string
+        return upload
+
+    @lock_thread
+    def get_upload_count(self, column: str, user_id: int) -> None:
+        """Available columns: photo_upload, joke_upload, admin_msg
+
+        Args:
+            column (str): One of those cols
+            user_id (int): TG user id
+
+        Returns:
+            int: Count of uploads
+        """
+        return self._get_upload_count(column, user_id)
+
+    @lock_thread
+    def new_photo_upload(self, user_id: int) -> None:
+        new_upload = self._get_upload_count('photo_upload', user_id) + 1
+        self._bd_cursor.execute(f'UPDATE {self._table} SET photo_upload = {new_upload} WHERE {self._column}={user_id}')
+        self._bd.commit()
+
+    @lock_thread
+    def new_joke_upload(self, user_id: int) -> None:
+        new_upload = self._get_upload_count('joke_upload', user_id) + 1
+        self._bd_cursor.execute(f'UPDATE {self._table} SET joke_upload = {new_upload} WHERE {self._column}={user_id}')
+        self._bd.commit()
+
+    @lock_thread
+    def new_admin_msg(self, user_id: int) -> None:
+        new_upload = self._get_upload_count('admin_msg', user_id) + 1
+        self._bd_cursor.execute(f'UPDATE {self._table} SET admin_msg = {new_upload} WHERE {self._column}={user_id}')
+        self._bd.commit()
+
+    @lock_thread
+    def get_upload_day(self, user_id: int) -> int:
+        self._bd_cursor.execute(f'SELECT upload_day FROM {self._table} WHERE {self._column}={user_id}')
+        day = self._bd_cursor.fetchall()[0][0] # list > tuple > string
+        return day
+
+    @lock_thread
+    def update_upload_day(self, user_id: int, day: int) -> None:
+        self._bd_cursor.execute(f'UPDATE {self._table} SET upload_day = {day} WHERE {self._column}={user_id}')
         self._bd.commit()
 
 

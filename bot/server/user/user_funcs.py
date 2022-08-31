@@ -1,7 +1,7 @@
 from io import BufferedReader
 from server import utils
 from header import bot, msgDB, userDB
-from config import PATH, ADMIN_ID, FILTER, PHOTO_CHANNEL, JOKE_CHANNEL
+from config import PATH, FILTER, ADMIN_ID, PHOTO_CHANNEL, JOKE_CHANNEL
 from server.utils.db import BoarsCategories
 from server.admin.admin_utils.suggestions import Suggestions
 from server.user.user_utils import funcs, premium, achievements
@@ -11,15 +11,35 @@ from server.user.user_utils.achievements import translate_category
 suggestions = Suggestions()
 
 
+def under_a_limit(type: str):
+    """
+    Available types: photo_upload, joke_upload, admin_msg
+    """
+    def _wrapped_func(func):
+        def _wrapper(message):
+            user_id = message.from_user.id
+            if funcs.check_upload_day(user_id):
+                funcs.new_upload_day(user_id)
+            if not funcs.limit_reached(type, user_id):
+                return func(message)
+            else:
+                bot.send_message(message.chat.id, "Упс!\n"
+                                    + "Ты достиг лимита загрузок для фотокарточек!\n"
+                                    + "Попробуй завтра или купи загрузки!")
+        return _wrapper
+    return _wrapped_func
+    
+
+@under_a_limit('photo_upload')
 def upload_photo(message) -> None: 
     if message.content_type == 'photo':
         if message.media_group_id != None: # able to save not only one pic
             bot.send_message(message.chat.id, "Пришли только одну картинку")
             bot.register_next_step_handler(message, upload_photo)
         else:
-            user_id = message.from_user.id
             user_name = message.from_user.username
-            picDB = utils.PicDB("accPics")
+            user_id = message.from_user.id
+            table = "accPics"
             upPic = utils.UploadPic(PATH.PHOTOS)
             txt = "Сохранил"
             # Checking ID of user, if admin is adding, pics`ll be added to main folder "photos/
@@ -28,9 +48,11 @@ def upload_photo(message) -> None:
             if user_id != ADMIN_ID:     
                 upPic = utils.UploadPic(PATH.RECIEVED_PHOTOS)
                 txt = "Добавлено на рассмотрение"
-                picDB.set_table("pics")
+                table = "pics"
                 suggestions.new_suggest()
+            picDB = utils.PicDB(table)
             premium.new_upload_for_user(message)
+            userDB.new_photo_upload(user_id)
             file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
             file = bot.download_file(file_info.file_path)
             file_name = file_info.file_path.replace('photos/', '')
@@ -55,12 +77,13 @@ def upload_photo(message) -> None:
             bot.register_next_step_handler(message, upload_photo)
 
 
+@under_a_limit('joke_upload')
 def upload_joke(message) -> None:
     if message.content_type == "text":
         if message.text.lower() != "/brake":
             if message.text not in FILTER.COMMANDS:
                 joke = message.text
-                user_id = message.from_user.id 
+                user_id = message.from_user.id
                 user_name = message.from_user.username 
                 table = "adminJokes"
                 userMessage = "Сохранил"
@@ -70,6 +93,7 @@ def upload_joke(message) -> None:
                     suggestions.new_suggest()
                 jokeDB = utils.JokeDB(table)
                 premium.new_upload_for_user(message)
+                userDB.new_joke_upload(user_id)
                 jokeDB.insert(joke, user_id, user_name)
                 bot.send_message(message.chat.id, userMessage)
                 if user_id == ADMIN_ID:
@@ -86,6 +110,7 @@ def upload_joke(message) -> None:
         bot.register_next_step_handler(message, upload_joke)
 
 
+@under_a_limit('admin_msg')
 def upload_message_to_admin(message) -> None: 
     user_id = message.from_user.id
     user_name = message.from_user.username
@@ -133,7 +158,8 @@ def get_wct_photo(message) -> tuple[BufferedReader, str]:
     boarID = userDB.get_wct_for_user(user_id)
     boar = db.get_record(boarID)
     achievements.check_new_boar(message, boar)
-    caption = translate_category(BoarsCategories.get_boar_category(boar))
+    boarsCategories = BoarsCategories()
+    caption = translate_category(boarsCategories.get_boar_category(boar))
 
     return open(PATH.WCT + boar, 'rb'), caption
 
