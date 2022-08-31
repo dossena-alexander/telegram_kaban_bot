@@ -4,6 +4,7 @@ from header import userPicDB, adminPicDB, adminJokeDB, userJokeDB
 from config import KEYS, PHOTO_CHANNEL, JOKE_CHANNEL
 
 import server.admin.admin_utils as admin_utils
+from server.admin.admin_utils.statistics import Statistics, Image_Statistic
 from server.admin.admin_funcs import *
 
 
@@ -12,10 +13,23 @@ suggestions = admin_utils.Suggestions()
 
 def admin_menu(call):
     if call.data == "STATISTICS":
-        stats = utils.Statistics()
+        stats = Statistics()
+        back = utils.InlineKeyboard()
+        back.add_button(text="Количественная", call="IMG_STATISTICS")
+        back.add_button(text="Назад", call="BACK_ADMIN")
+        bot.edit_message_text(text=stats.get(), chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=back.get(), parse_mode="html")
+        del stats
+
+    elif call.data == "IMG_STATISTICS":
+        stats = Statistics()
+        img_s = Image_Statistic()
+        stats.get_img_stats(img_s)
+        photo = img_s.path
+
         back = utils.InlineKeyboard()
         back.add_button(text="Назад", call="BACK_ADMIN")
-        bot.edit_message_text(text=stats.get() + stats.get_counts(), chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=back.get(), parse_mode="html")
+        bot.delete_message(call.message.chat.id, call.message.message_id)
+        bot.send_photo(call.message.chat.id, open(photo, 'rb'), caption='Количественная статистика')
         del stats
     
     elif call.data == "STOP_BOT":

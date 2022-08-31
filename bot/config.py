@@ -143,3 +143,5 @@ class PATH():
     RECIEVED_PHOTOS = '../materials/recieved_photos/'
     DB = '../db/main.db'
     LOG = "../Logs/bot.log"
+    DB_STATS = '../db/stats/'
+    MATERIALS = '../materials/'
