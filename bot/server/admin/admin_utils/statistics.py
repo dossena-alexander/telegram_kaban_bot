@@ -14,11 +14,11 @@ class Image_Statistic():
     def generate(self, val1, val2, val3, val4):
         img = Image.open(self.path)
         idraw = ImageDraw.Draw(img)
-        idraw.text((200, 260), 'КАБАНОВ:\n\n'
-                              +'КАРТИНОК:\n\n'
-                              +'ШУТОК:\n\n'
-                              +'ОТКРЫТЫХ\nКАБАНОВ:', font=self.font)
-        idraw.text((470, 260), f'{val1}\n\n'
+        idraw.text((180, 275), '/WCT:\n\n'
+                              +'/PHOTO:\n\n'
+                              +'/JOKE:\n\n'
+                              +'ОТКР. КАБАНОВ:', font=self.font)
+        idraw.text((530, 275), f'{val1}\n\n'
                               +f'{val2}\n\n'
                               +f'{val3}\n\n'
                               +f'{val4}', font=self.bold_font)

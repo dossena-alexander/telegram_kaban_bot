@@ -29,7 +29,7 @@ def admin_menu(call):
         back = utils.InlineKeyboard()
         back.add_button(text="Назад", call="BACK_ADMIN")
         bot.delete_message(call.message.chat.id, call.message.message_id)
-        bot.send_photo(call.message.chat.id, open(photo, 'rb'), caption='Количественная статистика')
+        bot.send_photo(call.message.chat.id, open(photo, 'rb'), caption='Количественная статистика', reply_markup=back)
         del stats
     
     elif call.data == "STOP_BOT":
@@ -68,7 +68,11 @@ def _admin_escape(call):
         adminMenu.set_message("Админ меню")
         if suggestions.exist():
             adminMenu.set_message(suggestions.get_message())
-        bot.edit_message_text(text=adminMenu.message, chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=adminMenu.get_inline_keyboard())
+        try:
+            bot.edit_message_text(text=adminMenu.message, chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=adminMenu.get_inline_keyboard())
+        except:
+            bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.message_id)
+            bot.send_message(text=adminMenu.message, chat_id=call.message.chat.id, reply_markup=adminMenu.get_inline_keyboard())
     
 
 def _admin_notify_menu(call):
