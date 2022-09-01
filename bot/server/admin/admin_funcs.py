@@ -142,10 +142,13 @@ def bot_notify(message) -> None:
     elif message.content_type == 'photo':
         file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
         users = userDB.get_users_list()
+        caption = ''
+        if message.caption != None:
+            caption = message.caption
         if len(users) != 0:
             for id in users:
                 try:
-                    bot.send_photo(id, file_info.file_id)
+                    bot.send_photo(id, file_info.file_id, caption)
                 except Exception:
                     userDB.delete_record(id)
         else:
