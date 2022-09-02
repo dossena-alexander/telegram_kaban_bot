@@ -5,6 +5,7 @@ from server.admin.admin_utils.statistics import Statistics
 
 boarsCategories = utils.BoarsCategories()
 
+
 class Achievements():
     _message: str
 
@@ -95,13 +96,13 @@ class Achievements():
 
 
 def translate_category(category: str) -> str:
-    """Translate boar category from Eng to Rus
+    """Translate boar category to russian
 
     Args:
-        category str: Eng vers of category from original DB
+        category str: Category in english
 
     Returns:
-        str: Rus vers of category
+        str: Category in russian
     """
     if category == "emotions":
         return "Эмотивные"

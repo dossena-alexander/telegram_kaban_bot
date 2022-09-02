@@ -4,8 +4,8 @@ from telebot import types
 class ReplyKeyboard(types.ReplyKeyboardMarkup):
     def __init__(self, resize_keyboard=True, row_width=1, selective=False) -> None:
         super().__init__(resize_keyboard=resize_keyboard,
-                       row_width=row_width,
-                       selective=selective)
+                         row_width=row_width,
+                         selective=selective)
 
     def get(self) -> types.ReplyKeyboardMarkup:
         return self
@@ -80,6 +80,18 @@ class InlineKeyboard(types.InlineKeyboardMarkup):
 
 
 def build_buttons(keys: dict):
+    """Build inline telegram buttons from dict such as: \n
+    {
+        0: 'text': 'some_text', 'call': 'some_call',
+        1: 'text': 'some_text', 'call': 'some_call'
+    }
+
+    Args:
+        keys (dict): _description_
+
+    Returns:
+        List of types.InlineKeyboardButton
+    """
     buttons = []
     for button in keys.values():
         inlineButton = types.InlineKeyboardButton(text=button["text"], callback_data=button["call"])
