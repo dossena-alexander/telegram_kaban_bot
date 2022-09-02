@@ -2,6 +2,7 @@ from server import utils
 from header import mesg
 from header import bot, userDB, msgDB
 from config import PATH, FILTER, ADMIN_ID, KEYS, WCT_CHANNEL
+
 from server.user.user_utils.achievements import translate_category
 from server.utils.ban import BannedDB
 
@@ -12,6 +13,7 @@ boarsCategories = utils.BoarsCategories()
 
 start_keyboard = utils.ReplyKeyboard()
 start_keyboard.set(KEYS.START)
+
 
 def choose_boar_category(message):
     if message.content_type == "text":
@@ -108,11 +110,14 @@ def admin_notify(message) -> None:
     elif message.content_type == 'photo':
         file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
         users = userDB.get_users_list()
+        caption = ''
+        if message.caption != None:
+            caption = message.caption
         if len(users) != 0:
             for id in users:
                 try:
                     bot.send_photo(id, file_info.file_id, 
-                                   caption="<b>Сообщение от админа:</b>", 
+                                   caption="<b>Сообщение от админа:</b>\n" + caption, 
                                    parse_mode='html')
                 except Exception:
                     userDB.delete_record(id)

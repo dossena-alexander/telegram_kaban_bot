@@ -60,7 +60,6 @@ class Statistics(DB):
         counts = []
         for i in range(len(cols)):
             counts.append(self.get_record(row=0, col=i))
-
         return counts
 
     def get_img_stats(self, image_stats: Image_Statistic) -> None:
@@ -86,8 +85,3 @@ class Statistics(DB):
         new = self.get_record(row=0, col=3) + 1
         self._bd_cursor.execute(f'UPDATE stats SET photo_button = {new}')
         self._bd.commit()
-
-
-
-img_s = Image_Statistic()
-img_s.generate(20, 30, 40 ,50)

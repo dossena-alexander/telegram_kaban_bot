@@ -19,6 +19,14 @@ class Suggestions():
         self._tables = {'pics': 'fileID', 
                         'userJokes': 'joke', 
                         'msgs': 'msg'}
+                        
+    def get_message(self) -> str:
+        self._all_suggestions_counter = 0
+        msg = ( "Админ меню.\n" +
+                f"Картинок: {self._photo_suggestions}. " +
+                f"Сообщений: {self._messages_suggestions}. " +
+                f"Анекдотов: {self._jokes_suggestions}")
+        return msg
 
     def exist(self) -> bool:
         suggestions_exist = False
@@ -61,11 +69,3 @@ class Suggestions():
         if self._check_limit():
             self._suggestions_notification = True
             self._upload_counter = 0
-
-    def get_message(self) -> str:
-        self._all_suggestions_counter = 0
-        msg = ( "Админ меню.\n" +
-                f"Картинок: {self._photo_suggestions}. " +
-                f"Сообщений: {self._messages_suggestions}. " +
-                f"Анекдотов: {self._jokes_suggestions}")
-        return msg
