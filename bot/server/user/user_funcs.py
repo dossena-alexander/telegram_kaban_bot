@@ -16,12 +16,12 @@ def under_a_limit(type: str):
     Available types: photo_upload, joke_upload, admin_msg
     """
     def _wrapped_func(func):
-        def _wrapper(message):
+        def _wrapper(message, *args, **kwargs):
             user_id = message.from_user.id
             if funcs.check_upload_day(user_id):
                 funcs.new_upload_day(user_id)
             if not funcs.limit_reached(type, user_id):
-                return func(message)
+                return func(message, *args, **kwargs)
             else:
                 bot.send_message(message.chat.id, "Упс!\n"
                                     + "Ты достиг лимита загрузок для фотокарточек!\n"
@@ -31,7 +31,7 @@ def under_a_limit(type: str):
     
 
 @under_a_limit('photo_upload')
-def upload_photo(message) -> None: 
+def upload_photo(message, bot_continue = True) -> None: 
     if message.content_type == 'photo':
         if message.media_group_id != None: # able to save not only one pic
             bot.send_message(message.chat.id, "Пришли только одну картинку")
@@ -64,7 +64,8 @@ def upload_photo(message) -> None:
             del picDB
             if user_id == ADMIN_ID:
                 bot.send_photo(PHOTO_CHANNEL, file_info.file_id)
-            bot.register_next_step_handler(message, upload_photo)
+            if bot_continue:
+                bot.register_next_step_handler(message, upload_photo)
     else:
         if message.content_type == "text":
             if message.text.lower() == "/brake":
