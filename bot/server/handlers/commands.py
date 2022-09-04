@@ -7,15 +7,18 @@ from server.utils.ban import BannedDB
 from server.user.user_funcs import get_wct_photo
 
 from server.admin.admin_utils.statistics import Statistics
-from server.utils.charts.collector import Collector
+from server.utils.charts.collector import ClickCollector
+
 
 stats = Statistics()
+jokeClickCollector = ClickCollector('joke_clicks')
+photoClickCollector = ClickCollector('photo_clicks')
+wctClickCollector = ClickCollector('wct_clicks')
+
 
 def start(message):
-    keyboard = utils.ReplyKeyboard()
-    keyboard.set(KEYS.START)
     bot.send_message(message.chat.id, "Хрю хрю, кабан {0.first_name}!"
-        .format(message.from_user, bot.get_me()), reply_markup=keyboard)
+        .format(message.from_user, bot.get_me()))
 
 
 def ban(message):
@@ -73,7 +76,6 @@ def user(message):
 
 def send_wct(message):
     check_suggestions()
-    stats.update_wct()
     user_id = message.from_user.id
     users = userDB.get_users_list()
 
@@ -81,6 +83,8 @@ def send_wct(message):
         bot.send_message(message.chat.id, "Ты не зарегистрировался. Нажми /auth, чтобы зарегистрироваться", reply_to_message_id=message.message_id)
         return None
     else:
+        stats.update_wct()
+        wctClickCollector.new()
         boar, caption = get_wct_photo(message)
         bot.send_photo(message.chat.id, boar, reply_to_message_id=message.message_id, caption=caption)
 
@@ -88,8 +92,7 @@ def send_wct(message):
 def send_joke(message):
     check_suggestions()
     stats.update_joke()
-    collector = Collector('joke_click')
-    collector.new()
+    jokeClickCollector.new()
     bot.send_message(message.chat.id, 
         adminJokeDB.get_record(row=random.randint(0, adminJokeDB.get_records_count() - 1)))
 
@@ -97,6 +100,7 @@ def send_joke(message):
 def send_photo(message): # by file_id
     check_suggestions()
     stats.update_photo()
+    photoClickCollector.new()
     bot.send_photo(message.chat.id, 
         adminPicDB.get_record(row=random.randint(0, adminPicDB.get_records_count() - 1), col=1))
 

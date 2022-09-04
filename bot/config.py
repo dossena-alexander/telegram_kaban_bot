@@ -33,6 +33,12 @@ class KEYS():
         5: { "text": "Пользователь",              "call": "USER"              }, 
         6: { "text": "Статистика",                "call": "STATISTICS"        },
     }
+    ADMIN_CHARTS = {
+        0: { "text": "Дни",                       "call": "CHARTS_DAY"        }, 
+        1: { "text": "Недели",                    "call": "CHARTS_WEEK"       },
+        2: { "text": "Месяцы",                    "call": "CHARTS_MONTH"      }, 
+        3: { "text": "Назад",                     "call": "BACK_ADMIN"        },
+    }
     USER = {
         0: { "text": "Загрузить",                 "call": "UPLOAD_MENU_USER"  }, 
         1: { "text": "Сообщение админу",          "call": "MESSAGE_TO_ADMIN"  },
