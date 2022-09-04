@@ -8,23 +8,24 @@ from datetime import datetime
 from server.utils.charts.collector import IStatClickCollector
 
 class Chart():
-    """
-    Draw chart by Collector data
-    """
+    """Draw chart by Collector data"""
     def __init__(self, path: str, 
                        collector: IStatClickCollector, 
                        mode = 0, 
-                       dpi = 350) -> None:
-        """
-        Args:
+                       dpi = 350,
+                       fig_name = 'stat.jpg') -> None:
+        """Args:
             path (str): path to save figure
+            collector (IStatClickCollector): _description_
             mode (int, optional): _description_. Defaults to 0.
             dpi (int, optional): Quality of figure. Defaults to 350.
+            fig_name (str, optional): File name to save. Defaults to 'stat.jpg'.
         """
         self.path = path
         self.collector = collector
         self.mode = mode
         self.dpi = dpi
+        self.fig_name = fig_name
         self.fmt = dates.DateFormatter('%H:%M:%S')
 
     def draw(self) -> None:
@@ -36,7 +37,7 @@ class Chart():
         ax.plot(time_interval, clicks, "-o")
         # ax.xaxis.set_major_formatter(self.fmt)
         fig.autofmt_xdate()
-        # plt.savefig(self.path, dpi=self.dpi)
+        plt.savefig(self.path+self.fig_name, dpi=self.dpi)
         plt.show()
 
     def get_data(self, collector: IStatClickCollector) -> tuple[list[datetime], list[int]]:
@@ -52,11 +53,14 @@ class Chart():
     def set_data_type(self, data_type: str) -> None:
         """For getting data from DataBase table must be named as data_type.\n
         data_type could be:
-            'wct_clicks'
-            'photo_clicks'
+            'wct_clicks',
+            'photo_clicks',
             'joke_clicks'
 
         Args:
             data_type (str): Table name
         """
         self.data_type = data_type
+
+    def get_fig_name(self) -> str:
+        return self.fig_name

@@ -57,7 +57,7 @@ class ClickCollectorObserver():
             return False
         return True
 
-    def time(self) -> Time:
+    def get_time(self) -> str:
         return self.time
 
     def same_hour(self) -> bool:
@@ -93,18 +93,19 @@ class ClickCollectorDB():
         self.date = date
 
     @lock_thread
-    def insert(self, name: str, time: str, clicks: int):
+    def insert(self, name: str, time: Time, clicks: int):
         try:
+            time = str(time)
             self.db_cursor.execute(f'INSERT INTO {name} (time, clicks) VALUES (?, ?)', (time, clicks) ) 
-        except:
+        except Exception as e:
             self.create()
             self.db_cursor.execute(f'INSERT INTO {name} (time, clicks) VALUES (?, ?)', (time, clicks) ) 
         self.db.commit()
 
     @lock_thread
     def get(self, from_target: str, # Table name
-                  start_time: datetime, 
-                  end_time: datetime) -> tuple[list[str], list[int]]:
+                  start_time: Time, 
+                  end_time: Time) -> tuple[list[str], list[int]]:
         start_time = str(start_time)
         end_time = str(end_time)
         self.db_cursor.execute(f'SELECT time FROM {from_target} WHERE time BETWEEN \'{start_time}\' AND \'{end_time}\' ') 
@@ -146,9 +147,9 @@ class ClickCollector():
         self.clicks = 0
 
     def new(self) -> None:
-        self.clicks += 1
+        self.clicks += 5
         if self.observer.new_hour():
-            time = self.observer.time()
+            time = self.observer.get_time()
             self.db.insert(self.target, time, self.clicks)
             self.clicks = 0
 
@@ -159,8 +160,7 @@ class IStatClickCollector():
 
 
 class DayStatClickCollector(IStatClickCollector):
-    """Clicks statistics for a day
-    """
+    """Day clicks statistics"""
     target_date: date
     target_time_interval: TimeInterval
 
@@ -168,6 +168,12 @@ class DayStatClickCollector(IStatClickCollector):
     def __init__(self, from_target: str, # Table name
                        target_date: date, # In format: YYYY-MM-DD
                        target_time_interval = TimeInterval('00:00:00', '23:59:59')) -> None:
+        """
+        Args:
+            from_target (str): Table name\n
+            target_date (date): In format: YYYY-MM-DD\n
+            target_time_interval (TimeInterval) = ('00:00:00', '23:59:59') | Any\n
+        """
         self.from_target = from_target
         self.target_date = target_date
         self.target_time_interval = target_time_interval
@@ -196,8 +202,7 @@ class DayStatClickCollector(IStatClickCollector):
 
 
 class DateStatClickCollector(IStatClickCollector):
-    """Use this if you need statistics for days, not for a day
-    """
+    """Use this if you need statistics for days, not for a day"""
     default_time_interval = TimeInterval('00:00:00', '23:59:59')
 
 
