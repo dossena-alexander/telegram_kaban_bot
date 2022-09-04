@@ -13,7 +13,7 @@ class Chart():
                        collector: IStatClickCollector, 
                        mode = 0, 
                        dpi = 350,
-                       fig_name = 'stat.jpg') -> None:
+                       fig_name = 'chart.jpg') -> None:
         """Args:
             path (str): path to save figure
             collector (IStatClickCollector): _description_
@@ -61,6 +61,3 @@ class Chart():
             data_type (str): Table name
         """
         self.data_type = data_type
-
-    def get_fig_name(self) -> str:
-        return self.fig_name
