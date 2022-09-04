@@ -21,7 +21,6 @@ def user_menu(call):
         keyboard.add_button(text="Назад", call="BACK_USER")
         bot.edit_message_text(text=user_translate_menu.message, chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard.get())
     
-
     _user_escape(call)
 
     _user_premium_menu(call)
@@ -29,6 +28,8 @@ def user_menu(call):
     _user_achievements(call)
 
     _user_upload_menu(call)
+
+    _donate_to_admin(call)
 
 
 def _user_escape(call):
@@ -82,3 +83,10 @@ def _user_achievements(call):
         keyboard = utils.InlineKeyboard()
         keyboard.add_button(text="Назад", call="BACK_USER")
         bot.edit_message_text(text=medals.get_message(), chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard.get(), parse_mode="html")
+
+
+def _donate_to_admin(call):
+    if call.data == "DONATE_TO_ADMIN":
+        keyboard = utils.InlineKeyboard()
+        keyboard.add_button(text="Назад", call="BACK_USER")
+        bot.edit_message_text(text='Донат админу', chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard, parse_mode="html")
