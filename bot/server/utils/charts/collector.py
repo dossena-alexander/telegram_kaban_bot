@@ -147,7 +147,7 @@ class ClickCollector():
         self.clicks = 0
 
     def new(self) -> None:
-        self.clicks += 5
+        self.clicks += 1
         if self.observer.new_hour():
             time = self.observer.get_time()
             self.db.insert(self.target, time, self.clicks)
