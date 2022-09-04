@@ -2,9 +2,12 @@ import shutil, os
 from header import adminMenu, userMenu
 from header import userPicDB, adminPicDB, adminJokeDB, userJokeDB
 from config import KEYS, PHOTO_CHANNEL, JOKE_CHANNEL
+from server import utils
 
 import server.admin.admin_utils as admin_utils
 from server.admin.admin_utils.statistics import Statistics, Image_Statistic
+from server.utils.charts.chart import Chart
+from server.utils.charts.collector import DayStatClickCollector, DateStatClickCollector
 from server.admin.admin_funcs import *
 
 
@@ -61,6 +64,8 @@ def admin_menu(call):
     _admin_see_jokes_suggestions(call)
 
     _admin_see_messages_from_users(call)
+
+    _admin_charts(call)
 
 
 def _admin_escape(call):
@@ -190,3 +195,36 @@ def _admin_see_messages_from_users(call):
             os.remove(PATH.RECIEVED_PHOTOS + msgDB.get_file_id(mesg.count))
         msgDB.delete_msg_and_file_id(mesg.count)
         see_messages_to_admin(call.message, KEYS.MSG_SEE)
+
+
+def _admin_charts(call):
+    def charts_menu(call):
+        keyboard = utils.InlineKeyboard()
+        keyboard.set(KEYS.ADMIN_CHARTS)
+        bot.delete_message(call.message.chat.id, call.message.message_id)
+        bot.send_message(call.message.chat.id, 'Графики', reply_markup=keyboard)
+
+    if call.data == "CHARTS":
+        charts_menu(call)
+
+    elif call.data == "CHARTS_DAY":
+        back = utils.InlineKeyboard()
+        back.add_button('Назад', 'BACK_FROM_CHARTS')
+        bot.delete_message(call.message.chat.id, call.message.message_id)
+        collector = DayStatClickCollector(target, target_date, target_time_interval)
+        chart = Chart(PATH.MATERIALS, collector)
+        photo = PATH.MATERIALS+chart.fig_name
+        bot.send_photo(call.message.chat.id, photo)
+
+    elif call.data == "CHARTS_WEEK":
+        back = utils.InlineKeyboard()
+        back.add_button('Назад', 'BACK_FROM_CHARTS')
+        bot.delete_message(call.message.chat.id, call.message.message_id)
+
+    elif call.data == "CHARTS_MONTH":
+        back = utils.InlineKeyboard()
+        back.add_button('Назад', 'BACK_FROM_CHARTS')
+        bot.delete_message(call.message.chat.id, call.message.message_id)
+
+    elif call.data == "BACK_FROM_CHARTS":
+        charts_menu(call)
