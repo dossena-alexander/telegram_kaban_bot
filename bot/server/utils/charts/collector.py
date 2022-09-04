@@ -191,12 +191,11 @@ class DayStatClickCollector(IStatClickCollector):
         return times, self.clicks
 
     def get_clicks(self) -> int:
-        if not self.clicks:
-            db = ClickCollectorDB(self.target_date)
-            _, self.clicks = db.get(self.from_target, 
-                                    self.target_time_interval[0], 
-                                    self.target_time_interval[1])
-            del db
+        db = ClickCollectorDB(self.target_date)
+        _, self.clicks = db.get(self.from_target, 
+                                self.target_time_interval[0], 
+                                self.target_time_interval[1])
+        del db
         clicks = sum(self.clicks)
         return clicks
 
