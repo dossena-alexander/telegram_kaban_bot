@@ -167,7 +167,7 @@ class DayStatClickCollector(IStatClickCollector):
 
     def __init__(self, from_target: str, # Table name
                        target_date: date, # In format: YYYY-MM-DD
-                       target_time_interval: TimeInterval) -> None:
+                       target_time_interval = TimeInterval('00:00:00', '23:59:59')) -> None:
         self.from_target = from_target
         self.target_date = target_date
         self.target_time_interval = target_time_interval
