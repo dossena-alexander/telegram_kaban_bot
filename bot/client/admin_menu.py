@@ -5,7 +5,7 @@ from config import KEYS, PHOTO_CHANNEL, JOKE_CHANNEL
 from server import utils
 
 import server.admin.admin_utils as admin_utils
-from server.admin.admin_utils.statistics import Statistics, Image_Statistic
+from server.admin.admin_utils.statistics import Statistics, ImageStatistic
 from server.utils.charts.chart import Chart
 from server.utils.charts.collector import DayStatClickCollector, DateStatClickCollector
 from server.admin.admin_funcs import *
@@ -25,7 +25,7 @@ def admin_menu(call):
 
     elif call.data == "IMG_STATISTICS":
         stats = Statistics()
-        img_s = Image_Statistic()
+        img_s = ImageStatistic()
         stats.get_img_stats(img_s)
         photo = img_s.path
 

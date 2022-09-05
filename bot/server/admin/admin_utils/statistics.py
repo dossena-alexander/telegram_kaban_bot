@@ -3,7 +3,7 @@ from server.utils.db import *
 from config import PATH
 
 
-class Image_Statistic():
+class ImageStatistic():
     def __init__(self) -> None:
         self.path = PATH.MATERIALS+"stats.jpg"
         self.font = ImageFont.truetype(PATH.MATERIALS+'Helvetica.ttc', size=40, index=4)
@@ -62,7 +62,7 @@ class Statistics(DB):
             counts.append(self.get_record(row=0, col=i))
         return counts
 
-    def get_img_stats(self, image_stats: Image_Statistic) -> None:
+    def get_img_stats(self, image_stats: ImageStatistic) -> None:
         counts = self._get_counts()
         image_stats.generate(*counts)
 
