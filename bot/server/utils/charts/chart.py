@@ -1,11 +1,9 @@
-from code import interact
 import matplotlib.pyplot as plt
 from matplotlib import dates
 from datetime import datetime
-# import numpy as np
-# import random, math
 
 from server.utils.charts.collector import IStatClickCollector
+
 
 class Chart():
     """Draw chart by Collector data"""
