@@ -82,6 +82,7 @@ class ClickCollectorDB():
         self.db_cursor = self.db.cursor()
 
     def create(self):
+        """If new DB has no tables"""
         self.db_cursor.execute('CREATE TABLE wct_clicks (time TIME, clicks INTEGER)') 
         self.db.commit()
         self.db_cursor.execute('CREATE TABLE photo_clicks (time TIME, clicks INTEGER)') 
