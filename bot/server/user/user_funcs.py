@@ -15,19 +15,22 @@ def under_a_limit(type: str):
     """
     Available types: photo_upload, joke_upload, admin_msg
     """
-    def _wrapped_func(func):
-        def _wrapper(message, *args, **kwargs):
+    def _wrapper(func):
+        def _wrapped_func(message, *args, **kwargs):
             user_id = message.from_user.id
             if funcs.check_upload_day(user_id):
                 funcs.new_upload_day(user_id)
             if not funcs.limit_reached(type, user_id):
                 return func(message, *args, **kwargs)
             else:
+                keyboard = utils.InlineKeyboard()
+                keyboard.add_button('О лимитах', 'ABOUT_LIMITS')
+                # keyboard.add_button('Купить загрузки', 'BUY_UPLOADS')
                 bot.send_message(message.chat.id, "Упс!\n"
                                     + "Ты достиг лимита загрузок для фотокарточек!\n"
-                                    + "Попробуй завтра или купи загрузки!")
-        return _wrapper
-    return _wrapped_func
+                                    + "Попробуй завтра или купи загрузки!", reply_markup=keyboard)
+        return _wrapped_func
+    return _wrapper
     
 
 @under_a_limit('photo_upload')

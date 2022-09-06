@@ -119,8 +119,8 @@ class KEYS():
 # limits for user per day
 class LIMIT():
     JOKE = 10
-    MESSAGE = 5
     PHOTO = 10
+    MESSAGE = 5
 
 
 class PREMIUM_LIMIT():

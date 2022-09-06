@@ -1,6 +1,6 @@
 from header import bot, userMenu, user_translate_menu
 from header import utils
-from config import KEYS
+from config import KEYS, LIMIT
 
 from server.user.user_utils import *
 from server.user.user_utils import premium
@@ -28,6 +28,8 @@ def user_menu(call):
     _user_achievements(call)
 
     _user_upload_menu(call)
+
+    _user_about_limits(call)
 
     _donate_to_admin(call)
 
@@ -83,6 +85,19 @@ def _user_achievements(call):
         keyboard = utils.InlineKeyboard()
         keyboard.add_button(text="Назад", call="BACK_USER")
         bot.edit_message_text(text=medals.get_message(), chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard.get(), parse_mode="html")
+
+
+def _user_about_limits(call):
+    if call.data == "ABOUT_LIMITS":
+        about_limits = (
+            '<b>О лимитах</b>\n'
+            + 'Лимиты нужны для облегчения работы админа, а также ограничении спама'
+            + '<i>Лимиты по загрузке:</i>\n'
+            + f'<b>Для анекдотов:</b> {LIMIT.JOKE}'
+            + f'<b>Для фотокарточек:</b> {LIMIT.PHOTO}'
+            + f'<b>Для сообщений админу:</b> {LIMIT.MESSAGE}'
+        )
+        bot.edit_message_text(text=about_limits, chat_id=call.message.chat.id, message_id=call.message.message_id, parse_mode='HTML')
 
 
 def _donate_to_admin(call):
