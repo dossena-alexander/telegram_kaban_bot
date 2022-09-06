@@ -206,7 +206,7 @@ class DateStatClickCollector(IStatClickCollector):
 
 
     def __init__(self, from_target: str,
-                       date_interval: tuple([datetime, datetime]),
+                       date_interval: tuple[datetime, datetime],
                        time_interval = default_time_interval) -> None:
         self.from_target = from_target
         self.default_time_interval = time_interval
