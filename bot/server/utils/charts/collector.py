@@ -64,9 +64,9 @@ class ClickCollectorObserver():
         date = datetime.now()
         now_hour = date.hour
         if now_hour > self.hour:
-            self.time = Time(date.time().strftime('%H:%M:%S'))
             self.hour = now_hour
             return False
+        self.time = Time(date.time().strftime('%H:%M:%S'))
         return True
 
 
