@@ -242,6 +242,13 @@ class UserDB(DB):
         self._bd_cursor.execute(f'UPDATE {self._table} SET upload_day = {day} WHERE {self._column}={user_id}')
         self._bd.commit()
 
+    @lock_thread
+    def can_send_notification(self, user_id: int) -> bool:
+        self._bd_cursor.execute(f'SELECT notify_option FROM {self._table} WHERE {self._column}={user_id}')
+        option = self._bd_cursor.fetchall()[0][0]
+        if option == '0':
+            return False
+        return True
 
 class JokeDB(DB):
     def __init__(self, table: str) -> None:
