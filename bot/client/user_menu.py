@@ -31,6 +31,8 @@ def user_menu(call):
 
     _user_about_limits(call)
 
+    _user_settings(call)
+
     _donate_to_admin(call)
 
 
@@ -99,6 +101,19 @@ def _user_about_limits(call):
         )
         bot.edit_message_text(text=about_limits, chat_id=call.message.chat.id, message_id=call.message.message_id, parse_mode='HTML')
 
+
+def _user_settings(call):
+    if call.data == "USER_SETTINGS":
+        keyboard = user_funcs.get_settings_keyboard(call.from_user.id)
+        bot.edit_message_text('Настройки', call.message.chat.id, call.message.message_id, reply_markup=keyboard)
+    elif call.data == "USER_NOTIFY_CANCEL":
+        userDB.update_notify_option(call.from_user.id, False)
+        keyboard = user_funcs.get_settings_keyboard(call.from_user.id)
+        bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=keyboard)
+    elif call.data == "USER_NOTIFY_ACCEPT":
+        userDB.update_notify_option(call.from_user.id, True)
+        keyboard = user_funcs.get_settings_keyboard(call.from_user.id)
+        bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=keyboard)
 
 def _donate_to_admin(call):
     if call.data == "DONATE_TO_ADMIN":

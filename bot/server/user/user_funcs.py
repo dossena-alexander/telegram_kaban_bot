@@ -168,3 +168,14 @@ def get_wct_photo(message) -> tuple[BufferedReader, str]:
     return open(PATH.WCT + boar, 'rb'), caption
 
 
+def get_settings_keyboard(user_id: int) -> utils.InlineKeyboard:
+    notify_option = userDB.can_send_notification(user_id)
+    text = 'Уведомления❌'
+    call = 'USER_NOTIFY_ACCEPT'
+    if notify_option:
+        text = 'Уведомления✅'
+        call = 'USER_NOTIFY_CANCEL'
+    keyboard = utils.InlineKeyboard()
+    keyboard.add_button(text, call)
+    keyboard.add_button('Назад', 'BACK_USER')
+    return keyboard

@@ -250,6 +250,14 @@ class UserDB(DB):
             return False
         return True
 
+    @lock_thread
+    def update_notify_option(self, user_id: int, option: bool) -> None:
+        if option == True:
+            option = 1
+        else:
+            option = 0
+        self._bd_cursor.execute(f'UPDATE {self._table} SET notify_option = {option} WHERE {self._column}={user_id}')
+
 class JokeDB(DB):
     def __init__(self, table: str) -> None:
         super().__init__()
