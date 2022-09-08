@@ -45,7 +45,8 @@ class KEYS():
         2: { "text": "Достижения",                "call": "ACHIEVEMENTS"      }, 
         3: { "text": "Премиум",                   "call": "PREMIUM"           },
         4: { "text": "Кабаний перевод телеграмм", "call": "TRANSLATE"         },  
-        5: { "text": "Поддержать админа",         "call": "DONATE_TO_ADMIN"   },  
+        5: { "text": "Настройки",                 "call": "USER_SETTINGS"     },  
+        6: { "text": "Поддержать админа",         "call": "DONATE_TO_ADMIN"   },  
     }
     START = {
         0: { "text": "Анекдот",                   "call": "None"              }, 
