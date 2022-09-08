@@ -164,17 +164,19 @@ def see_suggestions(message, type: str, db: utils.DB, keys: dict) -> None:
     record_len = db.get_records_count()
     counter = f"{mesg.count + 1}/{record_len}"
     keys[4]["text"] = counter
-    button_array = utils.build_buttons(keys)
     
     stand_keyboard = utils.InlineKeyboard()
-    stand_keyboard.add(button_array[0], button_array[1], button_array[2])
-    stand_keyboard.add(button_array[3], button_array[4], button_array[5])
+
     back_keyboard = utils.InlineKeyboard()
     back_keyboard.add_button(text="Назад", call="BACK_ADMIN")
 
     if record_len != 0:
         if mesg.count < record_len and mesg.count >= 0: # msgCounter is counter which increase and count every each record 
             id = db.get_record(mesg.count, 2)
+            keys[2]['call'] = 'PIC_ACCEPT'+' '+id
+            button_array = utils.build_buttons(keys)
+            stand_keyboard.add(button_array[0], button_array[1], button_array[2])
+            stand_keyboard.add(button_array[3], button_array[4], button_array[5])
             user_name = db.get_record(mesg.count, 3)
             if type == "txt":
                 id = db.get_record(mesg.count, 1)
@@ -185,7 +187,7 @@ def see_suggestions(message, type: str, db: utils.DB, keys: dict) -> None:
                     + "\n"
                     + f"{db.get_record(row=mesg.count)}",
                     reply_markup=stand_keyboard.get(),
-                    parse_mode='html')
+                    parse_mode='html', disable_web_page_preview=True)
             else:
                 bot.send_photo(message.chat.id, 
                     open(PATH.RECIEVED_PHOTOS + db.get_record(mesg.count), "rb"),

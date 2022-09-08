@@ -124,13 +124,16 @@ def _admin_see_pictures_suggestions(call):
         bot.delete_message(call.message.chat.id, call.message.message_id)
         see_suggestions(call.message, type="pic", db=userPicDB, keys=KEYS.PIC_SEE)
 
-    elif call.data == "PIC_ACCEPT":
+    elif "PIC_ACCEPT" in call.data:
+        user_id = call.data.split()[1]
         photo_name = userPicDB.get_record(mesg.count)
         photo_id = userPicDB.get_record(mesg.count, col=1)
         bot.delete_message(call.message.chat.id, call.message.message_id)
 
         adminPicDB.insert(photo_name, photo_id)
         bot.send_photo(PHOTO_CHANNEL, photo_id)
+        bot.send_notification(user_id, 'Ваше предложение принято')
+        
         userPicDB.delete_record(photo_name)
         shutil.move(PATH.RECIEVED_PHOTOS + photo_name, PATH.PHOTOS)
         
