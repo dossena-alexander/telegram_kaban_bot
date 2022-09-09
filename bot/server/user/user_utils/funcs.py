@@ -26,9 +26,9 @@ def new_day(userID) -> bool:
 
 
 def check_upload_day(user_id: int) -> bool:
-    actual_day = actual_day()
+    now_day = actual_day()
     upload_day = userDB.get_upload_day(user_id)
-    if actual_day == upload_day:
+    if now_day == upload_day:
         return False
     return True
 
