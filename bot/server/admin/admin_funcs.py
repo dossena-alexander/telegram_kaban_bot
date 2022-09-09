@@ -94,7 +94,7 @@ def admin_notify(message) -> None:
                 if len(users) != 0:
                     for id in users:
                         try:
-                            bot.send_message(id, 
+                            bot.send_notification(id, 
                                             "<b>Сообщение от админа:</b>\n"
                                             + msg, 
                                             parse_mode="html")
@@ -116,7 +116,7 @@ def admin_notify(message) -> None:
         if len(users) != 0:
             for id in users:
                 try:
-                    bot.send_photo(id, file_info.file_id, 
+                    bot.send_photo_notification(id, file_info.file_id, 
                                    caption="<b>Сообщение от админа:</b>\n" + caption, 
                                    parse_mode='html')
                 except Exception:
@@ -134,7 +134,7 @@ def bot_notify(message) -> None:
                 if len(users) != 0:
                     for id in users:
                         try:
-                            bot.send_message(id, msg, parse_mode="html")
+                            bot.send_notification(id, msg, parse_mode="html")
                         except Exception:
                             userDB.delete_record(id)
                 else:
@@ -153,7 +153,7 @@ def bot_notify(message) -> None:
         if len(users) != 0:
             for id in users:
                 try:
-                    bot.send_photo(id, file_info.file_id, caption)
+                    bot.send_photo_notification(id, file_info.file_id, caption)
                 except Exception:
                     userDB.delete_record(id)
         else:
@@ -173,16 +173,18 @@ def see_suggestions(message, type: str, db: utils.DB, keys: dict) -> None:
     if record_len != 0:
         if mesg.count < record_len and mesg.count >= 0: # msgCounter is counter which increase and count every each record 
             id = db.get_record(mesg.count, 2)
-            keys[2]['call'] = 'PIC_ACCEPT'+' '+id
+            keys[2]['call'] = 'PIC_ACCEPT'+' '+str(id)    
+            if type == 'txt':
+                keys[2]['call'] = 'JOKE_ACCEPT'+' '+str(id)
             button_array = utils.build_buttons(keys)
             stand_keyboard.add(button_array[0], button_array[1], button_array[2])
             stand_keyboard.add(button_array[3], button_array[4], button_array[5])
+            stand_keyboard.add_button('Бан', 'ADMIN_BAN_USER'+' '+str(id))
             user_name = db.get_record(mesg.count, 3)
             if type == "txt":
                 id = db.get_record(mesg.count, 1)
-                user_name = db.get_record(mesg.count, 2)
                 bot.send_message(message.chat.id,
-                    f"ID: {id}\n"
+                    f"ID: <code>{id}</code>\n"
                     + f"Имя: <a href=\"https://t.me/{user_name}\">{user_name}</a>\n"
                     + "\n"
                     + f"{db.get_record(row=mesg.count)}",
@@ -192,7 +194,7 @@ def see_suggestions(message, type: str, db: utils.DB, keys: dict) -> None:
                 bot.send_photo(message.chat.id, 
                     open(PATH.RECIEVED_PHOTOS + db.get_record(mesg.count), "rb"),
                     reply_markup=stand_keyboard.get(),
-                    caption=f"ID: {id}\n"
+                    caption=f"ID: <code>{id}</code>\n"
                             + f"Имя: <a href=\"https://t.me/{user_name}\">{user_name}</a>\n",
                     parse_mode='html')
         else:
@@ -225,14 +227,14 @@ def see_messages_to_admin(message, keys: dict) -> None:
                 bot.send_photo(message.chat.id, 
                     open(PATH.RECIEVED_PHOTOS + msgDB.get_file_id(mesg.count), "rb"),
                     reply_markup=stand_keyboard.get(),
-                    caption=f"<b>ID</b>: {id}\n"
+                    caption=f"<b>ID</b>: <code>{id}</code>\n"
                         + f"<b>Имя</b>: <a href=\"https://t.me/{user_name}\">{user_name}</a>\n"
                         + "\n"
                         + f"{msgDB.get_record(mesg.count)}",
                     parse_mode='html')
             else:
                 bot.send_message(message.chat.id,
-                    f"<b>ID</b>: {id}\n"
+                    f"<b>ID</b>: <code>{id}</code>\n"
                     + f"<b>Имя</b>: <a href=\"https://t.me/{user_name}\">{user_name}</a>\n"
                     + "\n"
                     + f"{msgDB.get_record(row=mesg.count)}",
@@ -265,7 +267,13 @@ def ban_user(message):
 
 def unban_user(message):
     txt = message.text
-    id_slice = int(txt[5:])
-    banDB = BannedDB()
-    banDB.unban(id_slice)
-    del banDB
+    try:
+        id_slice = int(txt[7:])
+    except:
+        return "Неправильная команда"
+    try:
+        banDB = BannedDB()
+        banDB.unban(id_slice)
+        del banDB
+    except:
+        return 'Что-то пошло не так...'
