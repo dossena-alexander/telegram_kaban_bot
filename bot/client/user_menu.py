@@ -77,10 +77,15 @@ def _user_upload_menu(call):
 
 
 def _user_achievements(call):
-    if call.data == "ACHIEVEMENTS":
+    if call.data == "USER_ACHIVE":
+        keyboard = utils.InlineKeyboard()
+        keyboard.add_button(text="Открытые кабаны", call="ACHIEVEMENTS")
+        keyboard.add_button(text="Назад", call="BACK_USER")
+        bot.edit_message_text(text='Меню достижений', chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard.get(), parse_mode="html")
+    elif call.data == "ACHIEVEMENTS":
         achievements = Achievements(call.message.chat.id)
         keyboard = utils.InlineKeyboard()
-        keyboard.add_button(text="Назад", call="BACK_USER")
+        keyboard.add_button(text="Назад", call="USER_ACHIVE")
         bot.edit_message_text(text=achievements.get_message(), chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard.get(), parse_mode="html")
     elif call.data == "MEDALS":
         medals = Medals(call.message.chat.id)
@@ -93,11 +98,11 @@ def _user_about_limits(call):
     if call.data == "ABOUT_LIMITS":
         about_limits = (
             '<b>О лимитах</b>\n'
-            + 'Лимиты нужны для облегчения работы админа, а также ограничении спама'
+            + 'Лимиты нужны для облегчения работы админа, а также ограничении спама\n'
             + '<i>Лимиты по загрузке:</i>\n'
-            + f'<b>Для анекдотов:</b> {LIMIT.JOKE}'
-            + f'<b>Для фотокарточек:</b> {LIMIT.PHOTO}'
-            + f'<b>Для сообщений админу:</b> {LIMIT.MESSAGE}'
+            + f'<b>Для анекдотов:</b> {LIMIT.JOKE}\n'
+            + f'<b>Для фотокарточек:</b> {LIMIT.PHOTO}\n'
+            + f'<b>Для сообщений админу:</b> {LIMIT.MESSAGE}\n'
         )
         bot.edit_message_text(text=about_limits, chat_id=call.message.chat.id, message_id=call.message.message_id, parse_mode='HTML')
 
@@ -118,5 +123,55 @@ def _user_settings(call):
 def _donate_to_admin(call):
     if call.data == "DONATE_TO_ADMIN":
         keyboard = utils.InlineKeyboard()
+        keyboard.add_button(text="Сбер", call="USER_ADMIN_DONATE_SBER")
+        keyboard.add_button(text="Тинькофф", call="USER_ADMIN_DONATE_TINKOFF")
         keyboard.add_button(text="Назад", call="BACK_USER")
-        bot.edit_message_text(text='Донат админу', chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard, parse_mode="html")
+        bot.edit_message_text(text='Донат админу можно совершить на сбер или тинькофф,' 
+                                 + 'по карте или с помощью удобных сервисов', 
+                                 chat_id=call.message.chat.id, message_id=call.message.message_id, 
+                                 reply_markup=keyboard, parse_mode="html")
+
+    elif call.data == 'USER_ADMIN_DONATE_SBER':
+        keyboard = utils.InlineKeyboard()
+        keyboard.add_button(text="Сбер чаевые", call="USER_ADMIN_DONATE_SBER_DONATE")
+        keyboard.add_button(text="Номер карты", call="USER_ADMIN_DONATE_SBER_CARD")
+        keyboard.add_button(text="Назад", call="DONATE_TO_ADMIN")
+        bot.edit_message_text('Донат через сбер', call.message.chat.id, call.message.message_id, reply_markup=keyboard)
+
+    elif call.data == 'USER_ADMIN_DONATE_SBER_CARD':
+        keyboard = utils.InlineKeyboard()
+        text = '<code>5469350013277563</code>'
+        keyboard.add_button(text="Назад", call="USER_ADMIN_DONATE_SBER")
+        bot.edit_message_text('Донат по номеру карты\nПросто нажми на номер\n\n'+text, call.message.chat.id, call.message.message_id, reply_markup=keyboard, parse_mode='html')
+
+    elif call.data == 'USER_ADMIN_DONATE_SBER_DONATE':
+        keyboard = utils.InlineKeyboard()
+        link = 'https://pay.mysbertips.ru/82608561'
+        keyboard.add_button(text="Назад", call="USER_ADMIN_DONATE_SBER")
+        bot.edit_message_text('Донат через Сбер чаевые\n'+link, call.message.chat.id, call.message.message_id, reply_markup=keyboard, parse_mode='html')
+
+    elif call.data == 'USER_ADMIN_DONATE_TINKOFF':
+        keyboard = utils.InlineKeyboard()
+        keyboard.add_button(text="CloudTips", call="USER_ADMIN_DONATE_TINKOFF_DONATE")
+        keyboard.add_button(text="Номер карты", call="USER_ADMIN_DONATE_TINKOFF_CARD")
+        keyboard.add_button(text="Тинькофф сбор", call="USER_ADMIN_DONATE_TINKOFF_COLLECTING")
+        keyboard.add_button(text="Назад", call="DONATE_TO_ADMIN")
+        bot.edit_message_text('Донат через сбер', call.message.chat.id, call.message.message_id, reply_markup=keyboard)
+
+    elif call.data == 'USER_ADMIN_DONATE_TINKOFF_CARD':
+        keyboard = utils.InlineKeyboard()
+        text = '<code>5469350013277563</code>'
+        keyboard.add_button(text="Назад", call="USER_ADMIN_DONATE_TINKOFF")
+        bot.edit_message_text('Донат по номеру карты\nПросто нажми на номер\n\n'+text, call.message.chat.id, call.message.message_id, reply_markup=keyboard, parse_mode='html')
+
+    elif call.data == 'USER_ADMIN_DONATE_TINKOFF_COLLECTING':
+        keyboard = utils.InlineKeyboard()
+        text = 'https://www.tinkoff.ru/cf/6IjR9049vWy'
+        keyboard.add_button(text="Назад", call="USER_ADMIN_DONATE_TINKOFF")
+        bot.edit_message_text('Донат через Тинькофф сбор\n'+text, call.message.chat.id, call.message.message_id, reply_markup=keyboard, parse_mode='html')
+
+    elif call.data == 'USER_ADMIN_DONATE_TINKOFF_DONATE':
+        keyboard = utils.InlineKeyboard()
+        link = 'https://pay.cloudtips.ru/p/b256f4c7'
+        keyboard.add_button(text="Назад", call="USER_ADMIN_DONATE_TINKOFF")
+        bot.edit_message_text('Донат через Тинькофф CloudTips\n'+link, call.message.chat.id, call.message.message_id, reply_markup=keyboard, parse_mode='html')
