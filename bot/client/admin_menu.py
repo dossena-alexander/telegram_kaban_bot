@@ -67,6 +67,8 @@ def admin_menu(call):
 
     _admin_charts(call)
 
+    _admin_ban_user(call)
+
 
 def _admin_escape(call):
     if call.data == "BACK_ADMIN":
@@ -125,14 +127,15 @@ def _admin_see_pictures_suggestions(call):
         see_suggestions(call.message, type="pic", db=userPicDB, keys=KEYS.PIC_SEE)
 
     elif "PIC_ACCEPT" in call.data:
-        user_id = call.data.split()[1]
+        user_id = int(call.data.split()[1])
         photo_name = userPicDB.get_record(mesg.count)
         photo_id = userPicDB.get_record(mesg.count, col=1)
         bot.delete_message(call.message.chat.id, call.message.message_id)
-
-        adminPicDB.insert(photo_name, photo_id)
+        
+        user_name = userPicDB.get_record(mesg.count, 3)
+        adminPicDB.insert(photo_name, photo_id, user_id, user_name)
         bot.send_photo(PHOTO_CHANNEL, photo_id)
-        bot.send_notification(user_id, 'Ваше предложение принято')
+        bot.send_notification(user_id, 'Ваше предложение (фотокарточка) принято')
         
         userPicDB.delete_record(photo_name)
         shutil.move(PATH.RECIEVED_PHOTOS + photo_name, PATH.PHOTOS)
@@ -161,12 +164,14 @@ def _admin_see_jokes_suggestions(call):
         bot.delete_message(call.message.chat.id, call.message.message_id)
         see_suggestions(call.message, "txt", userJokeDB, KEYS.JOKE_SEE)
 
-    elif call.data == "JOKE_ACCEPT":
+    elif "JOKE_ACCEPT" in call.data:
+        user_id = int(call.data.split()[1])
         joke = userJokeDB.get_record(mesg.count)
         bot.delete_message(call.message.chat.id, call.message.message_id)
 
         adminJokeDB.new_record(joke)
         bot.send_message(JOKE_CHANNEL, joke)
+        bot.send_notification(user_id, 'Ваше предложение (анекдот) принято')
 
         userJokeDB.delete_record(joke)
         see_suggestions(call.message, "txt", userJokeDB, KEYS.JOKE_SEE)
@@ -231,3 +236,25 @@ def _admin_charts(call):
 
     elif call.data == "BACK_FROM_CHARTS":
         charts_menu(call)
+
+
+def _admin_ban_user(call):
+    def ban(user_id: int):
+        try:
+            user_name = bot.get_chat_member(user_id, user_id).user.username
+            banDB = BannedDB()
+            banDB.ban(user_id, user_name)
+            del banDB
+        except Exception as e:
+            print(e)
+            return 'Пользователь заблокировал бота или пользователя с таким id нет'
+    if 'ADMIN_BAN_USER' in call.data:
+        user_id = int(call.data.split()[1])
+        err = ban(user_id)
+        if err != None:
+            bot.send_message(call.message.chat.id, err)
+        else:
+            bot.send_message(call.message.chat.id, "Забанил пользователя")
+
+
+
