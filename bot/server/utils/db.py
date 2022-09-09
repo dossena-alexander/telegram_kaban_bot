@@ -246,17 +246,18 @@ class UserDB(DB):
     def can_send_notification(self, user_id: int) -> bool:
         self._bd_cursor.execute(f'SELECT notify_option FROM {self._table} WHERE {self._column}={user_id}')
         option = self._bd_cursor.fetchall()[0][0]
-        if option == '0':
+        if option == 0:
             return False
         return True
 
     @lock_thread
     def update_notify_option(self, user_id: int, option: bool) -> None:
+        notify = 0
         if option == True:
-            option = 1
-        else:
-            option = 0
-        self._bd_cursor.execute(f'UPDATE {self._table} SET notify_option = {option} WHERE {self._column}={user_id}')
+            notify = 1
+        self._bd_cursor.execute(f'UPDATE {self._table} SET notify_option = {notify} WHERE {self._column}={user_id}')
+        self._bd.commit()
+
 
 class JokeDB(DB):
     def __init__(self, table: str) -> None:
