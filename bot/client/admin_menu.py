@@ -42,13 +42,13 @@ def admin_menu(call):
     elif call.data == "SUGGESTIONS":
         keyboard = utils.InlineKeyboard()
         keyboard.set(KEYS.SUGGESTIONS)
-        bot.edit_message_text(text="Предложения", chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard.get())
+        bot.edit_message_text(text="Предложения", chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard)
     
     elif call.data == "UPLOAD_MENU_ADMIN":
         keyboard = utils.InlineKeyboard()
         keyboard.set(KEYS.UPLOAD_MENU_ADMIN)
         keyboard.add_button(text="Назад", call="BACK_ADMIN")
-        bot.edit_message_text(text="Загрузить", chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard.get())
+        bot.edit_message_text(text="Загрузить", chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard)
 
     elif call.data == "USER": 
         bot.edit_message_text(text=userMenu.message, chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=userMenu.get_inline_keyboard())
@@ -87,7 +87,7 @@ def _admin_notify_menu(call):
         keyboard = utils.InlineKeyboard()
         keyboard.set(KEYS.NOTIFY)
         keyboard.add_button("Назад", "BACK_ADMIN")
-        bot.edit_message_text(text="Рассылка", chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard.get())
+        bot.edit_message_text(text="Рассылка", chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard)
     
     elif call.data == "NOTIFY":
         bot.edit_message_text(text="Напиши сообщение пользователям, или нажми /brake", chat_id=call.message.chat.id, message_id=call.message.message_id)
@@ -103,7 +103,7 @@ def _admin_upload_boars_menu(call):
         keyboard = utils.ReplyKeyboard()
         keyboard.set(KEYS.CATEGORY)
         bot.delete_message(call.message.chat.id, call.message.message_id)
-        bot.send_message(text="Выбери категорию кабана\nДля отмены нажми /brake", chat_id=call.message.chat.id, reply_markup=keyboard.get())
+        bot.send_message(text="Выбери категорию кабана\nДля отмены нажми /brake", chat_id=call.message.chat.id, reply_markup=keyboard)
         bot.register_next_step_handler(call.message, choose_boar_category)
 
     elif call.data == "UPLOAD_PREM_BOAR":

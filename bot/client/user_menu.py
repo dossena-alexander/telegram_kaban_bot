@@ -19,7 +19,7 @@ def user_menu(call):
         keyboard.add_url_button("Русский", "https://t.me/setlanguage/ru")
         keyboard.add_url_button("Кабаний", "https://t.me/setlanguage/kabanchikoff")
         keyboard.add_button(text="Назад", call="BACK_USER")
-        bot.edit_message_text(text=user_translate_menu.message, chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard.get())
+        bot.edit_message_text(text=user_translate_menu.message, chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard)
     
     _user_escape(call)
 
@@ -33,7 +33,9 @@ def user_menu(call):
 
     _user_settings(call)
 
-    _donate_to_admin(call)
+    _user_donate_to_admin(call)
+
+    _user_update_ex(call)
 
 
 def _user_escape(call):
@@ -48,26 +50,26 @@ def _user_premium_menu(call):
         keyboard.add_button(text="О премиум", call="ABOUT_PREMIUM")
         keyboard.add_button(text="Отключить премиум", call="DIS_PREMIUM")
         keyboard.add_button(text="Назад", call="BACK_USER")
-        bot.edit_message_text(text=premiumMenu.get_message(), chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard.get(), parse_mode="html")
+        bot.edit_message_text(text=premiumMenu.get_message(), chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard, parse_mode="html")
     elif call.data == "ABOUT_PREMIUM":
         text = premium.PremiumMenu.get_text_about()
         keyboard = utils.InlineKeyboard()
-        keyboard.add_button(text="Назад", call="BACK_USER")
-        bot.edit_message_text(text=text, chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard.get(), parse_mode="html")
+        keyboard.add_button(text="Назад", call="PREMIUM")
+        bot.edit_message_text(text=text, chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard, parse_mode="html")
     elif call.data == "DIS_PREMIUM":
         if userDB.is_premium(call.message.chat.id):
             boarDB = utils.BoarDB()
             userDB.disactivate_premium(call.message.chat.id)
             funcs.new_wct(call.message.chat.id, boarDB)
         keyboard = utils.InlineKeyboard()
-        keyboard.add_button(text="Назад", call="BACK_USER")
-        bot.edit_message_text(text="<b>Премиум отключен</b>", chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard.get(), parse_mode="html")
+        keyboard.add_button(text="Назад", call="PREMIUM")
+        bot.edit_message_text(text="<b>Премиум отключен</b>", chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard, parse_mode="html")
 
 def _user_upload_menu(call):
     if call.data == "UPLOAD_MENU_USER":
         keyboard = utils.InlineKeyboard()
         keyboard.set(KEYS.UPLOAD_MENU_USER)
-        bot.edit_message_text(text="Загрузить", chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard.get())
+        bot.edit_message_text(text="Загрузить", chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard)
     elif call.data == 'UPLOAD_PICTURE':
         bot.edit_message_text(text="Пришли картинку, или нажми /brake", chat_id=call.message.chat.id, message_id=call.message.message_id)
         bot.register_next_step_handler(call.message, user_funcs.upload_photo)
@@ -81,17 +83,17 @@ def _user_achievements(call):
         keyboard = utils.InlineKeyboard()
         keyboard.add_button(text="Открытые кабаны", call="ACHIEVEMENTS")
         keyboard.add_button(text="Назад", call="BACK_USER")
-        bot.edit_message_text(text='Меню достижений', chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard.get(), parse_mode="html")
+        bot.edit_message_text(text='Меню достижений', chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard, parse_mode="html")
     elif call.data == "ACHIEVEMENTS":
         achievements = Achievements(call.message.chat.id)
         keyboard = utils.InlineKeyboard()
         keyboard.add_button(text="Назад", call="USER_ACHIVE")
-        bot.edit_message_text(text=achievements.get_message(), chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard.get(), parse_mode="html")
+        bot.edit_message_text(text=achievements.get_message(), chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard, parse_mode="html")
     elif call.data == "MEDALS":
         medals = Medals(call.message.chat.id)
         keyboard = utils.InlineKeyboard()
         keyboard.add_button(text="Назад", call="BACK_USER")
-        bot.edit_message_text(text=medals.get_message(), chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard.get(), parse_mode="html")
+        bot.edit_message_text(text=medals.get_message(), chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard, parse_mode="html")
 
 
 def _user_about_limits(call):
@@ -120,7 +122,7 @@ def _user_settings(call):
         keyboard = user_funcs.get_settings_keyboard(call.from_user.id)
         bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=keyboard)
 
-def _donate_to_admin(call):
+def _user_donate_to_admin(call):
     if call.data == "DONATE_TO_ADMIN":
         keyboard = utils.InlineKeyboard()
         keyboard.add_button(text="Сбер", call="USER_ADMIN_DONATE_SBER")
@@ -175,3 +177,7 @@ def _donate_to_admin(call):
         link = 'https://pay.cloudtips.ru/p/b256f4c7'
         keyboard.add_button(text="Назад", call="USER_ADMIN_DONATE_TINKOFF")
         bot.edit_message_text('Донат через Тинькофф CloudTips\n'+link, call.message.chat.id, call.message.message_id, reply_markup=keyboard, parse_mode='html')
+
+
+def _user_update_ex(call):
+    pass
