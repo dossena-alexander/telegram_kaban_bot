@@ -7,9 +7,16 @@ bot.register_message_handler(commands=["start"],
                              func=start, 
                              callback="none")
 
-
 bot.register_message_handler(commands=["ban"], 
                              func=ban, 
+                             callback="none")
+
+bot.register_message_handler(commands=["unban"], 
+                             func=unban, 
+                             callback="none")
+
+bot.register_message_handler(commands=["boars"], 
+                             func=achieve_boars, 
                              callback="none")
 
 bot.register_message_handler(commands=["banlist"], 
