@@ -1,11 +1,11 @@
 import random
-from header import utils, bot, helpMenu, userDB, adminMenu, userMenu, adminPicDB, adminJokeDB
-from config import ADMIN_ID, KEYS, BOT_MESSAGE
+from header import bot, helpMenu, userDB, adminMenu, userMenu, adminPicDB, adminJokeDB
+from config import ADMIN_ID, KEYS
 from server.admin.admin_utils.suggestions import Suggestions
 import server.admin.admin_funcs as admin_funcs
 from server.utils.ban import BannedDB
 from server.user.user_funcs import get_wct_photo
-
+from server.utils.keyboard import InlineKeyboard
 from server.admin.admin_utils.statistics import Statistics
 from server.utils.charts.collector import ClickCollector
 from server.user.user_utils import Achievements
@@ -59,8 +59,9 @@ def auth(message):
 
 
 def help(message):
-    helpMenu.set_message(BOT_MESSAGE.HELP(photo_count = adminPicDB.get_records_count(), joke_count = adminJokeDB.get_records_count()))
-    bot.send_message(message.chat.id, helpMenu.message, parse_mode="html")
+    keyboard = InlineKeyboard()
+    keyboard.add_button()
+    bot.send_message(message.chat.id, 'Меню помощи', parse_mode="html", reply_markup=keyboard)
 
 
 def admin(message):
@@ -114,5 +115,4 @@ def check_suggestions():
 
 def achieve_boars(message):
     achievements = Achievements(message.from_user.id)
-    keyboard = utils.InlineKeyboard()
-    bot.send_message(message.chat.id, achievements.get_message(), reply_markup=keyboard, parse_mode="html")
+    bot.send_message(message.chat.id, achievements.get_message(), parse_mode="html")
