@@ -151,3 +151,4 @@ class PATH():
     LOG = "../Logs/bot.log"
     DB_STATS = '../db/stats/'
     MATERIALS = '../materials/'
+    HELP = '../materials/help/'

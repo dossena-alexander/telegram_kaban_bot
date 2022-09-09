@@ -1,6 +1,7 @@
 import random
 from header import bot, helpMenu, userDB, adminMenu, userMenu, adminPicDB, adminJokeDB
 from config import ADMIN_ID, KEYS
+from client.update_excursus import user_excursus
 from server.admin.admin_utils.suggestions import Suggestions
 import server.admin.admin_funcs as admin_funcs
 from server.utils.ban import BannedDB
@@ -59,9 +60,8 @@ def auth(message):
 
 
 def help(message):
-    keyboard = InlineKeyboard()
-    keyboard.add_button()
-    bot.send_message(message.chat.id, 'Меню помощи', parse_mode="html", reply_markup=keyboard)
+    chat_id = message.chat.id
+    user_excursus(chat_id)
 
 
 def admin(message):
