@@ -8,6 +8,7 @@ from server.user.user_funcs import get_wct_photo
 
 from server.admin.admin_utils.statistics import Statistics
 from server.utils.charts.collector import ClickCollector
+from server.user.user_utils import Achievements
 
 
 stats = Statistics()
@@ -109,3 +110,9 @@ def check_suggestions():
     suggestions = Suggestions()
     if suggestions.limit_reached():
         bot.send_message(ADMIN_ID, f"Есть новые {suggestions.all_suggestions} предложений")
+
+
+def achieve_boars(message):
+    achievements = Achievements(message.from_user.id)
+    keyboard = utils.InlineKeyboard()
+    bot.send_message(message.chat.id, achievements.get_message(), reply_markup=keyboard, parse_mode="html")
