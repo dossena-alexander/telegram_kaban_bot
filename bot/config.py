@@ -40,9 +40,9 @@ class KEYS():
     USER = {
         0: { "text": "Загрузить",                 "call": "UPLOAD_MENU_USER"  }, 
         1: { "text": "Сообщение админу",          "call": "MESSAGE_TO_ADMIN"  },
-        2: { "text": "Достижения",                "call": "ACHIEVEMENTS"      }, 
+        2: { "text": "Достижения",                "call": "USER_ACHIVE"      }, 
         3: { "text": "Премиум",                   "call": "PREMIUM"           },
-        4: { "text": "Кабаний перевод телеграмм", "call": "TRANSLATE"         },  
+        4: { "text": "Кабаний перевод",           "call": "TRANSLATE"         },  
         5: { "text": "Настройки",                 "call": "USER_SETTINGS"     },  
         6: { "text": "Поддержать админа",         "call": "DONATE_TO_ADMIN"   },  
     }
