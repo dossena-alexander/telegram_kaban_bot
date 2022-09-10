@@ -1,6 +1,6 @@
 import sqlite3
 from datetime import date, datetime, timedelta
-from config import PATH
+from config import PATH, STAT_COLLECTOR_LOCK
 from server.utils.db import lock_thread
 
 
@@ -142,17 +142,19 @@ class ClickCollector():
             'photo_clicks'\n
             'joke_clicks'\n
         """
-        self.target = target
-        self.observer = ClickCollectorObserver()
-        self.db = ClickCollectorDB()
-        self.clicks = 0
+        if not STAT_COLLECTOR_LOCK:
+            self.target = target
+            self.observer = ClickCollectorObserver()
+            self.db = ClickCollectorDB()
+            self.clicks = 0
 
     def new(self) -> None:
-        if self.observer.new_hour():
-            time = self.observer.get_time()
-            self.db.insert(self.target, time, self.clicks)
-            self.clicks = 0
-        self.clicks += 1
+        if not STAT_COLLECTOR_LOCK:
+            if self.observer.new_hour():
+                time = self.observer.get_time()
+                self.db.insert(self.target, time, self.clicks)
+                self.clicks = 0
+            self.clicks += 1
 
 
 class IStatClickCollector():
