@@ -3,21 +3,58 @@ ADMIN_ID = 0
 WCT_CHANNEL = 0
 PHOTO_CHANNEL = 0
 JOKE_CHANNEL = 0
+
+#========================LOCK======================================
+
+UPLOAD_LOCK = False
+
+STAT_COLLECTOR_LOCK = False
+
 #========================MSG======================================
 
 class BOT_MESSAGE():
     USER = "Меню пользователя"
     ADMIN = "Админ меню"
     USER_SUB_MENU = "Кабаний перевод телеграмм для настоящих кабанов, просто нажми на кнопку, чтобы установить"
-    def HELP(photo_count: int = 1000, joke_count: int = 5000) -> str:
-        msg = ("<b>Что я умею</b>\n <i>Мои команды:</i>\n"
-            + "• /auth - Пользовательское меню\n" 
-            + "• /help - Помощь\n"
-            + "<i>Мои возможности:</i>\n" 
-            + "• /wct -- <b>Какой ты кабан сегодня</b>\n"
-            + f"• /photo -- <b>Фотокарточка</b> –– Смешная картинка из {photo_count}\n"
-            + f"• /joke -- <b>Анекдот</b> –– Рандомный анекдот из {joke_count}")
-        return msg
+
+#========================LIMITS===================================
+
+# limits for user per day
+class LIMIT():
+    JOKE = 10
+    PHOTO = 10
+    MESSAGE = 5
+
+
+# Photos/jokes count to become premium user
+class PREMIUM_LIMIT():
+    UPLOADS_COUNT = 10
+    DAYS = 2
+
+#========================FILTER===================================
+
+# text-worker filter
+class FILTER():
+    COMMANDS = [
+            "Фотокарточка", 
+            "Анекдот", 
+            "Какой я кабан сегодня", 
+            "/auth", "/help", "/start",
+            "/hide", "/keys"
+    ]
+
+#========================PATHS====================================
+
+# path to folders
+class PATH():
+    WCT = '../materials/wct/'
+    PHOTOS = '../materials/photos/'
+    RECIEVED_PHOTOS = '../materials/recieved_photos/'
+    DB = '../db/main.db'
+    LOG = "../Logs/bot.log"
+    DB_STATS = '../db/stats/'
+    MATERIALS = '../materials/'
+    HELP = '../materials/help/'
 
 #========================KEYS=====================================
 
@@ -111,44 +148,3 @@ class KEYS():
         8: { "text": "upper_stratum",             "call": "9"                 }, 
         9: { "text": "sub_culture",               "call": "10"                }, 
     }
-    
-
-#========================LIMITS===================================
-
-# limits for user per day
-class LIMIT():
-    JOKE = 10
-    PHOTO = 10
-    MESSAGE = 5
-
-
-class PREMIUM_LIMIT():
-    UPLOADS_COUNT = 10
-    DAYS = 2
-
-UPLOAD_LOCK = False
-
-#========================FILTER===================================
-
-# text-worker filter
-class FILTER():
-    COMMANDS = [
-            "Фотокарточка", 
-            "Анекдот", 
-            "Какой я кабан сегодня", 
-            "/auth", "/help", "/start",
-            "/hide", "/keys"
-    ]
-
-#========================PATHS====================================
-
-# path to folders
-class PATH():
-    WCT = '../materials/wct/'
-    PHOTOS = '../materials/photos/'
-    RECIEVED_PHOTOS = '../materials/recieved_photos/'
-    DB = '../db/main.db'
-    LOG = "../Logs/bot.log"
-    DB_STATS = '../db/stats/'
-    MATERIALS = '../materials/'
-    HELP = '../materials/help/'
