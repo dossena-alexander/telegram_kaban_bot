@@ -132,7 +132,7 @@ def translate_category(category: str) -> str:
 
 def _new_boar(message, userID, boar_category, boar):
     translated_category = translate_category(boar_category)
-    bot.send_message(message.chat.id, f"Ты открыл нового кабана из категории <i>{translated_category}</i>", parse_mode="html")
+    bot.send_notification(message.chat.id, f"Ты открыл нового кабана из категории <i>{translated_category}</i>", parse_mode="html")
     userDB.new_boar_for_user(userID, boar, boar_category)
 
 
