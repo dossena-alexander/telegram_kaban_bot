@@ -1,7 +1,6 @@
 import random
-from header import bot, helpMenu, userDB, adminMenu, userMenu, adminPicDB, adminJokeDB
-from config import ADMIN_ID, KEYS
-from client.update_excursus import user_excursus
+from header import bot, userDB, adminMenu, userMenu, adminPicDB, adminJokeDB
+from config import ADMIN_ID, PATH
 from server.admin.admin_utils.suggestions import Suggestions
 import server.admin.admin_funcs as admin_funcs
 from server.utils.ban import BannedDB
@@ -60,8 +59,14 @@ def auth(message):
 
 
 def help(message):
-    chat_id = message.chat.id
-    user_excursus(chat_id)
+    keyboard = InlineKeyboard()
+    keyboard.add_button('Достижения', 'USER_EX_ACHIEVEMENTS')
+    keyboard.add_button('Премиум', 'USER_EX_PREMIUM')
+    keyboard.add_button('Сообщение админу', 'USER_EX_ADMIN_MSG')
+    keyboard.add_button('Настройки', 'USER_EX_SETTINGS')
+    keyboard.add_button('Команды', 'USER_EX_COMMANDS')
+    photo = open(PATH.HELP+'user_menu/'+'default.png', 'rb')
+    bot.send_photo(message.chat.id, photo, "Помощь по функциям бота", reply_markup=keyboard)
 
 
 def admin(message):
