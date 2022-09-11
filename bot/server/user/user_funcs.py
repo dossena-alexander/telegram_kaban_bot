@@ -86,7 +86,7 @@ def upload_joke(message) -> None:
     if message.content_type == "text":
         if message.text.lower() != "/brake":
             if message.text not in FILTER.COMMANDS:
-                joke = message.text
+                joke = message.html_text
                 user_id = message.from_user.id
                 user_name = message.from_user.username 
                 table = "adminJokes"

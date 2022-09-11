@@ -101,7 +101,8 @@ def send_joke(message):
     stats.update_joke()
     jokeClickCollector.new()
     bot.send_message(message.chat.id, 
-        adminJokeDB.get_record(row=random.randint(0, adminJokeDB.get_records_count() - 1)))
+        adminJokeDB.get_record(row=random.randint(0, adminJokeDB.get_records_count() - 1)), 
+        parse_mode='html')
 
 
 def send_photo(message): # by file_id

@@ -87,7 +87,7 @@ def upload_premium_wct(message) -> None:
 
 def admin_notify(message) -> None:
     if message.content_type == 'text':
-        msg = message.text
+        msg = message.html_text
         if msg != '/brake':
             if msg not in FILTER.COMMANDS:
                 users = userDB.get_users_list()
@@ -112,7 +112,7 @@ def admin_notify(message) -> None:
         users = userDB.get_users_list()
         caption = ''
         if message.caption != None:
-            caption = message.caption
+            caption = message.html_caption
         if len(users) != 0:
             for id in users:
                 try:
@@ -127,7 +127,7 @@ def admin_notify(message) -> None:
 
 def bot_notify(message) -> None:
     if message.content_type == 'text':
-        msg = message.text
+        msg = message.html_text
         if msg != '/brake':
             if msg not in FILTER.COMMANDS:
                 users = userDB.get_users_list()
@@ -149,11 +149,11 @@ def bot_notify(message) -> None:
         users = userDB.get_users_list()
         caption = ''
         if message.caption != None:
-            caption = message.caption
+            caption = message.html_caption
         if len(users) != 0:
             for id in users:
                 try:
-                    bot.send_photo_notification(id, file_info.file_id, caption)
+                    bot.send_photo_notification(id, file_info.file_id, caption, parse_mode='html')
                 except Exception:
                     userDB.delete_record(id)
         else:
