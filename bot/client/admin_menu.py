@@ -1,4 +1,4 @@
-import shutil, os
+import shutil, os, time
 from header import adminMenu, userMenu
 from header import userPicDB, adminPicDB, adminJokeDB, userJokeDB
 from config import KEYS, PHOTO_CHANNEL, JOKE_CHANNEL
@@ -31,9 +31,11 @@ def admin_menu(call):
 
         back = utils.InlineKeyboard()
         back.add_button(text="Назад", call="BACK_ADMIN")
+        time.sleep(1)
         bot.delete_message(call.message.chat.id, call.message.message_id)
         bot.send_photo(call.message.chat.id, open(photo, 'rb'), caption='Количественная статистика', reply_markup=back)
         del stats
+        del img_s
     
     elif call.data == "STOP_BOT":
         utils.log.info("ОСТАНОВКА БОТА")

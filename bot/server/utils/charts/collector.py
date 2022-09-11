@@ -1,3 +1,4 @@
+from asyncio import subprocess
 import sqlite3
 from datetime import date, datetime, timedelta
 from config import PATH, STAT_COLLECTOR_LOCK
@@ -78,8 +79,13 @@ class ClickCollectorDB():
         self.connect(db_name)
 
     def connect(self, db_name: str) -> None:
-        self.db = sqlite3.connect(PATH.DB_STATS+db_name, check_same_thread=False)
-        self.db_cursor = self.db.cursor()
+        try:
+            self.db = sqlite3.connect(PATH.DB_STATS+db_name, check_same_thread=False)
+            self.db_cursor = self.db.cursor()
+        except:
+            subprocess.call(['mv', 'test.db', f'{self.get_db_name()}'])
+            self.db = sqlite3.connect(PATH.DB_STATS+db_name, check_same_thread=False)
+            self.db_cursor = self.db.cursor()
 
     def create(self):
         """If new DB has no tables"""

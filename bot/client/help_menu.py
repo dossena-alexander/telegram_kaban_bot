@@ -3,6 +3,7 @@ from config import PATH
 from server.utils.keyboard import InlineKeyboard
 from telebot import types
 
+
 achievements = PATH.HELP+'achievements/'
 premium = PATH.HELP+'premium/'
 settings = PATH.HELP+'settings/'
@@ -21,7 +22,6 @@ def excursus(call):
 
     if call.data == "USER_EXCURSUS":
         bot.send_photo(call.message.chat.id, photo, "Помощь по функциям бота", reply_markup=keyboard)
-
     elif call.data == "USER_EXCURSUS_BACK":
         media = types.InputMediaPhoto(photo)
         bot.edit_message_media(media=media, chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard)
