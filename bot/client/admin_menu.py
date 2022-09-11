@@ -248,7 +248,6 @@ def _admin_ban_user(call):
             banDB.ban(user_id, user_name)
             del banDB
         except Exception as e:
-            print(e)
             return 'Пользователь заблокировал бота или пользователя с таким id нет'
     if 'ADMIN_BAN_USER' in call.data:
         user_id = int(call.data.split()[1])
