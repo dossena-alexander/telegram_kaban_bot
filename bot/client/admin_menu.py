@@ -1,4 +1,5 @@
 import shutil, os, time
+from server.utils.charts.charts_menu import get_charts_keyboard, translate_b_call, reverse_b_call
 from header import adminMenu, userMenu
 from header import userPicDB, adminPicDB, adminJokeDB, userJokeDB
 from config import KEYS, PHOTO_CHANNEL, JOKE_CHANNEL
@@ -169,10 +170,11 @@ def _admin_see_jokes_suggestions(call):
     elif "JOKE_ACCEPT" in call.data:
         user_id = int(call.data.split()[1])
         joke = userJokeDB.get_record(mesg.count)
+        text = userJokeDB.get_record(mesg.count, 3)
         bot.delete_message(call.message.chat.id, call.message.message_id)
 
         adminJokeDB.new_record(joke)
-        bot.send_message(JOKE_CHANNEL, joke)
+        bot.send_message(JOKE_CHANNEL, text)
         bot.send_notification(user_id, 'Ваше предложение (анекдот) принято')
 
         userJokeDB.delete_record(joke)
@@ -210,21 +212,116 @@ def _admin_see_messages_from_users(call):
 def _admin_charts(call):
     def charts_menu(call):
         keyboard = utils.InlineKeyboard()
-        keyboard.set(KEYS.ADMIN_CHARTS)
-        bot.delete_message(call.message.chat.id, call.message.message_id)
-        bot.send_message(call.message.chat.id, 'Графики', reply_markup=keyboard)
+        keys = utils.build_buttons(KEYS.ADMIN_CHARTS)
+        keyboard.add(*keys, row_width=1)
+        bot.edit_message_text('Выбери график', call.message.chat.id, 
+                                call.message.message_id,
+                                reply_markup=keyboard)
 
     if call.data == "CHARTS":
         charts_menu(call)
 
-    elif call.data == "CHARTS_DAY":
-        back = utils.InlineKeyboard()
-        back.add_button('Назад', 'BACK_FROM_CHARTS')
-        bot.delete_message(call.message.chat.id, call.message.message_id)
-        collector = DayStatClickCollector(target, target_date, target_time_interval)
+    elif 'SEE_CHARTS_DAY' in call.data:
+        keyboard = get_charts_keyboard(0, '', 'CHARTS_YEAR', 'CHARTS')
+        bot.edit_message_text('Доступные года', call.message.chat.id, 
+                                call.message.message_id,
+                                reply_markup=keyboard)
+
+    elif call.data.split()[0] == '>':
+        offset = int(call.data.split()[1])
+        try:
+            year = call.data.split()[2]
+        except:
+            year = '/'
+        try:
+            month = call.data.split()[3]
+        except:
+            month = '/'
+        b_call = call.data.split()[4]
+        keyboard = get_charts_keyboard(offset, year+'/'+month+'/', b_call, reverse_b_call(b_call)+' '+year+'/')
+        try:
+            date = f'{year}/{month}'
+            if month == '/':
+                date = f'{year}'
+            bot.edit_message_text(f'Доступные {translate_b_call(b_call)} ({date})', call.message.chat.id, 
+                                    call.message.message_id,
+                                    reply_markup=keyboard)
+        except:
+            pass
+        
+    elif '<' in call.data:
+        offset = int(call.data.split()[1])
+        if offset <= 0:
+            offset = 0 
+        try:
+            year = call.data.split()[2]
+        except:
+            year = '/'
+        try:
+            month = call.data.split()[3]
+        except:
+            month = '/'
+        b_call = call.data.split()[4]
+        keyboard = get_charts_keyboard(offset, year+'/'+month+'/', b_call, reverse_b_call(b_call)+' '+year+'/')
+        try:
+            date = f'{year}/{month}'
+            if month == '/':
+                date = f'{year}'
+            bot.edit_message_text(f'Доступные {translate_b_call(b_call)} ({date})', call.message.chat.id, 
+                                    call.message.message_id,
+                                    reply_markup=keyboard)
+        except:
+            pass
+
+
+    elif 'CHARTS_YEAR' in call.data:
+        year = call.data.split()[1]
+        keyboard = get_charts_keyboard(0, year+'/', 'CHARTS_MONTH', 'SEE_CHARTS_DAY')
+        bot.edit_message_text(f'Доступные месяцы ({year})', call.message.chat.id, 
+                                call.message.message_id,
+                                reply_markup=keyboard)
+
+    elif 'CHARTS_MONTH' in call.data:
+        month = call.data.split()[1]
+        year = call.data.split()[2]
+        keyboard = get_charts_keyboard(0, year+'/'+month+'/', 'CHART_DAY_SEE', 'CHARTS_YEAR'+' '+year+'/')
+        bot.edit_message_text(f'Доступные графики ({year}/{month})', call.message.chat.id, 
+                                call.message.message_id,
+                                reply_markup=keyboard)
+    
+    elif call.data == '|<':
+        keyboard = get_charts_keyboard(0)
+        try:
+            bot.edit_message_text('Доступные графики', call.message.chat.id, 
+                                    call.message.message_id,
+                                    reply_markup=keyboard)
+        except:
+            pass
+
+
+    elif '>|' in call.data:
+        offset = int(call.data.split()[1])
+        keyboard = get_charts_keyboard(offset)
+        try:
+            bot.edit_message_text('Доступные графики', call.message.chat.id, 
+                                    call.message.message_id,
+                                    reply_markup=keyboard)
+        except:
+            pass
+
+    elif 'CHART_DAY_SEE' in call.data:
+        file = call.data.split()[1]
+        from multiprocessing import Process
+        proc = Process()
+        target = 'joke_clicks'
+        collector = DayStatClickCollector(target, file)
         chart = Chart(PATH.MATERIALS, collector)
-        photo = PATH.MATERIALS+chart.fig_name
-        bot.send_photo(call.message.chat.id, photo)
+        chart.draw()
+        photo = open(PATH.MATERIALS+chart.fig_name, 'rb')
+        keyboard = utils.InlineKeyboard()
+        keyboard.add_button('Назад', 'BACK_FROM_CHARTS')
+        bot.delete_message(call.message.chat.id, call.message.message_id)
+        bot.send_photo(call.message.chat.id, photo, reply_markup=keyboard)
 
     elif call.data == "CHARTS_WEEK":
         back = utils.InlineKeyboard()
