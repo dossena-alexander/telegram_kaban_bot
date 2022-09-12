@@ -79,7 +79,7 @@ class InlineKeyboard(types.InlineKeyboardMarkup):
         self.add(button)
 
 
-def build_buttons(keys: dict):
+def build_buttons(keys: dict) -> list:
     """Build inline telegram buttons from dict such as: \n
     {
         0: 'text': 'some_text', 'call': 'some_call',
