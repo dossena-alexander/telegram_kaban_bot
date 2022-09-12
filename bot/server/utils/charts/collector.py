@@ -1,4 +1,4 @@
-import subprocess
+import os
 import sqlite3
 from datetime import date, datetime, timedelta
 from config import PATH, STAT_COLLECTOR_LOCK
@@ -81,14 +81,15 @@ class ClickCollectorDB():
         self.connect(db_name)
 
     def connect(self, db_name: str) -> None:
-        self.db = sqlite3.connect(PATH.DB_STATS+db_name, check_same_thread=False)
+        year = str(date.today().year) + '/'
+        month = str(date.today().month) + '/'
+        self._make_dir(PATH.DB_STATS+year+month)
+        self.db = sqlite3.connect(PATH.DB_STATS+year+month+db_name, check_same_thread=False)
         self.db_cursor = self.db.cursor()
 
-    def create_tables(self):
+    def create_table(self, target: str):
         """If new DB has no tables"""
-        self.db_cursor.execute('CREATE TABLE wct_clicks (time TIME, clicks INTEGER DEFAULT (0) )')
-        self.db_cursor.execute('CREATE TABLE photo_clicks (time TIME, clicks INTEGER DEFAULT (0) )') 
-        self.db_cursor.execute('CREATE TABLE joke_clicks (time TIME, clicks INTEGER DEFAULT (0) )') 
+        self.db_cursor.execute(f'CREATE TABLE {target} (time TIME, clicks INTEGER DEFAULT (0) )')
         self.db.commit()
 
     def new_row(self, target, time):
@@ -99,20 +100,20 @@ class ClickCollectorDB():
         self.date = date
 
     @lock_thread
-    def insert(self, name: str, time: Time, clicks: int) -> None:
-        db_name = self._current_day_db_name()   
+    def insert(self, target: str, time: Time, clicks: int) -> None:
+        db_name = self._current_date_db_name()   
         self.connect(db_name)
         time = str(time)
         try:
-            self.db_cursor.execute(f'INSERT INTO {name} (time, clicks) VALUES (?, ?)', (time, clicks) ) 
+            self.db_cursor.execute(f'INSERT INTO {target} (time, clicks) VALUES (?, ?)', (time, clicks) ) 
         except:
-            self.create_tables()
-            self.db_cursor.execute(f'INSERT INTO {name} (time, clicks) VALUES (?, ?)', (time, clicks) ) 
+            self.create_table(target)
+            self.db_cursor.execute(f'INSERT INTO {target} (time, clicks) VALUES (?, ?)', (time, clicks) ) 
         self.db.commit()
 
     @lock_thread
     def update_clicks(self, target: str, time: Time) -> None:
-        db_name = self._current_day_db_name()
+        db_name = self._current_date_db_name()
         self.connect(db_name)
         time = str(time)
         clicks = 0
@@ -121,7 +122,7 @@ class ClickCollectorDB():
             clicks = self.db_cursor.fetchall()[0][0] 
         except:
             try:
-                self.create_tables()
+                self.create_table(target)
             except:
                 self.new_row(target, time)
             self.db_cursor.execute(f'SELECT clicks FROM {target} WHERE time = \'{time}\'')
@@ -143,13 +144,19 @@ class ClickCollectorDB():
         clicks = [click[0] for click in clicks]
         return times, clicks
 
+    def _make_dir(self, path: str):
+        try:
+            os.makedirs(path)
+        except FileExistsError:
+            pass
+
     def _now_day(self, full_date = False):
         now = date.today() # yyyy-mm-dd
         if full_date:
             return str(now)
         return now.day
 
-    def _current_day_db_name(self):
+    def _current_date_db_name(self):
         name = self._now_day(full_date=True)
         return f'{name}.db'
 
