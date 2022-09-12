@@ -81,21 +81,19 @@ class ClickCollectorDB():
         self.connect(db_name)
 
     def connect(self, db_name: str) -> None:
-        # try:
         self.db = sqlite3.connect(PATH.DB_STATS+db_name, check_same_thread=False)
         self.db_cursor = self.db.cursor()
-        # except:
-        #     subprocess.call(['mv', 'test.db', f'{db_name}'])
-        #     self.db = sqlite3.connect(PATH.DB_STATS+db_name, check_same_thread=False)
-        #     self.db_cursor = self.db.cursor()
 
-    def create(self, time):
+    def create_tables(self):
         """If new DB has no tables"""
         self.db_cursor.execute('CREATE TABLE wct_clicks (time TIME, clicks INTEGER DEFAULT (0) )')
-        self.db_cursor.execute('INSERT INTO wct_clicks (time, clicks) VALUES (?, ?)', (time, 0) )  
         self.db_cursor.execute('CREATE TABLE photo_clicks (time TIME, clicks INTEGER DEFAULT (0) )') 
-        self.db_cursor.execute('INSERT INTO photo_clicks (time, clicks) VALUES (?, ?)', (time, 0) )  
         self.db_cursor.execute('CREATE TABLE joke_clicks (time TIME, clicks INTEGER DEFAULT (0) )') 
+        self.db.commit()
+
+    def create_cols(self, time):
+        self.db_cursor.execute('INSERT INTO wct_clicks (time, clicks) VALUES (?, ?)', (time, 0) )  
+        self.db_cursor.execute('INSERT INTO photo_clicks (time, clicks) VALUES (?, ?)', (time, 0) )  
         self.db_cursor.execute('INSERT INTO joke_clicks (time, clicks) VALUES (?, ?)', (time, 0) )  
         self.db.commit()
 
@@ -109,8 +107,8 @@ class ClickCollectorDB():
         time = str(time)
         try:
             self.db_cursor.execute(f'INSERT INTO {name} (time, clicks) VALUES (?, ?)', (time, clicks) ) 
-        except Exception as e:
-            self.create(time)
+        except:
+            self.create_tables()
             self.db_cursor.execute(f'INSERT INTO {name} (time, clicks) VALUES (?, ?)', (time, clicks) ) 
         self.db.commit()
 
@@ -124,7 +122,10 @@ class ClickCollectorDB():
             self.db_cursor.execute(f'SELECT clicks FROM {target} WHERE time = \'{time}\'')
             clicks = self.db_cursor.fetchall()[0][0] 
         except:
-            self.create(time)
+            try:
+                self.create_tables()
+            except:
+                self.create_cols(time)
             self.db_cursor.execute(f'SELECT clicks FROM {target} WHERE time = \'{time}\'')
             clicks = self.db_cursor.fetchall()[0][0] 
         self.db_cursor.execute(f'UPDATE {target} SET clicks = {clicks + 1} WHERE time = \'{time}\'') 
