@@ -1,4 +1,4 @@
-from asyncio import subprocess
+import subprocess
 import sqlite3
 from datetime import date, datetime, timedelta
 from config import PATH, STAT_COLLECTOR_LOCK
@@ -58,6 +58,7 @@ class ClickCollectorObserver():
         return True
 
     def new_time(self) -> None:
+        date = datetime.now()
         self.time = self.time = Time(date.time().strftime('%H:%M:%S'))
 
     def get_time(self) -> str:
@@ -69,7 +70,6 @@ class ClickCollectorObserver():
         if now_hour > self.hour:
             self.hour = now_hour
             return False
-        self.time = Time(date.time().strftime('%H:%M:%S'))
         return True
 
 
@@ -81,36 +81,53 @@ class ClickCollectorDB():
         self.connect(db_name)
 
     def connect(self, db_name: str) -> None:
-        try:
-            self.db = sqlite3.connect(PATH.DB_STATS+db_name, check_same_thread=False)
-            self.db_cursor = self.db.cursor()
-        except:
-            subprocess.call(['mv', 'test.db', f'{self.get_db_name()}'])
-            self.db = sqlite3.connect(PATH.DB_STATS+db_name, check_same_thread=False)
-            self.db_cursor = self.db.cursor()
+        # try:
+        self.db = sqlite3.connect(PATH.DB_STATS+db_name, check_same_thread=False)
+        self.db_cursor = self.db.cursor()
+        # except:
+        #     subprocess.call(['mv', 'test.db', f'{db_name}'])
+        #     self.db = sqlite3.connect(PATH.DB_STATS+db_name, check_same_thread=False)
+        #     self.db_cursor = self.db.cursor()
 
-    def create(self):
+    def create(self, time):
         """If new DB has no tables"""
-        self.db_cursor.execute('CREATE TABLE wct_clicks (time TIME, clicks INTEGER)') 
-        self.db.commit()
-        self.db_cursor.execute('CREATE TABLE photo_clicks (time TIME, clicks INTEGER)') 
-        self.db.commit()
-        self.db_cursor.execute('CREATE TABLE joke_clicks (time TIME, clicks INTEGER)') 
+        self.db_cursor.execute('CREATE TABLE wct_clicks (time TIME, clicks INTEGER DEFAULT (0) )')
+        self.db_cursor.execute('INSERT INTO wct_clicks (time, clicks) VALUES (?, ?)', (time, 0) )  
+        self.db_cursor.execute('CREATE TABLE photo_clicks (time TIME, clicks INTEGER DEFAULT (0) )') 
+        self.db_cursor.execute('INSERT INTO photo_clicks (time, clicks) VALUES (?, ?)', (time, 0) )  
+        self.db_cursor.execute('CREATE TABLE joke_clicks (time TIME, clicks INTEGER DEFAULT (0) )') 
+        self.db_cursor.execute('INSERT INTO joke_clicks (time, clicks) VALUES (?, ?)', (time, 0) )  
         self.db.commit()
 
     def set_date(self, date: date) -> None:
         self.date = date
 
     @lock_thread
-    def insert(self, name: str, time: Time, clicks: int):
-        db_name = self._now_day(full_date=True)
+    def insert(self, name: str, time: Time, clicks: int) -> None:
+        db_name = self._current_day_db_name()   
         self.connect(db_name)
+        time = str(time)
         try:
-            time = str(time)
             self.db_cursor.execute(f'INSERT INTO {name} (time, clicks) VALUES (?, ?)', (time, clicks) ) 
         except Exception as e:
-            self.create()
+            self.create(time)
             self.db_cursor.execute(f'INSERT INTO {name} (time, clicks) VALUES (?, ?)', (time, clicks) ) 
+        self.db.commit()
+
+    @lock_thread
+    def update_clicks(self, target: str, time: Time) -> None:
+        db_name = self._current_day_db_name()
+        self.connect(db_name)
+        time = str(time)
+        clicks = 0
+        try:
+            self.db_cursor.execute(f'SELECT clicks FROM {target} WHERE time = \'{time}\'')
+            clicks = self.db_cursor.fetchall()[0][0] 
+        except:
+            self.create(time)
+            self.db_cursor.execute(f'SELECT clicks FROM {target} WHERE time = \'{time}\'')
+            clicks = self.db_cursor.fetchall()[0][0] 
+        self.db_cursor.execute(f'UPDATE {target} SET clicks = {clicks + 1} WHERE time = \'{time}\'') 
         self.db.commit()
 
     @lock_thread
@@ -127,11 +144,15 @@ class ClickCollectorDB():
         clicks = [click[0] for click in clicks]
         return times, clicks
 
-    def _now_day(self, full_date = False) -> int:
+    def _now_day(self, full_date = False):
         now = date.today() # yyyy-mm-dd
         if full_date:
-            return now
+            return str(now)
         return now.day
+
+    def _current_day_db_name(self):
+        name = self._now_day(full_date=True)
+        return f'{name}.db'
 
     def get_db_name(self) -> str:
         try:
@@ -166,6 +187,12 @@ class ClickCollector():
                 self.observer.new_time()
                 self.clicks = 0
             self.clicks += 1
+
+    def new_by_db(self) -> None:
+        if not STAT_COLLECTOR_LOCK:
+            if self.observer.new_hour():
+                self.observer.new_time()
+            self.db.update_clicks(self.target, self.observer.get_time())
 
 
 class IStatClickCollector():
