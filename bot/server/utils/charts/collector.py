@@ -91,10 +91,8 @@ class ClickCollectorDB():
         self.db_cursor.execute('CREATE TABLE joke_clicks (time TIME, clicks INTEGER DEFAULT (0) )') 
         self.db.commit()
 
-    def create_cols(self, time):
-        self.db_cursor.execute('INSERT INTO wct_clicks (time, clicks) VALUES (?, ?)', (time, 0) )  
-        self.db_cursor.execute('INSERT INTO photo_clicks (time, clicks) VALUES (?, ?)', (time, 0) )  
-        self.db_cursor.execute('INSERT INTO joke_clicks (time, clicks) VALUES (?, ?)', (time, 0) )  
+    def new_row(self, target, time):
+        self.db_cursor.execute(f'INSERT INTO {target} (time, clicks) VALUES (?, ?)', (time, 0) )  
         self.db.commit()
 
     def set_date(self, date: date) -> None:
@@ -125,7 +123,7 @@ class ClickCollectorDB():
             try:
                 self.create_tables()
             except:
-                self.create_cols(time)
+                self.new_row(target, time)
             self.db_cursor.execute(f'SELECT clicks FROM {target} WHERE time = \'{time}\'')
             clicks = self.db_cursor.fetchall()[0][0] 
         self.db_cursor.execute(f'UPDATE {target} SET clicks = {clicks + 1} WHERE time = \'{time}\'') 
