@@ -91,7 +91,7 @@ def send_wct(message):
         return None
     else:
         stats.update_wct()
-        wctClickCollector.new()
+        wctClickCollector.new_by_db()
         boar, caption = get_wct_photo(message)
         bot.send_photo(message.chat.id, boar, reply_to_message_id=message.message_id, caption=caption)
 
@@ -99,7 +99,7 @@ def send_wct(message):
 def send_joke(message):
     check_suggestions()
     stats.update_joke()
-    jokeClickCollector.new()
+    jokeClickCollector.new_by_db()
     bot.send_message(message.chat.id, 
         adminJokeDB.get_record(row=random.randint(0, adminJokeDB.get_records_count() - 1)), 
         parse_mode='html')
@@ -108,7 +108,7 @@ def send_joke(message):
 def send_photo(message): # by file_id
     check_suggestions()
     stats.update_photo()
-    photoClickCollector.new()
+    photoClickCollector.new_by_db()
     bot.send_photo(message.chat.id, 
         adminPicDB.get_record(row=random.randint(0, adminPicDB.get_records_count() - 1), col=1))
 
