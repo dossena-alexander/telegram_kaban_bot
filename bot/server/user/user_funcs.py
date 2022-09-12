@@ -87,6 +87,7 @@ def upload_joke(message) -> None:
         if message.text.lower() != "/brake":
             if message.text not in FILTER.COMMANDS:
                 joke = message.html_text
+                text = message.text
                 user_id = message.from_user.id
                 user_name = message.from_user.username 
                 table = "adminJokes"
@@ -98,7 +99,7 @@ def upload_joke(message) -> None:
                 jokeDB = utils.JokeDB(table)
                 premium.new_upload_for_user(message)
                 userDB.new_joke_upload(user_id)
-                jokeDB.insert(joke, user_id, user_name)
+                jokeDB.insert(joke, user_id, user_name, text)
                 bot.send_message(message.chat.id, userMessage)
                 if user_id == ADMIN_ID:
                     bot.send_message(JOKE_CHANNEL, joke)
