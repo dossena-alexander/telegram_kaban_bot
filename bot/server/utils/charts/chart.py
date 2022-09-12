@@ -36,7 +36,6 @@ class Chart():
         # ax.xaxis.set_major_formatter(self.fmt)
         fig.autofmt_xdate()
         plt.savefig(self.path+self.fig_name, dpi=self.dpi)
-        plt.show()
 
     def get_data(self, collector: IStatClickCollector) -> tuple[list[datetime], list[int]]:
         """Collecting data from Collector object. \n
