@@ -45,7 +45,6 @@ class TimeInterval():
 
 class ClickCollectorObserver():
     time: Time
-    new_time: Time
 
 
     def __init__(self) -> None:
@@ -57,6 +56,9 @@ class ClickCollectorObserver():
         if self.same_hour():
             return False
         return True
+
+    def new_time(self) -> None:
+        self.time = self.time = Time(date.time().strftime('%H:%M:%S'))
 
     def get_time(self) -> str:
         return self.time
@@ -101,6 +103,8 @@ class ClickCollectorDB():
 
     @lock_thread
     def insert(self, name: str, time: Time, clicks: int):
+        db_name = self._now_day(full_date=True)
+        self.connect(db_name)
         try:
             time = str(time)
             self.db_cursor.execute(f'INSERT INTO {name} (time, clicks) VALUES (?, ?)', (time, clicks) ) 
@@ -159,6 +163,7 @@ class ClickCollector():
             if self.observer.new_hour():
                 time = self.observer.get_time()
                 self.db.insert(self.target, time, self.clicks)
+                self.observer.new_time()
                 self.clicks = 0
             self.clicks += 1
 
