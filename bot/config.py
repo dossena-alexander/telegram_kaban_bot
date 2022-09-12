@@ -67,9 +67,10 @@ class KEYS():
         4: { "text": "Остановить бота",           "call": "STOP_BOT"          },
         5: { "text": "Пользователь",              "call": "USER"              }, 
         6: { "text": "Статистика",                "call": "STATISTICS"        },
+        7: { "text": "Графики",                   "call": "CHARTS"            },
     }
     ADMIN_CHARTS = {
-        0: { "text": "Дни",                       "call": "CHARTS_DAY"        }, 
+        0: { "text": "Дни",                       "call": "SEE_CHARTS_DAY"    }, 
         1: { "text": "Недели",                    "call": "CHARTS_WEEK"       },
         2: { "text": "Месяцы",                    "call": "CHARTS_MONTH"      }, 
         3: { "text": "Назад",                     "call": "BACK_ADMIN"        },
