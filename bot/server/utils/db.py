@@ -266,8 +266,8 @@ class JokeDB(DB):
         self._column = 'joke'
 
     @lock_thread
-    def insert(self, joke: str, user_id: int, user_name: str) -> None:
-        self._bd_cursor.execute(f'INSERT INTO {self._table} ({self._column}, user_id, user_name) VALUES (?, ?, ?)', (joke, user_id, user_name) ) 
+    def insert(self, joke: str, user_id: int, user_name: str, text: str) -> None:
+        self._bd_cursor.execute(f'INSERT INTO {self._table} ({self._column}, user_id, user_name, text) VALUES (?, ?, ?, ?)', (joke, user_id, user_name, text) ) 
         self._bd.commit()
 
 
