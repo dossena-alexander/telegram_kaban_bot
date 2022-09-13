@@ -3,6 +3,7 @@ ADMIN_ID = 0
 WCT_CHANNEL = 0
 PHOTO_CHANNEL = 0
 JOKE_CHANNEL = 0
+SERVICE_CHANNEL = 0
 
 #========================LOCK======================================
 
@@ -50,11 +51,13 @@ class PATH():
     WCT = '../materials/wct/'
     PHOTOS = '../materials/photos/'
     RECIEVED_PHOTOS = '../materials/recieved_photos/'
-    DB = '../db/main.db'
+    DB = '../db/main/main.db'
+    MAIN_DB = '../db/main/'
     LOG = "../Logs/bot.log"
     DB_STATS = '../db/stats/'
     MATERIALS = '../materials/'
     HELP = '../materials/help/'
+    BACKUP = '../materials/backup/'
 
 #========================KEYS=====================================
 
@@ -67,7 +70,8 @@ class KEYS():
         4: { "text": "Остановить бота",           "call": "STOP_BOT"          },
         5: { "text": "Пользователь",              "call": "USER"              }, 
         6: { "text": "Статистика",                "call": "STATISTICS"        },
-        7: { "text": "Графики",                   "call": "CHARTS"            },
+        7: { "text": "Бекап",                     "call": "ADMIN_ZIP_DB"      },
+        8: { "text": "Графики",                   "call": "CHARTS"            },
     }
     ADMIN_CHARTS = {
         0: { "text": "Дни",                       "call": "SEE_CHARTS_DAY"    }, 
