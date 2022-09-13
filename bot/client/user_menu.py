@@ -35,8 +35,6 @@ def user_menu(call):
 
     _user_donate_to_admin(call)
 
-    _user_update_ex(call)
-
 
 def _user_escape(call):
     if call.data == "BACK_USER":
@@ -123,13 +121,56 @@ def _user_settings(call):
         bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=keyboard)
 
 def _user_donate_to_admin(call):
+    if call.data == "DONATE":
+        keyboard = utils.InlineKeyboard()
+        keyboard.add_button(text="Админу", call="DONATE_TO_ADMIN")
+        keyboard.add_button(text="Дизайнеру", call="DONATE_TO_ADMIN_DESIGNER")
+        keyboard.add_button(text="Назад", call="BACK_USER")
+        bot.edit_message_text(text='Пожертвование участникам проекта', 
+                                 chat_id=call.message.chat.id, message_id=call.message.message_id, 
+                                 reply_markup=keyboard, parse_mode="html")
+
+    if call.data == "DONATE_TO_ADMIN_DESIGNER":
+        keyboard = utils.InlineKeyboard()
+        keyboard.add_button(text="ВТБ", call="USER_DESIGNER_DONATE_VTB")
+        keyboard.add_button(text="Тинькофф", call="USER_DESIGNER_DONATE_TINKOFF")
+        keyboard.add_button(text="Назад", call="DONATE")
+        bot.edit_message_text(text='Донат можно совершить на ВТБ или Тинькофф,' 
+                                 + ' по номеру карты', 
+                                 chat_id=call.message.chat.id, message_id=call.message.message_id, 
+                                 reply_markup=keyboard, parse_mode="html")
+
+    elif call.data == 'USER_DESIGNER_DONATE_VTB':
+        keyboard = utils.InlineKeyboard()
+        keyboard.add_button(text="Номер карты", call="USER_DESIGNER_DONATE_VTB_CARD")
+        keyboard.add_button(text="Назад", call="DONATE_TO_ADMIN_DESIGNER")
+        bot.edit_message_text('Донат через ВТБ', call.message.chat.id, call.message.message_id, reply_markup=keyboard)
+
+    elif call.data == 'USER_DESIGNER_DONATE_VTB_CARD':
+        keyboard = utils.InlineKeyboard()
+        text = '<code>2200240468876244</code>'
+        keyboard.add_button(text="Назад", call="USER_DESIGNER_DONATE_VTB")
+        bot.edit_message_text('Донат по номеру карты\nПросто нажми на номер\n\n'+text, call.message.chat.id, call.message.message_id, reply_markup=keyboard, parse_mode='html')
+
+    elif call.data == 'USER_DESIGNER_DONATE_TINKOFF':
+        keyboard = utils.InlineKeyboard()
+        keyboard.add_button(text="Номер карты", call="USER_DESIGNER_DONATE_TINKOFF_CARD")
+        keyboard.add_button(text="Назад", call="DONATE_TO_ADMIN_DESIGNER")
+        bot.edit_message_text('Донат через Тинькофф', call.message.chat.id, call.message.message_id, reply_markup=keyboard)
+
+    elif call.data == 'USER_DESIGNER_DONATE_TINKOFF_CARD':
+        keyboard = utils.InlineKeyboard()
+        text = '<code>2200700153280754</code>'
+        keyboard.add_button(text="Назад", call="USER_DESIGNER_DONATE_TINKOFF")
+        bot.edit_message_text('Донат по номеру карты\nПросто нажми на номер\n\n'+text, call.message.chat.id, call.message.message_id, reply_markup=keyboard, parse_mode='html')
+
     if call.data == "DONATE_TO_ADMIN":
         keyboard = utils.InlineKeyboard()
         keyboard.add_button(text="Сбер", call="USER_ADMIN_DONATE_SBER")
         keyboard.add_button(text="Тинькофф", call="USER_ADMIN_DONATE_TINKOFF")
-        keyboard.add_button(text="Назад", call="BACK_USER")
-        bot.edit_message_text(text='Донат админу можно совершить на сбер или тинькофф,' 
-                                 + 'по карте или с помощью удобных сервисов', 
+        keyboard.add_button(text="Назад", call="DONATE")
+        bot.edit_message_text(text='Донат админу можно совершить на Сбер или Тинькофф,' 
+                                 + ' по номеру карты или с помощью удобных сервисов', 
                                  chat_id=call.message.chat.id, message_id=call.message.message_id, 
                                  reply_markup=keyboard, parse_mode="html")
 
@@ -177,7 +218,3 @@ def _user_donate_to_admin(call):
         link = 'https://pay.cloudtips.ru/p/b256f4c7'
         keyboard.add_button(text="Назад", call="USER_ADMIN_DONATE_TINKOFF")
         bot.edit_message_text('Донат через Тинькофф CloudTips\n'+link, call.message.chat.id, call.message.message_id, reply_markup=keyboard, parse_mode='html')
-
-
-def _user_update_ex(call):
-    pass
