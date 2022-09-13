@@ -8,14 +8,15 @@ boarsCategories = utils.BoarsCategories()
 
 class Achievements():
     _message: str
-
+    _all = 0
+    _all_by_user = 0
 
     def __init__(self, userID) -> None:
         self.boarsCategories = boarsCategories
         self._categories = self.boarsCategories.get_all_categories()
         self.count_achievements(userID)
         message = (
-            f"<b>Открытые кабаны:</b>\n"+
+            f"<b>Открытые кабаны:</b>"+f'<b>Всего открыто:</b> {self._all_by_user} из {self._all}\n'+
             f" • Эмотивные: "            + f"<b><i>{self._categories[0]}%</i></b>\n"  +
             "----------------------------------------\n"                              +
             f" • Игровые: "              + f"<b><i>{self._categories[1]}%</i></b>\n"  +
@@ -73,8 +74,10 @@ class Achievements():
         all_boars_in_category = self.boarsCategories.get_boars_of_category(category) # -> list
         count = 0
         for boar in boars:
+            self._all += 1
             if boar in all_boars_in_category:
                 count += 1
+                self._all_by_user += 1
 
         count = self._transform_to_percent(count, category)
         return "{:2.2f}".format(count)
