@@ -1,10 +1,11 @@
+from datetime import datetime, date
 import shutil, os, time
-from server.utils.charts.charts_menu import get_charts_keyboard, translate_b_call, reverse_b_call
 from header import adminMenu, userMenu
 from header import userPicDB, adminPicDB, adminJokeDB, userJokeDB
-from config import KEYS, PHOTO_CHANNEL, JOKE_CHANNEL
+from config import KEYS, PHOTO_CHANNEL, JOKE_CHANNEL, SERVICE_CHANNEL
 from server import utils
 
+from server.utils.charts.charts_menu import get_charts_keyboard, translate_b_call, reverse_b_call
 import server.admin.admin_utils as admin_utils
 from server.admin.admin_utils.statistics import Statistics, ImageStatistic
 from server.utils.charts.chart import Chart
@@ -17,14 +18,19 @@ suggestions = admin_utils.Suggestions()
 
 def admin_menu(call):
     if call.data == "STATISTICS":
+        current_date = date.today()
+        current_time = datetime.now().time().strftime('%H:%M:%S')
         stats = Statistics()
         back = utils.InlineKeyboard()
         back.add_button(text="Количественная", call="IMG_STATISTICS")
         back.add_button(text="Назад", call="BACK_ADMIN")
         bot.edit_message_text(text=stats.get(), chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=back.get(), parse_mode="html")
+        bot.send_message(SERVICE_CHANNEL, f'<b>{current_date} ({current_time})</b>\n'+stats.get(), parse_mode='html')
         del stats
 
     elif call.data == "IMG_STATISTICS":
+        current_date = date.today()
+        current_time = datetime.now().time().strftime('%H:%M:%S')
         stats = Statistics()
         img_s = ImageStatistic()
         stats.get_img_stats(img_s)
@@ -35,6 +41,7 @@ def admin_menu(call):
         time.sleep(1)
         bot.delete_message(call.message.chat.id, call.message.message_id)
         bot.send_photo(call.message.chat.id, open(photo, 'rb'), caption='Количественная статистика', reply_markup=back)
+        bot.send_photo(SERVICE_CHANNEL, open(photo, 'rb'), caption=f'Статистика за\n<b>{current_date} ({current_time})</b>', parse_mode='html')
         del stats
         del img_s
     
@@ -71,6 +78,8 @@ def admin_menu(call):
     _admin_charts(call)
 
     _admin_ban_user(call)
+
+    _admin_zip_db(call)
 
 
 def _admin_escape(call):
@@ -355,4 +364,14 @@ def _admin_ban_user(call):
             bot.send_message(call.message.chat.id, "Забанил пользователя")
 
 
-
+def _admin_zip_db(call):
+    if call.data == 'ADMIN_ZIP_DB':
+        current_date = date.today()
+        current_time = datetime.now().time().strftime('%H:%M:%S')
+        stats_path = PATH.DB_STATS
+        main_path = PATH.MAIN_DB
+        stats_zip_name = shutil.make_archive(PATH.BACKUP+'stats', 'zip', stats_path)
+        main_zip_name = shutil.make_archive(PATH.BACKUP+'main', 'zip', main_path)
+        bot.send_document(SERVICE_CHANNEL, open(main_zip_name, 'rb'), caption=f'Бекап MAIN\n<b>{current_date}</b> <b>({current_time})</b>', parse_mode='html')
+        bot.send_document(SERVICE_CHANNEL, open(stats_zip_name, 'rb'), caption=f'Бекап STATS\n<b>{current_date}</b> <b>({current_time})</b>', parse_mode='html')
+        bot.send_message(call.message.chat.id, 'Создан создан (на сервере) и отослан в сервисный канал')
