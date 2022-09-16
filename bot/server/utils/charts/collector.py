@@ -1,27 +1,47 @@
 import os
 import sqlite3
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone, time
 from config import PATH, STAT_COLLECTOR_LOCK
 from server.utils.db import lock_thread
 
 
-TIME_ZONE = -3 
-
-
 class Time():
-    """str in format %H:%M:%S
-    """
     time: str
+    hour: int
+    minute: int
+    second: int
+    _msc_offset = 3
+    msc_tz = timezone(timedelta(hours=_msc_offset), name='msc')
 
 
-    def __init__(self, time: str) -> None:
-        self.time = time
-        
+    def __init__(self, hour = None, 
+                       minute = None, 
+                       second = None, 
+                       now = False) -> None:
+        if now == True:
+            date = datetime.now(self.msc_tz)
+            hour = date.hour
+            minute = date.minute
+            second = date.second
+            del date
+        else:
+            if hour == None:
+                hour = 0
+            if minute == None:
+                minute = 0
+            if second == None:
+                second = 0
+        self.hour = hour
+        self.minute = minute
+        self.second = second
+        self.time = time(hour, minute, second, tzinfo=self.msc_tz).strftime('%H:%M:%S')
+
+    @classmethod
+    def now(cls):
+        return datetime.now(cls.msc_tz).strftime('%H:%M:%S')
+
     def __repr__(self) -> str:
-        return self.time
-
-    def convert_str_time(self) -> datetime:
-        return datetime.strptime(self.time, "%H:%M:%S")
+        return str(self.time)
 
 
 class TimeInterval():
@@ -31,16 +51,11 @@ class TimeInterval():
     def __init__(self, start: Time, end: Time) -> None:
         self.time = (start, end)
 
-    def __repr__(self) -> tuple[str, str]:
+    def __repr__(self) -> tuple[Time, Time]:
         return self.time
 
     def __getitem__(self, item: int) -> Time:
         return self.time[item]
-
-    def convert_str_time(self) -> tuple[datetime, datetime]:
-        t = (self.time[0].convert_str_time(), 
-             self.time[1].convert_str_time())
-        return t
 
 
 class ClickCollectorObserver():
@@ -48,9 +63,9 @@ class ClickCollectorObserver():
 
 
     def __init__(self) -> None:
-        date = datetime.now()
-        self.hour = date.hour
-        self.time = Time(date.time().strftime('%H:%M:%S'))
+        time = Time(now=True)
+        self.time = time.time
+        self.hour = time.hour
 
     def new_hour(self) -> bool:
         if self.same_hour():
@@ -58,15 +73,13 @@ class ClickCollectorObserver():
         return True
 
     def new_time(self) -> None:
-        date = datetime.now()
-        self.time = self.time = Time(date.time().strftime('%H:%M:%S'))
+        self.time = Time.now()
 
     def get_time(self) -> str:
         return self.time
 
     def same_hour(self) -> bool:
-        date = datetime.now()
-        now_hour = date.hour
+        now_hour = Time(now=True).hour
         if now_hour > self.hour:
             self.hour = now_hour
             return False
@@ -100,10 +113,9 @@ class ClickCollectorDB():
         self.date = date
 
     @lock_thread
-    def insert(self, target: str, time: Time, clicks: int) -> None:
+    def insert(self, target: str, time: str, clicks: int) -> None:
         db_name = self._current_date_db_name()   
         self.connect(db_name)
-        time = str(time)
         try:
             self.db_cursor.execute(f'INSERT INTO {target} (time, clicks) VALUES (?, ?)', (time, clicks) ) 
         except:
@@ -112,10 +124,9 @@ class ClickCollectorDB():
         self.db.commit()
 
     @lock_thread
-    def update_clicks(self, target: str, time: Time) -> None:
+    def update_clicks(self, target: str, time: str) -> None:
         db_name = self._current_date_db_name()
         self.connect(db_name)
-        time = str(time)
         clicks = 0
         try:
             self.db_cursor.execute(f'SELECT clicks FROM {target} WHERE time = \'{time}\'')
@@ -132,10 +143,9 @@ class ClickCollectorDB():
 
     @lock_thread
     def get(self, from_target: str, # Table name
-                  start_time: Time, 
-                  end_time: Time) -> tuple[list[str], list[int]]:
-        start_time = str(start_time)
-        end_time = str(end_time)
+                  time_interval: TimeInterval) -> tuple[list[str], list[int]]:
+        start_time = time_interval[0].time
+        end_time = time_interval[1].time
         self.db_cursor.execute(f'SELECT time FROM {from_target} WHERE time BETWEEN \'{start_time}\' AND \'{end_time}\' ') 
         times = self.db_cursor.fetchall()
         times = [time[0] for time in times]
@@ -214,7 +224,7 @@ class DayStatClickCollector(IStatClickCollector):
 
     def __init__(self, from_target: str, # Table name
                        target_date: date, # In format: YYYY-MM-DD
-                       target_time_interval = TimeInterval('00:00:00', '23:59:59')) -> None:
+                       target_time_interval = TimeInterval(Time(0, 0, 0), Time(23, 59, 59))) -> None:
         """
         Args:
             from_target (str): Table name\n
@@ -224,51 +234,55 @@ class DayStatClickCollector(IStatClickCollector):
         self.from_target = from_target
         self.target_date = target_date
         self.target_time_interval = target_time_interval
+        self._prep_data()
 
     def get_data(self) -> tuple[list[datetime], list[int]]:
         """
         Returns:
             Hours interval (list) and clicks (list) for a day
         """
-        db = ClickCollectorDB(self.target_date)
-        times, self.clicks = db.get(self.from_target, 
-                                    self.target_time_interval[0], 
-                                    self.target_time_interval[1])
-        del db
-        return times, self.clicks
+        return self.times, self.clicks
 
-    def get_clicks(self) -> int:
+    def _prep_data(self):
         db = ClickCollectorDB(self.target_date)
-        _, self.clicks = db.get(self.from_target, 
-                                self.target_time_interval[0], 
-                                self.target_time_interval[1])
+        self.times, self.clicks = db.get(self.from_target, 
+                                    self.target_time_interval[0].time, 
+                                    self.target_time_interval[1].time)
         del db
+
+    def get_clicks_sum(self) -> int:
         clicks = sum(self.clicks)
         return clicks
+
+    def get_times(self) -> list[str]:
+        return self.times
 
 
 class DateStatClickCollector(IStatClickCollector):
     """Use this if you need statistics for days, not for a day"""
-    default_time_interval = TimeInterval('00:00:00', '23:59:59')
+    default_time_interval = TimeInterval(Time(0, 0, 0), Time(23, 59, 59))
+    time_interval: TimeInterval
 
 
     def __init__(self, from_target: str,
                        date_interval: tuple[datetime, datetime],
                        time_interval = default_time_interval) -> None:
         self.from_target = from_target
-        self.default_time_interval = time_interval
+        self.time_interval = time_interval
         self.date_interval = date_interval
 
-    def get_data(self) -> tuple[list[datetime], list[int]]:
+    def get_data(self, time_interval = None) -> tuple[list[datetime], list[int]]:
         """
         Returns:
             tuple[list[datetime], list[int]]: list of dates (days) and clicks per day
         """
+        if not time_interval:
+            time_interval = self.time_interval
         dates_interval = self.prep_dates(self.date_interval)
         clicks = []
         for date in dates_interval:
-            statClickCollector = DayStatClickCollector(self.from_target, date, self.default_time_interval)
-            clicks.append(statClickCollector.get_clicks())
+            statClickCollector = DayStatClickCollector(self.from_target, date, time_interval)
+            clicks.append(statClickCollector.get_clicks_sum())
         return dates_interval, clicks
 
     def prep_dates(self, date_interval: tuple[datetime, datetime]) -> list[datetime]:
