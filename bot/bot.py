@@ -1,53 +1,30 @@
-# v1.8.9.7
+# v1.8.9.71
+import threading
+from server.admin.admin_utils.backup import c_backup
 from server.handlers import *
-from header import *
 
 
-bot.register_message_handler(commands=["start"], 
-                             func=start, 
-                             callback="none")
+bot.register_message_handler(commands=["start"], func=start, callback='none')
 
-bot.register_message_handler(commands=["ban"], 
-                             func=ban, 
-                             callback="none")
+bot.register_message_handler(commands=["ban"], func=ban, callback='none')
 
-bot.register_message_handler(commands=["unban"], 
-                             func=unban, 
-                             callback="none")
+bot.register_message_handler(commands=["unban"], func=unban, callback='none')
 
-bot.register_message_handler(commands=["boars"], 
-                             func=achieve_boars, 
-                             callback="none")
+bot.register_message_handler(commands=["banlist"], func=banList, callback='none')
 
-bot.register_message_handler(commands=["banlist"], 
-                             func=banList, 
-                             callback="none")
+bot.register_message_handler(commands=["boars"], func=achieve_boars, callback='none')
 
-bot.register_message_handler(commands=["auth"], 
-                             func=auth, 
-                             callback="none",
-                             chat_types='private')
+bot.register_message_handler(commands=["auth"], func=auth, chat_types='private', callback='none')
 
-bot.register_message_handler(commands=["help"], 
-                             func=help, 
-                             callback="none")
+bot.register_message_handler(commands=["help"], func=help, callback='none')
 
-bot.register_message_handler(commands=["wct"], 
-                             func=send_wct, 
-                             callback="none")
+bot.register_message_handler(commands=["wct"], func=send_wct, callback='none')
 
-bot.register_message_handler(commands=["photo"], 
-                             func=send_photo, 
-                             callback="none")
+bot.register_message_handler(commands=["photo"], func=send_photo, callback='none')
 
-bot.register_message_handler(commands=["joke"], 
-                             func=send_joke, 
-                             callback="none")
+bot.register_message_handler(commands=["joke"], func=send_joke, callback='none')
 
-
-bot.register_message_handler(content_types="photo", 
-                             func=upload_photo_in_private_chat, 
-                             callback="none")
+bot.register_message_handler(content_types="photo", func=upload_photo_in_private_chat, callback='none')
 
 
 @bot.callback_query_handler(func=lambda call: True)
@@ -69,6 +46,9 @@ if __name__ == "__main__":
     try:
         print("BOT STARTED")
         utils.log.info("BOT STARTED")
+        backup_worker = threading.Thread(target=c_backup, args=[bot])
+        backup_worker.start()
+        backup_worker.join(60*60*15)
         bot.infinity_polling()
     except Exception as e:
         utils.log.error(e)
