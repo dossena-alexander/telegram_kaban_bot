@@ -48,7 +48,6 @@ if __name__ == "__main__":
         utils.log.info("BOT STARTED")
         backup_worker = threading.Thread(target=c_backup, args=[bot])
         backup_worker.start()
-        backup_worker.join(60*60*15)
         bot.infinity_polling()
     except Exception as e:
         utils.log.error(e)
