@@ -79,7 +79,7 @@ def admin_menu(call):
 
     _admin_ban_user(call)
 
-    _admin_zip_db(call)
+    _admin_zip(call)
 
 
 def _admin_escape(call):
@@ -364,9 +364,37 @@ def _admin_ban_user(call):
             bot.send_message(call.message.chat.id, "Забанил пользователя")
 
 
-def _admin_zip_db(call):
-    if call.data == 'ADMIN_ZIP_DB':
+def _admin_zip(call):
+    if call.data == 'ADMIN_ZIP':
+        keyboard = utils.InlineKeyboard()
+        keyboard.add_button('Актуальный БД', 'ADMIN_ZIP_DB')
+        keyboard.add_button('Архив БД', 'ADMIN_ZIP_BACKUPS')
+        keyboard.add_button('Всех фото', 'ADMIN_ZIP_PHOTO')
+        keyboard.add_button('Всех кабанов', 'ADMIN_ZIP_BOARS')
+        keyboard.add_button('Назад', 'BACK_ADMIN')
+        bot.edit_message_text('Выбери тип бэкапа', call.message.chat.id, call.message.message_id, reply_markup=keyboard)
+
+    elif call.data == 'ADMIN_ZIP_DB':
         main_zip_name, stats_zip_name, date, time = admin_utils.admin_backup()
         bot.send_document(SERVICE_CHANNEL, open(main_zip_name, 'rb'), caption=f'Бекап MAIN\n<b>{date}</b> <b>({time})</b>\n#backup', parse_mode='html')
-        bot.send_document(SERVICE_CHANNEL, open(stats_zip_name, 'rb'), caption=f'Бекап STATS\n<b>{date}</b> <b>({time})</b>\nbackup', parse_mode='html')
+        bot.send_document(SERVICE_CHANNEL, open(stats_zip_name, 'rb'), caption=f'Бекап STATS\n<b>{date}</b> <b>({time})</b>\n#backup', parse_mode='html')
         bot.send_message(call.message.chat.id, 'Бэкап создан (на сервере) и отослан в сервисный канал')
+
+    elif call.data == 'ADMIN_ZIP_BACKUPS':
+        zip_name, date, time = admin_utils.admin_backup_dir(PATH.MATERIALS, 'backup_all', PATH.BACKUP)
+        bot.send_document(SERVICE_CHANNEL, open(zip_name, 'rb'), caption=f'Бекап архивов БД\n<b>{date}</b> <b>({time})</b>\n#backup', parse_mode='html')
+        bot.send_message(call.message.chat.id, 'Бэкап архива создан и отослан в сервисный канал')
+        os.remove(zip_name)
+
+    elif call.data == 'ADMIN_ZIP_PHOTO':
+        zip_name, date, time = admin_utils.admin_backup_dir(PATH.MATERIALS, 'backup_photo', PATH.PHOTOS)
+        bot.send_document(SERVICE_CHANNEL, open(zip_name, 'rb'), caption=f'Бекап фото\n<b>{date}</b> <b>({time})</b>\n#backup', parse_mode='html')
+        bot.send_message(call.message.chat.id, 'Бэкап фото создан и отослан в сервисный канал')
+        os.remove(zip_name)
+
+    elif call.data == 'ADMIN_ZIP_BOARS':
+        zip_name, date, time = admin_utils.admin_backup_dir(PATH.MATERIALS, 'backup_wct', PATH.WCT)
+        bot.send_document(SERVICE_CHANNEL, open(zip_name, 'rb'), caption=f'Бекап кабанов\n<b>{date}</b> <b>({time})</b>\n#backup', parse_mode='html')
+        bot.send_message(call.message.chat.id, 'Бэкап кабанов создан и отослан в сервисный канал')   
+        os.remove(zip_name)
+        
