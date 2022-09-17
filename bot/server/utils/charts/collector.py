@@ -25,12 +25,8 @@ class Time():
             second = date.second
             del date
         else:
-            if hour == None:
-                hour = 0
-            if minute == None:
-                minute = 0
-            if second == None:
-                second = 0
+            for v in [hour, minute, second]:
+                if v == None: v = 0
         self.hour = hour
         self.minute = minute
         self.second = second
