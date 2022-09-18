@@ -1,3 +1,4 @@
+from server.utils.db import BoarDB
 from header import utils
 from header import bot, userDB
 from server.admin.admin_utils.statistics import Statistics
@@ -15,8 +16,10 @@ class Achievements():
         self.boarsCategories = boarsCategories
         self._categories = self.boarsCategories.get_all_categories()
         self.count_achievements(userID)
+        boarDB = BoarDB()
+        self._all = boarDB.get_records_count()
         message = (
-            f"<b>Открытые кабаны:</b>"+f'<b>Всего открыто:</b> {self._all_by_user} из {self._all}\n'+
+            f"<b>Открытые кабаны:</b>\n"+f'<b>Всего открыто:</b> {self._all_by_user} из {self._all}\n'+
             f" • Эмотивные: "            + f"<b><i>{self._categories[0]}%</i></b>\n"  +
             "----------------------------------------\n"                              +
             f" • Игровые: "              + f"<b><i>{self._categories[1]}%</i></b>\n"  +
@@ -74,7 +77,6 @@ class Achievements():
         all_boars_in_category = self.boarsCategories.get_boars_of_category(category) # -> list
         count = 0
         for boar in boars:
-            self._all += 1
             if boar in all_boars_in_category:
                 count += 1
                 self._all_by_user += 1
@@ -135,7 +137,8 @@ def translate_category(category: str) -> str:
 
 def _new_boar(message, userID, boar_category, boar):
     translated_category = translate_category(boar_category)
-    bot.send_notification(message.chat.id, f"Ты открыл нового кабана из категории <i>{translated_category}</i>", parse_mode="html")
+    if userDB.can_send_notification(userID):
+        bot.send_message(message.chat.id, f"Ты открыл нового кабана из категории <i>{translated_category}</i>", parse_mode="html")
     userDB.new_boar_for_user(userID, boar, boar_category)
 
 
