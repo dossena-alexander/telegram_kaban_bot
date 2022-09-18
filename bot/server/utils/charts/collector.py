@@ -83,10 +83,13 @@ class ClickCollectorObserver():
 
 
 class ClickCollectorDB():
-    def __init__(self, date = None):
+    def __init__(self, date = None, db_name = None):
         if date:
             self.date = date
-        db_name = self.get_db_name()
+        if db_name:
+            db_name = db_name
+        else:
+            db_name = self.get_db_name()
         self.connect(db_name)
 
     def connect(self, db_name: str) -> None:
@@ -219,7 +222,7 @@ class DayStatClickCollector(IStatClickCollector):
 
 
     def __init__(self, from_target: str, # Table name
-                       target_date: date, # In format: YYYY-MM-DD
+                       target_file: str, # DB File name
                        target_time_interval = TimeInterval(Time(0, 0, 0), Time(23, 59, 59))) -> None:
         """
         Args:
@@ -228,7 +231,7 @@ class DayStatClickCollector(IStatClickCollector):
             target_time_interval (TimeInterval) = ('00:00:00', '23:59:59') | Any\n
         """
         self.from_target = from_target
-        self.target_date = target_date
+        self.target_file = target_file
         self.target_time_interval = target_time_interval
         self._prep_data()
 
@@ -240,10 +243,10 @@ class DayStatClickCollector(IStatClickCollector):
         return self.times, self.clicks
 
     def _prep_data(self):
-        db = ClickCollectorDB(self.target_date)
-        self.times, self.clicks = db.get(self.from_target, 
-                                    self.target_time_interval[0].time, 
-                                    self.target_time_interval[1].time)
+        db = ClickCollectorDB(db_name=self.target_file)
+        times, clicks = db.get(self.from_target, self.target_time_interval)
+        self.times = times
+        self.clicks = clicks
         del db
 
     def get_clicks_sum(self) -> int:
@@ -261,7 +264,7 @@ class DateStatClickCollector(IStatClickCollector):
 
 
     def __init__(self, from_target: str,
-                       date_interval: tuple[datetime, datetime],
+                       date_interval: tuple[str, str],
                        time_interval = default_time_interval) -> None:
         self.from_target = from_target
         self.time_interval = time_interval
@@ -274,22 +277,36 @@ class DateStatClickCollector(IStatClickCollector):
         """
         if not time_interval:
             time_interval = self.time_interval
-        dates_interval = self.prep_dates(self.date_interval)
+        dates_interval = DateStatClickCollector.prep_dates(self.date_interval)
+        files = DateStatClickCollector.prep_files(dates_interval)
         clicks = []
-        for date in dates_interval:
-            statClickCollector = DayStatClickCollector(self.from_target, date, time_interval)
+        for file in files:
+            statClickCollector = DayStatClickCollector(self.from_target, file, time_interval)
             clicks.append(statClickCollector.get_clicks_sum())
         return dates_interval, clicks
 
-    def prep_dates(self, date_interval: tuple[datetime, datetime]) -> list[datetime]:
+    @staticmethod
+    def prep_dates(date_interval: tuple[str, str]) -> list[str]:
         """
         Args:
-            date_interval (tuple[datetime, datetime]): Start date and End date of interval
+            date_interval (tuple[str, str]): Start date and End date of interval
 
         Returns:
             All dates between start - end dates
         """
-        start = datetime.strptime(date_interval[0], '%Y/%M/%D')
-        end = datetime.strptime(date_interval[1], '%Y/%M/%D')   
+        start = datetime.strptime(date_interval[0], '%Y-%m-%d')
+        end = datetime.strptime(date_interval[1], '%Y-%m-%d')   
 
-        return [(start + timedelta(days=x)).strftime('%Y/%M/%D') for x in range(0, (end-start).days)]
+        return [(start + timedelta(days=x)).strftime('%Y-%m-%d') for x in range(0, (end-start).days)]
+
+    @staticmethod
+    def prep_files(dates_interval: list[str]) -> list[str]:
+        """append .db to all dates
+
+        Args:
+            dates_interval (list[str]): list of dates in string
+
+        Returns:
+            list[str]: list of files in string
+        """
+        return [date+'.db' for date in dates_interval]
