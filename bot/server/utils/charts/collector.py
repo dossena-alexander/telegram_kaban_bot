@@ -145,12 +145,18 @@ class ClickCollectorDB():
                   time_interval: TimeInterval) -> tuple[list[str], list[int]]:
         start_time = time_interval[0].time
         end_time = time_interval[1].time
-        self.db_cursor.execute(f'SELECT time FROM {from_target} WHERE time BETWEEN \'{start_time}\' AND \'{end_time}\' ') 
-        times = self.db_cursor.fetchall()
-        times = [time[0] for time in times]
-        self.db_cursor.execute(f'SELECT clicks FROM {from_target} WHERE time BETWEEN \'{start_time}\' AND \'{end_time}\' ') 
-        clicks = self.db_cursor.fetchall()
-        clicks = [click[0] for click in clicks]
+        try:
+            self.db_cursor.execute(f'SELECT time FROM {from_target} WHERE time BETWEEN \'{start_time}\' AND \'{end_time}\' ') 
+            times = self.db_cursor.fetchall()
+            times = [time[0] for time in times]
+        except:
+            times = ['0']
+        try:
+            self.db_cursor.execute(f'SELECT clicks FROM {from_target} WHERE time BETWEEN \'{start_time}\' AND \'{end_time}\' ') 
+            clicks = self.db_cursor.fetchall()
+            clicks = [click[0] for click in clicks]
+        except:
+            clicks = [0]
         return times, clicks
 
     def _make_dir(self, path: str):
@@ -211,17 +217,27 @@ class ClickCollector():
 
 
 class IStatClickCollector():
-    def get_data(self) -> tuple[list[datetime], list[int]]:
-        pass
+    targets: list[str]
+    target_file: str
+    data_dict: dict
+
+
+    def get_data(self) -> tuple[list[str], list[int]]:
+        return self.data_dict
+
+    def init_dict(self):
+        return {target: dict.fromkeys(['times', 'clicks']) for target in self.targets}
 
 
 class DayStatClickCollector(IStatClickCollector):
     """Day clicks statistics"""
-    target_date: date
+    targets: list
+    target_file: str
     target_time_interval: TimeInterval
+    data_dict: dict
 
 
-    def __init__(self, from_target: str, # Table name
+    def __init__(self, targets: list[str], # Table name
                        target_file: str, # DB File name
                        target_time_interval = TimeInterval(Time(0, 0, 0), Time(23, 59, 59))) -> None:
         """
@@ -230,60 +246,55 @@ class DayStatClickCollector(IStatClickCollector):
             target_date (date): In format: YYYY-MM-DD\n
             target_time_interval (TimeInterval) = ('00:00:00', '23:59:59') | Any\n
         """
-        self.from_target = from_target
+        self.targets = targets
         self.target_file = target_file
         self.target_time_interval = target_time_interval
         self._prep_data()
 
-    def get_data(self) -> tuple[list[datetime], list[int]]:
-        """
-        Returns:
-            Hours interval (list) and clicks (list) for a day
-        """
-        return self.times, self.clicks
-
     def _prep_data(self):
+        self.data_dict = self.init_dict()
         db = ClickCollectorDB(db_name=self.target_file)
-        times, clicks = db.get(self.from_target, self.target_time_interval)
-        self.times = times
-        self.clicks = clicks
+        for target in self.targets:
+            times, clicks = db.get(target, self.target_time_interval)
+            self.data_dict[target]['times'] = times
+            self.data_dict[target]['clicks'] = clicks
         del db
 
-    def get_clicks_sum(self) -> int:
-        clicks = sum(self.clicks)
+    def get_clicks_sum(self, target: str) -> int:
+        clicks = sum(self.data_dict[target]['clicks'])
         return clicks
 
-    def get_times(self) -> list[str]:
-        return self.times
+    def get_times(self, target: str) -> list[str]:
+        return self.data_dict[target]['times']
 
 
 class DateStatClickCollector(IStatClickCollector):
     """Use this if you need statistics for days, not for a day"""
     default_time_interval = TimeInterval(Time(0, 0, 0), Time(23, 59, 59))
     time_interval: TimeInterval
+    targets: list[str]
+    dates_interval: list[str]
+    data_dict: dict
 
 
-    def __init__(self, from_target: str,
+    def __init__(self, targets: list[str],
                        date_interval: tuple[str, str],
                        time_interval = default_time_interval) -> None:
-        self.from_target = from_target
+        self.targets = targets
         self.time_interval = time_interval
-        self.date_interval = date_interval
+        self.dates_interval = DateStatClickCollector.prep_dates(date_interval)
+        self._prep_data()
 
-    def get_data(self, time_interval = None) -> tuple[list[datetime], list[int]]:
-        """
-        Returns:
-            tuple[list[datetime], list[int]]: list of dates (days) and clicks per day
-        """
-        if not time_interval:
-            time_interval = self.time_interval
-        dates_interval = DateStatClickCollector.prep_dates(self.date_interval)
-        files = DateStatClickCollector.prep_files(dates_interval)
-        clicks = []
+    def _prep_data(self):
+        self.data_dict = self.init_dict()
+        files = DateStatClickCollector.prep_dates_to_files(self.dates_interval)
         for file in files:
-            statClickCollector = DayStatClickCollector(self.from_target, file, time_interval)
-            clicks.append(statClickCollector.get_clicks_sum())
-        return dates_interval, clicks
+            for target in self.targets:
+                db = ClickCollectorDB(db_name=file)
+                _, clicks = db.get(target, self.target_time_interval)
+                self.data_dict[target]['times'] = self.dates_interval
+                self.data_dict[target]['clicks'] = sum(clicks)
+        del db
 
     @staticmethod
     def prep_dates(date_interval: tuple[str, str]) -> list[str]:
@@ -300,7 +311,7 @@ class DateStatClickCollector(IStatClickCollector):
         return [(start + timedelta(days=x)).strftime('%Y-%m-%d') for x in range(0, (end-start).days)]
 
     @staticmethod
-    def prep_files(dates_interval: list[str]) -> list[str]:
+    def prep_dates_to_files(dates_interval: list[str]) -> list[str]:
         """append .db to all dates
 
         Args:
