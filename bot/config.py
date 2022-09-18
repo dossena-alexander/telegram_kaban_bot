@@ -58,6 +58,7 @@ class PATH():
     MATERIALS = './materials/'
     HELP = './materials/help/'
     BACKUP = './materials/backup/'
+    CHARTS = './materials/charts/'
 
 #========================KEYS=====================================
 
