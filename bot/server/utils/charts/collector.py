@@ -160,7 +160,7 @@ class ClickCollectorDB():
             pass
 
     def _now_day(self, full_date = False):
-        now = date.today() # yyyy-mm-dd
+        now = datetime.now(Time.msc_tz).date() # yyyy-mm-dd
         if full_date:
             return str(now)
         return now.day
