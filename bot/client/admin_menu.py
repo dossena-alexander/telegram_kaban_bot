@@ -327,11 +327,17 @@ def _admin_charts(call):
         path = file.split('-')
         year = path[0]
         month = path[1][1:]
-        target = 'joke_clicks'
-        collector = DayStatClickCollector(target, target_file=file)
-        chart = Chart(PATH.MATERIALS, collector)
-        chart.draw()
-        photo = open(PATH.MATERIALS+chart.fig_name, 'rb')
+        targets = ['joke_clicks', 'wct_clicks', 'photo_clicks']
+        charts = os.listdir(PATH.CHARTS)
+        chart_photo = file[:-3]+'.jpg'
+        if chart_photo not in charts:
+            collector = DayStatClickCollector(targets, target_file=file)
+            chart = Chart(PATH.CHARTS, collector)
+            chart.draw()
+            chart_photo = chart.fig_name
+
+        photo = open(PATH.CHARTS+chart_photo, 'rb')
+
         keyboard = utils.InlineKeyboard()
         keyboard.add_button('Назад', f'CHARTS_MONTH {month} {year}')
         bot.delete_message(call.message.chat.id, call.message.message_id)
