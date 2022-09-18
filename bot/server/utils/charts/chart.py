@@ -1,3 +1,5 @@
+from PIL import Image
+import PIL.ImageOps  
 import matplotlib.pyplot as plt
 from matplotlib import dates
 from datetime import datetime
@@ -43,6 +45,9 @@ class Chart():
         ax.legend()
         fig.autofmt_xdate()
         plt.savefig(self.path+self.fig_name, dpi=self.dpi)
+        image = Image.open(self.path+self.fig_name)
+        inverted_image = PIL.ImageOps.invert(image)
+        inverted_image.save(self.path+self.fig_name)
 
     def get_data(self, collector: IStatClickCollector) -> tuple[list[datetime], list[int]]:
         """Collecting data from Collector object. \n
