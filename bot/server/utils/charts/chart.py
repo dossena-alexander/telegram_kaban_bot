@@ -10,8 +10,7 @@ class Chart():
     def __init__(self, path: str, 
                        collector: IStatClickCollector, 
                        mode = 0, 
-                       dpi = 350,
-                       fig_name = 'chart.jpg') -> None:
+                       dpi = 350) -> None:
         """Args:
             path (str): path to save figure
             collector (IStatClickCollector): _description_
@@ -23,17 +22,25 @@ class Chart():
         self.collector = collector
         self.mode = mode
         self.dpi = dpi
-        self.fig_name = fig_name
-        self.fmt = dates.DateFormatter('%H:%M:%S')
+        self.fig_name = collector.target_file[:-3] + '.jpg'
+        # self.fmt = dates.DateFormatter('%H:%M')
+        self.colors = ['red', 'green', 'blue', 'brown']
 
     def draw(self) -> None:
         fig, ax = plt.subplots()
-        plt.title('График нажатий', fontsize=20, fontname='Helvetica')
+        plt.title('График использования', fontsize=20, fontname='Helvetica')
         plt.xlabel('Время', color='gray')
         plt.ylabel('Кол-во',color='gray')
-        time_interval, clicks = self.get_data(self.collector)
-        ax.plot(time_interval, clicks, "-o")
+        data_dict = self.get_data(self.collector)
+        for c, target in enumerate(self.collector.targets):
+            time_interval = data_dict[target]['times']
+            clicks = data_dict[target]['clicks']
+            if time_interval[0] == '0':
+                pass
+            else:
+                ax.plot(time_interval, clicks, "-o", color=self.colors[c], label=target)
         # ax.xaxis.set_major_formatter(self.fmt)
+        ax.legend()
         fig.autofmt_xdate()
         plt.savefig(self.path+self.fig_name, dpi=self.dpi)
 
@@ -44,8 +51,7 @@ class Chart():
         Returns:
             tuple[list[datetime], int]: times_interval, clicks
         """
-        interval, clicks = collector.get_data()
-        return interval, clicks
+        return collector.get_data()
 
     def set_data_type(self, data_type: str) -> None:
         """For getting data from DataBase table must be named as data_type.\n
