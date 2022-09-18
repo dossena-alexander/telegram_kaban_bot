@@ -294,9 +294,13 @@ def _admin_charts(call):
         month = call.data.split()[1]
         year = call.data.split()[2]
         keyboard = get_charts_keyboard(0, year+'/'+month+'/', 'CHART_DAY_SEE', 'CHARTS_YEAR'+' '+year+'/')
-        bot.edit_message_text(f'Доступные графики ({year}/{month})', call.message.chat.id, 
-                                call.message.message_id,
-                                reply_markup=keyboard)
+        try:
+            bot.edit_message_text(f'Доступные графики ({year}/{month})', call.message.chat.id, 
+                                    call.message.message_id,
+                                    reply_markup=keyboard)
+        except:
+            bot.delete_message(call.message.chat.id, call.message.message_id)
+            bot.send_message(call.message.chat.id, f'Доступные графики ({year}/{month})', reply_markup=keyboard)
     
     elif call.data == '|<':
         keyboard = get_charts_keyboard(0)
@@ -320,15 +324,16 @@ def _admin_charts(call):
 
     elif 'CHART_DAY_SEE' in call.data:
         file = call.data.split()[1]
-        from multiprocessing import Process
-        proc = Process()
+        path = file.split('-')
+        year = path[0]
+        month = path[1][1:]
         target = 'joke_clicks'
-        collector = DayStatClickCollector(target, file)
+        collector = DayStatClickCollector(target, target_file=file)
         chart = Chart(PATH.MATERIALS, collector)
         chart.draw()
         photo = open(PATH.MATERIALS+chart.fig_name, 'rb')
         keyboard = utils.InlineKeyboard()
-        keyboard.add_button('Назад', 'BACK_FROM_CHARTS')
+        keyboard.add_button('Назад', f'CHARTS_MONTH {month} {year}')
         bot.delete_message(call.message.chat.id, call.message.message_id)
         bot.send_photo(call.message.chat.id, photo, reply_markup=keyboard)
 
@@ -343,7 +348,7 @@ def _admin_charts(call):
         bot.delete_message(call.message.chat.id, call.message.message_id)
 
     elif call.data == "BACK_FROM_CHARTS":
-        charts_menu(call)
+        bot.delete_message(call.message.chat.id, call.message.message_id)
 
 
 def _admin_ban_user(call):
