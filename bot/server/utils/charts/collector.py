@@ -256,7 +256,7 @@ class DayStatClickCollector(IStatClickCollector):
 
     def __init__(self, targets: list[str], # Table name
                        target_file: str, # DB File name
-                       target_time_interval = TimeInterval(Time(0, 0, 0), Time(23, 59, 59)) | None) -> None:
+                       target_time_interval: TimeInterval = TimeInterval(Time(0, 0, 0), Time(23, 59, 59))) -> None:
         """
         Args:
             from_target (str): Table name\n
