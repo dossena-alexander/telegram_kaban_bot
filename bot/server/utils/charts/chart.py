@@ -24,9 +24,15 @@ class Chart():
         self.collector = collector
         self.mode = mode
         self.dpi = dpi
-        self.fig_name = collector.target_file[:-3] + '.jpg'
+        self.fig_name = collector._target_file[:-3] + '.jpg'
         # self.fmt = dates.DateFormatter('%H:%M')
-        self.colors = ['red', 'green', 'blue', 'brown']
+        self.colors =  [ 
+            '#00ffff', # red
+            '#ffff00', # blue
+            '#11bffe', # orange
+            '#6bff2b', # violet
+            '#ff00ff' # green
+        ]
 
     def draw(self) -> None:
         fig, ax = plt.subplots()
