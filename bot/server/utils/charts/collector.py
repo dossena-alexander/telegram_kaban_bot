@@ -230,7 +230,20 @@ class IStatClickCollector():
 
 
 class DayStatClickCollector(IStatClickCollector):
-    """Day clicks statistics"""
+    """DayStatClickCollector must be setted up by:
+    targets (tables_name to get data), 
+    target file (.db file)
+    target_time_interval ('00:00:00'-'23:59:59' as default)
+    
+    With method .get_data() you will recieve dictionary that`ll be builded by targets you provide.
+    The dict struct is:
+    {
+        'target': {
+            'times': list[str],
+            'clicks': list[int]
+        }
+    }
+    """
     targets: list
     target_file: str
     target_time_interval: TimeInterval
