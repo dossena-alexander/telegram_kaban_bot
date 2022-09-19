@@ -42,7 +42,10 @@ class Chart():
             else:
                 ax.plot(time_interval, clicks, "-o", color=self.colors[c], label=target)
         # ax.xaxis.set_major_formatter(self.fmt)
-        ax.legend()
+        try:
+            ax.legend()
+        except:
+            pass
         fig.autofmt_xdate()
         plt.savefig(self.path+self.fig_name, dpi=self.dpi)
         image = Image.open(self.path+self.fig_name)
