@@ -1,0 +1,6 @@
+numpy
+matplotlib
+pillow
+pytelegrambotapi
+fake_headers
+BeautifulSoup
