@@ -184,8 +184,8 @@ class ClickCollectorDB():
 
 
 class ClickCollector():
-    target: str
-    clicks: int
+    _target: str
+    _clicks: int
 
 
     def __init__(self, target: str) -> None:
@@ -195,25 +195,25 @@ class ClickCollector():
             'joke_clicks'\n
         """
         if not STAT_COLLECTOR_LOCK:
-            self.target = target
-            self.observer = ClickCollectorObserver()
-            self.db = ClickCollectorDB()
-            self.clicks = 0
+            self._target = target
+            self._observer = ClickCollectorObserver()
+            self._db = ClickCollectorDB()
+            self._clicks = 0
 
     def new(self) -> None:
         if not STAT_COLLECTOR_LOCK:
-            if self.observer.new_hour():
-                time = self.observer.get_time()
-                self.db.insert(self.target, time, self.clicks)
-                self.observer.new_time()
-                self.clicks = 0
-            self.clicks += 1
+            if self._observer.new_hour():
+                time = self._observer.get_time()
+                self._db.insert(self._target, time, self._clicks)
+                self._observer.new_time()
+                self._clicks = 0
+            self._clicks += 1
 
     def new_by_db(self) -> None:
         if not STAT_COLLECTOR_LOCK:
-            if self.observer.new_hour():
-                self.observer.new_time()
-            self.db.update_clicks(self.target, self.observer.get_time())
+            if self._observer.new_hour():
+                self._observer.new_time()
+            self._db.update_clicks(self._target, self._observer.get_time())
 
 
 class IStatClickCollector():
@@ -281,6 +281,7 @@ class DayStatClickCollector(IStatClickCollector):
         self._targets = targets
         self._target_file = target_file
         self._target_time_interval = target_time_interval
+        super().__init__()
         self._prep_data()
 
     def _prep_data(self):
