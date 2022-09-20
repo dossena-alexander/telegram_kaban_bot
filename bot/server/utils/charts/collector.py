@@ -219,8 +219,12 @@ class ClickCollector():
 class IStatClickCollector():
     _targets: list[str]
     _target_file: str
+    _target_file_date: str
     _data_dict: dict
 
+    
+    def __init__(self) -> None:
+        self._target_file_date = self._target_file[:-3]
 
     def get_data(self) -> tuple[list[str], list[int]]:
         return self._data_dict
@@ -232,14 +236,24 @@ class IStatClickCollector():
     def targets(self) -> list[str]:
         return self._targets
 
+    @property
+    def file(self) -> str:
+        return self._target_file
+
+    @property
+    def date(self) -> str:
+        return self._target_file_date
+
 
 class DayStatClickCollector(IStatClickCollector):
     """DayStatClickCollector must be setted up by:
     targets (tables_name to get data), 
     target file (.db file)
     target_time_interval ('00:00:00'-'23:59:59' as default)
+
+    _target_file_date is date when file was created (file name without .db). Creates in __init__ automaticaly
     
-    With method .get_data() you will recieve dictionary that`ll be builded by targets you provide.
+    With method .get_data() you will recieve dictionary that'll be builded by targets you provide.
     The dict struct is:
     {
         'target': {
@@ -248,10 +262,11 @@ class DayStatClickCollector(IStatClickCollector):
         }
     }
     """
-    _targets: list
+    _targets: list[str]
     _target_file: str
-    _target_time_interval: TimeInterval
+    _target_file_date: str
     _data_dict: dict
+    _target_time_interval: TimeInterval
 
 
     def __init__(self, targets: list[str], # Table name

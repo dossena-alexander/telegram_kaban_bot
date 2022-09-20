@@ -24,8 +24,8 @@ class Chart():
         self.collector = collector
         self.mode = mode
         self.dpi = dpi
-        self.fig_name = collector._target_file[:-3] + '.jpg'
-        # self.fmt = dates.DateFormatter('%H:%M')
+        self.fig_name = collector.date + '.jpg'
+        self.fmt = dates.DateFormatter('%H:%M')
         self.colors =  [ 
             '#00ffff', # red
             '#ffff00', # blue
