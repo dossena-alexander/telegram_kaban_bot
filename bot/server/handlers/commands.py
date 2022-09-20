@@ -18,8 +18,11 @@ wctClickCollector = ClickCollector('wct_clicks')
 
 
 def start(message):
+    see_manual = InlineKeyboard()
+    see_manual.add_button('Посмотреть', 'USER_EXCURSUS')
     bot.send_message(message.chat.id, "Хрю хрю, кабан {0.first_name}!"
         .format(message.from_user, bot.get_me()))
+    bot.send_message(message.chat.id, 'Обязательно посмотри мануал)', reply_markup=see_manual)
 
 
 def ban(message):
