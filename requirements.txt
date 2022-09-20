@@ -1,6 +1,6 @@
 numpy
 matplotlib
-pillow
-pytelegrambotapi
+Pillow
+PyTelegramBotApi
 fake_headers
 BeautifulSoup
