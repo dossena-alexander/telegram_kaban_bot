@@ -14,7 +14,7 @@ def query_text(query):
         bot.answer_inline_query(query.id, results, next_offset=str(offset + 5), cache_time=60)
     elif query.query.lower().split()[0] == 'фото' and query.query.lower().split()[0] != ' ': # The first word in query 'фото котик'
         results = create_yandex_photos(query.query.lower(), offset)
-        bot.answer_inline_query(query.id, results, next_offset=str(offset + 5), cache_time=60)
+        bot.answer_inline_query(query.id, results, next_offset=str(offset + 5), cache_time=30)
 
 
 def empty_query(query):
@@ -32,7 +32,7 @@ def create_jokes(offset: int):
     def get_joke() -> list[str]:
         return adminJokeDB.get_record(row=random.randint(0, adminJokeDB.get_records_count() - 1)) 
 
-    jokes = [get_joke() for i in range(offset) if i <= offset]
+    jokes = [get_joke() for _ in range(offset + 1)]
     return [types.InlineQueryResultArticle(
                 id=str(c), title="Анекдот",
                 description=v,
@@ -45,17 +45,21 @@ def create_photos(offset: int):
     def get_photo() -> list[str]:
         return adminPicDB.get_record(row=random.randint(0, adminPicDB.get_records_count() - 1), col=1)
 
-    photos = [get_photo() for i in range(offset) if i <= offset]
+    photos = [get_photo() for _ in range(offset + 1)]
     return [types.InlineQueryResultCachedPhoto(id = str(c), photo_file_id=v) 
                                                     for c, v in enumerate(photos)]
 
 
 def create_yandex_photos(query: str, offset: int) -> list[types.InlineQueryResultPhoto]:
     parser = YandexImage()
-    results = [item for item in parser.search(query)]
-    photos = [item.url for item in results]
-    thumbs = [item.preview.url for item in results]
-    
-    return [types.InlineQueryResultPhoto(id=str(c), photo_url=v, thumb_url=thumbs[c]) 
-                                            for c, v in enumerate(photos) if c <= offset]
+    results = (item for item in parser.gen_search(query))
+    def photos():
+        i = 0
+        for item in results:
+            if item != '':
+                yield i, item.url, item.preview.url
+                i += 1
+
+    return [types.InlineQueryResultPhoto(id=str(c), photo_url=url, thumb_url=thumb) 
+                                            for c, url, thumb in photos()]
 
