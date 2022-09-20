@@ -1,4 +1,4 @@
-# Telegram Kaban Bot
+<div align="center"><h1>Telegram Kaban Bot</h1></div>
 
 ![https://img.shields.io/badge/Python-3.9.12-green](https://img.shields.io/badge/Python-3.9.12-green) 
 ![https://img.shields.io/badge/Telebot-4.4.1-green](https://img.shields.io/badge/Telebot-4.4.0-green) 
