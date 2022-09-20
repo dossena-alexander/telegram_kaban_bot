@@ -1,3 +1,4 @@
+from telebot import types
 from server import utils
 from header import mesg
 from header import bot, userDB, msgDB
@@ -11,8 +12,7 @@ boarDB = utils.BoarDB()
 premiumBoarDB = utils.PremiumBoarDB()
 boarsCategories = utils.BoarsCategories()
 
-start_keyboard = utils.ReplyKeyboard()
-start_keyboard.set(KEYS.START)
+back_keyboard = types.ReplyKeyboardRemove()
 
 
 def choose_boar_category(message):
@@ -26,7 +26,7 @@ def choose_boar_category(message):
                bot.send_message(message.chat.id, "Это не то, но я жду ответ.\nДля отмены нажми /brake") 
                bot.register_next_step_handler(message, choose_boar_category)
         else:
-            bot.send_message(message.chat.id, "Отменено", reply_markup=start_keyboard.get())
+            bot.send_message(message.chat.id, "Отменено", reply_markup=back_keyboard)
     else:
         bot.send_message(message.chat.id, "Это не то, но я жду ответ.\nДля отмены нажми /brake")
         bot.register_next_step_handler(message, choose_boar_category)
@@ -46,7 +46,7 @@ def _upload_wct(message, boar_category) -> None:
             boarsCategories.new_boar(boar_category, boar)
             upPic.upload(file, boar)
             bot.send_photo(WCT_CHANNEL, file_info.file_id, translate_category(boar_category))
-            bot.send_message(message.chat.id, "Сохранил", reply_markup=start_keyboard.get())
+            bot.send_message(message.chat.id, "Сохранил", reply_markup=back_keyboard)
     else:
         if message.content_type == "text":
             if message.text.lower() == "/brake":
