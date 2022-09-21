@@ -58,7 +58,7 @@ class Chart():
         inverted_image = PIL.ImageOps.invert(image)
         inverted_image.save(self.path+self.fig_name)
 
-    def get_data(self, collector: IStatClickCollector) -> tuple[list[datetime], list[int]]:
+    def get_data(self, collector: IStatClickCollector) -> tuple[list[str], list[int]]:
         """Collecting data from Collector object. \n
         Collector needs to be setted up. \n
 
