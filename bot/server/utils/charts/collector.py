@@ -53,6 +53,14 @@ class TimeInterval():
     def __getitem__(self, item: int) -> Time:
         return self.time[item]
 
+    @property
+    def start(self):
+        return self.time[0]
+
+    @property
+    def end(self):
+        return self.time[1]
+
 
 class ClickCollectorObserver():
     time: Time
@@ -143,8 +151,8 @@ class ClickCollectorDB():
     @lock_thread
     def get(self, from_target: str, # Table name
                   time_interval: TimeInterval) -> tuple[list[str], list[int]]:
-        start_time = time_interval[0].time
-        end_time = time_interval[1].time
+        start_time = time_interval.start.time
+        end_time = time_interval.end.time
         try:
             self.db_cursor.execute(f'SELECT time FROM {from_target} WHERE time BETWEEN \'{start_time}\' AND \'{end_time}\' ') 
             times = self.db_cursor.fetchall()
