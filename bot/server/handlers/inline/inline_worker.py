@@ -12,8 +12,8 @@ def query_text(query):
     if query.query.lower() == 'фото':
         results = create_photos(offset)
         bot.answer_inline_query(query.id, results, next_offset=str(offset + 5), cache_time=60)
-    elif query.query.lower().split()[0] == 'фото' and query.query.lower().split()[0] != ' ': # The first word in query 'фото котик'
-        results = create_yandex_photos(query.query.lower(), offset)
+    elif query.query.lower().split()[0] == 'фото' and query.query.lower().split()[1]: # The first word in query 'фото котик'
+        results = create_yandex_photos(query.query.lower().split()[1:], offset)
         bot.answer_inline_query(query.id, results, next_offset=str(offset + 5), cache_time=30)
 
 
