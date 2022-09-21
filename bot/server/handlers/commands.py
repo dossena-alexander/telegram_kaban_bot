@@ -18,8 +18,14 @@ wctClickCollector = ClickCollector('wct_clicks')
 
 
 def start(message):
+    user_id = message.from_user.id
+    usersList = userDB.get_users_list()
+    if user_id not in usersList:
+        userDB.add_user(user_id)
+
     see_manual = InlineKeyboard()
     see_manual.add_button('Посмотреть', 'USER_EXCURSUS')
+
     bot.send_message(message.chat.id, "Хрю хрю, кабан {0.first_name}!"
         .format(message.from_user, bot.get_me()))
     bot.send_message(message.chat.id, 'Обязательно посмотри мануал)', reply_markup=see_manual)
@@ -55,9 +61,6 @@ def auth(message):
     if userID == ADMIN_ID:
         admin(message)
     else:
-        usersList = userDB.get_users_list()
-        if userID not in usersList:
-            userDB.add_user(userID)
         user(message)
 
 
