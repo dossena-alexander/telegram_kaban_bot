@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib import dates
 from datetime import datetime
 
-from server.utils.charts.collector import IStatClickCollector
+from server.utils.charts.collector import IStatClickCollector, Time
 
 
 class Chart():
@@ -24,7 +24,7 @@ class Chart():
         self.collector = collector
         self.mode = mode
         self.dpi = dpi
-        self.fig_name = collector.date + '.jpg'
+        self.fig_name = f'{collector.date} ({Time(now=True).time}).jpg'
         self.fmt = dates.DateFormatter('%H:%M')
         self.colors =  [ 
             '#00ffff', # red
