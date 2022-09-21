@@ -238,6 +238,15 @@ class IStatClickCollector():
         return self._data_dict
 
     def init_dict(self):
+        """
+        The dict struct is:
+        {
+            'target': {
+                'times': list[str],
+                'clicks': list[int]
+            }
+        }
+        """
         return {target: dict.fromkeys(['times', 'clicks']) for target in self._targets}
 
     @property
@@ -254,14 +263,15 @@ class IStatClickCollector():
 
 
 class DayStatClickCollector(IStatClickCollector):
-    """DayStatClickCollector must be setted up by:
-    targets (tables_name to get data), 
+    """`Must be setted up by:`
+
+    targets (tables name to get data), 
     target file (.db file)
-    target_time_interval ('00:00:00'-'23:59:59' as default)
+    target time interval ('00:00:00'-'23:59:59' as default)
 
     _target_file_date is date when file was created (file name without .db). Creates in __init__ automaticaly
     
-    With method .get_data() you will recieve dictionary that'll be builded by targets you provide.
+    With method .get_data() you will recieve dictionary that'll be builded by targets you've set.
     The dict struct is:
     {
         'target': {
@@ -293,6 +303,13 @@ class DayStatClickCollector(IStatClickCollector):
         self._prep_data()
 
     def _prep_data(self):
+        """
+        1. Initialize dict
+        2. Set target
+        3. Get data from db
+        4. Save data to dict
+        5. Go to next target (p. 2)
+        """
         self._data_dict = self.init_dict()
         db = ClickCollectorDB(db_name=self._target_file)
         for target in self._targets:
@@ -310,7 +327,23 @@ class DayStatClickCollector(IStatClickCollector):
 
 
 class DateStatClickCollector(IStatClickCollector):
-    """Use this if you need statistics for days, not for a day"""
+    """`Must to be setted up by:`
+
+    targets (tables names to get data), 
+    dates interval: start date to end date
+    time interval ('00:00:00'-'23:59:59' as default)
+
+    
+    With method .get_data() you will recieve dictionary that'll be builded by targets you've set.
+
+    The dict struct is:
+    {
+        'target': {
+            'times': list[str], -- In cause DateStatClickCollector provide data for days -- 'times' is 'days'.
+            'clicks': list[int] -- Sum of clicks for a day from dates interval.
+        }
+    }
+    """
     _default_time_interval = TimeInterval(Time(0, 0, 0), Time(23, 59, 59))
     _time_interval: TimeInterval
     _targets: list[str]
@@ -327,6 +360,16 @@ class DateStatClickCollector(IStatClickCollector):
         self._prep_data()
 
     def _prep_data(self):
+        """
+        1. Initialize dict
+        2. Get files names
+        3. Set file
+        4. Set target
+        5. Connect to db file 
+        6. Get data from db
+        7. Save data to dict
+        8. Go to next file (p. 3)
+        """
         self._data_dict = self.init_dict()
         files = DateStatClickCollector.prep_dates_to_files(self._dates_interval)
         for file in files:
@@ -341,10 +384,10 @@ class DateStatClickCollector(IStatClickCollector):
     def prep_dates(date_interval: tuple[str, str]) -> list[str]:
         """
         Args:
-            date_interval (tuple[str, str]): Start date and End date of interval
+            date_interval (tuple[str, str]): Start date to End date of interval
 
         Returns:
-            All dates between start - end dates
+            All dates in interval
         """
         start = datetime.strptime(date_interval[0], '%Y-%m-%d')
         end = datetime.strptime(date_interval[1], '%Y-%m-%d')   
@@ -353,7 +396,7 @@ class DateStatClickCollector(IStatClickCollector):
 
     @staticmethod
     def prep_dates_to_files(dates_interval: list[str]) -> list[str]:
-        """append .db to all dates
+        """append `.db` to all dates
 
         Args:
             dates_interval (list[str]): list of dates in string
