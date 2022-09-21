@@ -23,8 +23,8 @@ class _Preview:
 
 
 class _Result:
-    def __init__(self, title: str | None,
-                 description: str | None,
+    def __init__(self, title: str,
+                 description: str,
                  domain: str,
                  url: str,
                  width: int,
