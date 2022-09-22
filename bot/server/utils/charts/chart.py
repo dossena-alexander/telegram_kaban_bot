@@ -43,9 +43,7 @@ class Chart():
         for c, target in enumerate(self.collector.targets):
             time_interval = data_dict[target]['times']
             clicks = data_dict[target]['clicks']
-            if time_interval[0] == '0':
-                pass
-            else:
+            if time_interval and clicks: # If lists have values
                 ax.plot(time_interval, clicks, "-o", color=self.colors[c], label=target)
         # ax.xaxis.set_major_formatter(self.fmt)
         try:
