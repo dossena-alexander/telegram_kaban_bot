@@ -155,17 +155,19 @@ class ClickCollectorDB():
         end_time = time_interval.end.time
         try:
             self.db_cursor.execute(f'SELECT time FROM {from_target} WHERE time BETWEEN \'{start_time}\' AND \'{end_time}\' ') 
-            times = self.db_cursor.fetchall()
-            times = [time[0] for time in times]
-        except:
-            times = ['0']
+            times_interval = self.db_cursor.fetchall()
+            times = [time[0] for time in times_interval]
+        except: # If no such table or column
+            times = []
         try:
             self.db_cursor.execute(f'SELECT clicks FROM {from_target} WHERE time BETWEEN \'{start_time}\' AND \'{end_time}\' ') 
-            clicks = self.db_cursor.fetchall()
-            clicks = [click[0] for click in clicks]
-        except:
-            clicks = [0]
+            clicks_interval = self.db_cursor.fetchall()
+            clicks = [click[0] for click in clicks_interval]
+        except: # If no such table or column
+            clicks = []
+
         return times, clicks
+
 
     def _make_dir(self, path: str):
         try:
