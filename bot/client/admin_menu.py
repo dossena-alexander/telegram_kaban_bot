@@ -81,6 +81,8 @@ def admin_menu(call):
 
     _admin_zip(call)
 
+    _admin_see_files(call)
+
 
 def _admin_escape(call):
     if call.data == "BACK_ADMIN":
@@ -327,14 +329,12 @@ def _admin_charts(call):
         path = file.split('-')
         year = path[0]
         month = path[1][1:]
+
         targets = ['joke_clicks', 'wct_clicks', 'photo_clicks']
-        charts = os.listdir(PATH.CHARTS)
-        chart_photo = file[:-3]+'.jpg'
-        if chart_photo not in charts:
-            collector = DayStatClickCollector(targets, target_file=file)
-            chart = Chart(PATH.CHARTS, collector)
-            chart.draw()
-            chart_photo = chart.fig_name
+        collector = DayStatClickCollector(targets, target_file=file)
+        chart = Chart(PATH.CHARTS, collector)
+        chart.draw()
+        chart_photo = chart.fig_name
 
         photo = open(PATH.CHARTS+chart_photo, 'rb')
 
@@ -409,3 +409,6 @@ def _admin_zip(call):
         bot.send_message(call.message.chat.id, 'Бэкап кабанов создан и отослан в сервисный канал')   
         os.remove(zip_name)
         
+
+def _admin_see_files(call):
+    pass
