@@ -10,7 +10,7 @@ from server.utils.charts.collector import IStatClickCollector, Time
 class Chart():
     """Draw chart by Collector data"""
     date_format: str = '%Y-%M-%D'
-    time_format: str = '%H:%M'
+    time_format: str = '%H:%M:%S'
 
     def __init__(self, path: str, 
                        collector: IStatClickCollector, 
@@ -28,7 +28,7 @@ class Chart():
         self.mode = mode
         self.dpi = dpi
         self.fig_name = f'{collector.date} ({Time(now=True).time}).jpg'
-        self.fmt = dates.DateFormatter(self.time_format)
+        self.fmt = dates.DateFormatter('%H:%M')
         self.colors =  [ # inverted colors
             '#00ffff',   # red
             '#ffff00',   # blue
