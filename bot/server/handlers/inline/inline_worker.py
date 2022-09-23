@@ -5,15 +5,15 @@ from header import adminPicDB, adminJokeDB, bot
 
 
 def query_text(query):
-    offset = int(query.offset) if query.offset else 5
+    offset = int(query.offset) if query.offset and query.offset < 50 else 5
     if query.query.lower() == 'анекдот':
         results = create_jokes(offset)
         bot.answer_inline_query(query.id, results, next_offset=str(offset + 5), cache_time=30)
     if query.query.lower() == 'фото':
         results = create_photos(offset)
         bot.answer_inline_query(query.id, results, next_offset=str(offset + 5), cache_time=60)
-    elif query.query.lower().split()[0] == 'фото' and query.query.lower().split()[1]: # The first word in query 'фото котик'
-        results = create_yandex_photos(query.query.lower().split()[1:], offset)
+    elif query.query.lower()[4:]:
+        results = create_yandex_photos(query.query.lower()[4:], offset)
         bot.answer_inline_query(query.id, results, next_offset=str(offset + 5), cache_time=30)
 
 
@@ -46,8 +46,9 @@ def create_photos(offset: int):
         return adminPicDB.get_record(row=random.randint(0, adminPicDB.get_records_count() - 1), col=1)
 
     photos = [get_photo() for _ in range(offset + 1)]
-    return [types.InlineQueryResultCachedPhoto(id = str(c), photo_file_id=v) 
-                                                    for c, v in enumerate(photos)]
+    return [types.InlineQueryResultCachedPhoto(id = str(c), 
+                                               photo_file_id=v) 
+                                               for c, v in enumerate(photos)]
 
 
 def create_yandex_photos(query: str, offset: int) -> list[types.InlineQueryResultPhoto]:
@@ -60,6 +61,8 @@ def create_yandex_photos(query: str, offset: int) -> list[types.InlineQueryResul
                 yield i, item.url, item.preview.url
                 i += 1
 
-    return [types.InlineQueryResultPhoto(id=str(c), photo_url=url, thumb_url=thumb) 
-                                            for c, url, thumb in photos()]
+    return [types.InlineQueryResultPhoto(id=str(c), 
+                                         photo_url=url, 
+                                         thumb_url=thumb) 
+                                         for c, url, thumb in photos()]
 
