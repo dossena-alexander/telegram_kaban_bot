@@ -60,12 +60,7 @@ class Achievements():
         return list(string)
 
     def _delete_none_from_list(self, with_none_list: list[str]) -> list[str]:
-        not_none_list = []
-        for string in with_none_list:
-            if string != None:
-                not_none_list.append(string)
-
-        return not_none_list
+        return [string for string in with_none_list if string != None]
 
     def _transform_to_percent(self, count: int, boar_category: str) -> int:
         boars_in_category = self.boarsCategories.get_boars_of_category(boar_category)

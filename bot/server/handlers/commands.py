@@ -8,7 +8,8 @@ from server.user.user_funcs import get_wct_photo
 from server.utils.keyboard import InlineKeyboard
 from server.admin.admin_utils.statistics import Statistics
 from server.utils.charts.collector import ClickCollector
-from server.user.user_utils import Achievements
+from server.user.user_utils.achievements import Achievements
+from server.user.user_utils.achievements.levels import user_set_status
 
 
 stats = Statistics()
@@ -129,3 +130,7 @@ def check_suggestions():
 def achieve_boars(message):
     achievements = Achievements(message.from_user.id)
     bot.send_message(message.chat.id, achievements.get_message(), parse_mode="html")
+
+
+def set_status(message):
+    user_set_status(message)
