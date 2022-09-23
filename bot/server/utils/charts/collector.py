@@ -158,13 +158,13 @@ class ClickCollectorDB():
             times = self.db_cursor.fetchall()
             times = [time[0] for time in times]
         except:
-            times = ['0']
+            times = []
         try:
             self.db_cursor.execute(f'SELECT clicks FROM {from_target} WHERE time BETWEEN \'{start_time}\' AND \'{end_time}\' ') 
             clicks = self.db_cursor.fetchall()
             clicks = [click[0] for click in clicks]
         except:
-            clicks = [0]
+            clicks = []
         return times, clicks
 
     def _make_dir(self, path: str):
