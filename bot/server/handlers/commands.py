@@ -71,6 +71,7 @@ def help(message):
     keyboard.add_button('Сообщение админу', 'USER_EX_ADMIN_MSG')
     keyboard.add_button('Настройки', 'USER_EX_SETTINGS')
     keyboard.add_button('Команды', 'USER_EX_COMMANDS')
+    keyboard.add_button('In-line', 'USER_EX_INLINE')
     photo = open(PATH.HELP+'user_menu/'+'default.png', 'rb')
     bot.send_photo(message.chat.id, photo, "Помощь по функциям бота", reply_markup=keyboard)
 

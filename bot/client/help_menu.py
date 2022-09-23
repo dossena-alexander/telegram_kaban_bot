@@ -133,7 +133,7 @@ def _user_ex_settings(call):
         bot.edit_message_media(media=media, chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard)
     elif call.data == "EX_SETTINGS_NOTIFY_OFF":
         photo = open(settings+'notify_off.png', 'rb') 
-        text = 'Чтобы выключить уведомления, достаточно нажать на кнопку. Если на кнопке отобразится ❌ (крестик), то значит, что уведомления отключены, тоже и наоборот'
+        text = 'Чтобы выключить уведомления, достаточно нажать на кнопку. Если на кнопке отобразится ❌ (крестик), то значит, что уведомления отключены, то же и наоборот'
         keyboard = InlineKeyboard()
         keyboard.add_button(text="Назад", call="EX_SETTINGS_NOTIFY")
         media = types.InputMediaPhoto(photo, text, parse_mode='html')
@@ -218,7 +218,7 @@ def _user_ex_inline(call):
         bot.edit_message_media(media=media, chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard)
     elif call.data == "EX_INLINE_SEE":
         photo = open(inline+'step_one.png', 'rb') 
-        text = 'Существую <b>два</b> режима работы in-line'
+        text = 'Существуют <b>два</b> режима работы in-line'
         keyboard = InlineKeyboard()
         keyboard.add_button(text="Фото", call="EX_INLINE_PHOTO")
         keyboard.add_button(text="Анекдот", call="EX_INLINE_JOKE")
@@ -226,16 +226,16 @@ def _user_ex_inline(call):
         media = types.InputMediaPhoto(photo, text, parse_mode='html')
         bot.edit_message_media(media=media, chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard)
     elif call.data == "EX_INLINE_PHOTO":
-        photo = open(inline+'inline_photo.png', 'rb') 
-        text = '<b>Режим фото</b>\nНеобходимо в любом чате упомянуть бота и через пробел написать "фото". Тогда Кабан Бот предложить рандомные фотографии, остается только выбрать, нажав на нужную фотокарточку'
+        animation = open(inline+'photo.gif', 'rb') 
+        text = '<b>Режим фото</b>\nНеобходимо в любом чате упомянуть бота и через пробел написать "фото". Тогда Кабан Бот предложит рандомные фотографии, остается только выбрать, нажав на нужную фотокарточку'
         keyboard = InlineKeyboard()
         keyboard.add_button(text="Назад", call="EX_INLINE_SEE")
-        media = types.InputMediaPhoto(photo, text, parse_mode='html')
+        media = types.InputMediaAnimation(media=animation, caption=text, parse_mode='html')
         bot.edit_message_media(media=media, chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard)
     elif call.data == "EX_INLINE_JOKE":
-        photo = open(inline+'inline_joke.png', 'rb') 
-        text = '<b>Режим анедот</b>\nНеобходимо в любом чате упомянуть бота и через пробел написать "анекдот". Тогда Кабан Бот предложить рандомные анекдоты, остается только выбрать, нажав на нужный'
+        animation = open(inline+'jokes.gif', 'rb') 
+        text = '<b>Режим анекдот</b>\nНеобходимо в любом чате упомянуть бота и через пробел написать "анекдот". Тогда Кабан Бот предложит рандомные анекдоты, остается только выбрать, нажав на нужный'
         keyboard = InlineKeyboard()
         keyboard.add_button(text="Назад", call="EX_INLINE_SEE")
-        media = types.InputMediaPhoto(photo, text, parse_mode='html')
+        media = types.InputMediaAnimation(media=animation, caption=text, parse_mode='html')
         bot.edit_message_media(media=media, chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard)
