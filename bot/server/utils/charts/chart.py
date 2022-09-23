@@ -14,17 +14,19 @@ class Chart():
 
     def __init__(self, path: str, 
                        collector: IStatClickCollector, 
+                       title: str,
                        mode: str = 'time', 
                        dpi: int = 350) -> None:
         """Args:
-            path (str): path to save figure
-            collector (IStatClickCollector): _description_
-            mode (str, optional): X interval format 
-            dpi (int, optional): Quality of figure. Defaults to 350.
-            fig_name (str, optional): File name to save. Defaults to 'stat.jpg'.
+            * path (str): path to save figure
+            * collector (IStatClickCollector): Collector to get data from
+            * title (str): Chart subname
+            * mode (str, optional): X interval format 
+            * dpi (int, optional): Quality of figure. Defaults to 350.
         """
         self.path = path
         self.collector = collector
+        self.title = title
         self.mode = mode
         self.dpi = dpi
         self.fig_name = f'{collector.date} ({Time(now=True).time}).jpg'
@@ -43,7 +45,7 @@ class Chart():
             formatter = self.date_format
 
         fig, ax = plt.subplots()
-        plt.title('График использования', fontsize=20, fontname='Helvetica')
+        plt.title(f'График использования ({self.title})', fontsize=20, fontname='Helvetica')
         plt.xlabel('Время', color='gray')
         plt.ylabel('Кол-во',color='gray')
 

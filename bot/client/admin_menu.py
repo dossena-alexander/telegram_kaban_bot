@@ -332,7 +332,7 @@ def _admin_charts(call):
 
         targets = ['joke_clicks', 'wct_clicks', 'photo_clicks']
         collector = DayStatClickCollector(targets, target_file=file)
-        chart = Chart(PATH.CHARTS, collector)
+        chart = Chart(PATH.CHARTS, collector, f'{file[:-3]}')
         chart.draw()
         chart_photo = chart.fig_name
 
