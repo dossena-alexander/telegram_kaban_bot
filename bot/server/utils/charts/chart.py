@@ -26,7 +26,7 @@ class Chart():
         self.dpi = dpi
         self.fig_name = f'{collector.date} ({Time(now=True).time}).jpg'
         self.fmt = dates.DateFormatter('%H:%M')
-        self.colors =  [ 
+        self.colors =  [ # inverted colors
             '#00ffff', # red
             '#ffff00', # blue
             '#11bffe', # orange
@@ -45,11 +45,11 @@ class Chart():
             clicks = data_dict[target]['clicks']
             if time_interval and clicks: # If lists have values
                 ax.plot(time_interval, clicks, "-o", color=self.colors[c], label=target)
-        # ax.xaxis.set_major_formatter(self.fmt)
         try:
             ax.legend()
         except:
             pass
+        # ax.xaxis.set_major_formatter(self.fmt)
         fig.autofmt_xdate()
         plt.savefig(self.path+self.fig_name, dpi=self.dpi)
         image = Image.open(self.path+self.fig_name)
