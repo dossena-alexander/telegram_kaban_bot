@@ -54,6 +54,7 @@ class Chart():
             time_interval = data_dict[target]['times']
             if time_interval:
                 times = [datetime.strptime(time, formatter) for time in time_interval]
+                times.sort()
                 clicks = data_dict[target]['clicks']
                 ax.plot(times, clicks, "-o", color=self.colors[c], label=target)
         try:
