@@ -258,6 +258,20 @@ class UserDB(DB):
         self._bd_cursor.execute(f'UPDATE {self._table} SET notify_option = {notify} WHERE {self._column}={user_id}')
         self._bd.commit()
 
+    @lock_thread
+    def update_photo_option(self, user_id: int, option: bool) -> None:
+        send_photo = 0
+        if option == True:
+            send_photo = 1
+        self._bd_cursor.execute(f'UPDATE {self._table} SET photo_option = {send_photo} WHERE {self._column}={user_id}')
+        self._bd.commit()
+
+    @lock_thread
+    def get_level(self, user_id: int) -> str:
+        self._bd_cursor.execute(f'SELECT level FROM {self._table} WHERE {self._column}={user_id}')
+        level = self._bd_cursor.fetchall()[0][0]
+        return level
+
 
 class JokeDB(DB):
     def __init__(self, table: str) -> None:

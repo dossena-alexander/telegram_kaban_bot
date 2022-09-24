@@ -9,7 +9,7 @@ from server.utils.keyboard import InlineKeyboard
 from server.admin.admin_utils.statistics import Statistics
 from server.utils.charts.collector import ClickCollector
 from server.user.user_utils.achievements import Achievements
-from server.user.user_utils.achievements.levels import user_set_status
+from server.user.user_utils.achievements.levels import user_set_status, user_get_status
 
 
 stats = Statistics()
@@ -134,3 +134,6 @@ def achieve_boars(message):
 
 def set_status(message):
     user_set_status(message)
+
+def get_status(message):
+    user_get_status(message)

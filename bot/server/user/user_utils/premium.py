@@ -11,15 +11,16 @@ premiumBoarDB = utils.PremiumBoarDB()
 
 class PremiumMenu():
     _message: str
-
+    _premium_status: str
+    _days_gone: str
 
     def __init__(self, userID) -> None:
         self.userDB = userDB
-        premium_status = self._get_status(userID)
-        days_gone = self._calculate_premium_days(userID)
+        self._premium_status = self._get_status(userID)
+        self._days_gone = self._calculate_premium_days(userID)
         self._set_message(
-            f"•Статус: {premium_status}" "\n" +
-            f"•Дней: {days_gone}"
+            f"•Статус: {self._premium_status}" "\n" +
+            f"•Дней: {self._days_gone}"
         )
         del self.userDB
 
@@ -53,6 +54,14 @@ class PremiumMenu():
                 + "Во время премиума счетчик загрузок работать не будет\n" 
                 + " •Длится премиум <b>2 дня</b>"
             )
+
+    @property
+    def status(self) -> str:
+        return self._premium_status
+
+    @property
+    def days(self) -> int:
+        return self._days_gone
 
 
 def choice_DB_by_premium(user_id: int):
