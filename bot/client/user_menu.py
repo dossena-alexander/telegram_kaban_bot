@@ -80,8 +80,11 @@ def _user_achievements(call):
     if call.data == "USER_ACHIVE":
         keyboard = utils.InlineKeyboard()
         keyboard.add_button(text="Открытые кабаны", call="ACHIEVEMENTS")
+        keyboard.add_button(text="Медали", call="MEDALS")
+        keyboard.add_button(text="Об уровнях", call="ABOUT_LEVELS")
         keyboard.add_button(text="Назад", call="BACK_USER")
-        bot.edit_message_text(text='Меню достижений', chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard, parse_mode="html")
+        level = userDB.get_level(call.from_user.id)
+        bot.edit_message_text(text=f'Меню достижений /n Твой текущий уровень - <b>{level}</b>', chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard, parse_mode="html")
     elif call.data == "ACHIEVEMENTS":
         achievements = Achievements(call.message.chat.id)
         keyboard = utils.InlineKeyboard()
