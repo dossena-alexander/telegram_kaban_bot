@@ -121,11 +121,14 @@ class ClickCollectorDB():
 
     @lock_thread
     def insert(self, target: str, time: str, clicks: int) -> None:
+        self._insert(target, time, clicks)
+
+    def _insert(self, target, time, clicks):
         db_name = self._current_date_db_name()   
         self.connect(db_name)
-        try:
+        if self.table_exist(target):
             self.db_cursor.execute(f'INSERT INTO {target} (time, clicks) VALUES (?, ?)', (time, clicks) ) 
-        except:
+        else:
             self.create_table(target)
             self.db_cursor.execute(f'INSERT INTO {target} (time, clicks) VALUES (?, ?)', (time, clicks) ) 
         self.db.commit()
@@ -135,18 +138,18 @@ class ClickCollectorDB():
         db_name = self._current_date_db_name()
         self.connect(db_name)
         clicks = 0
-        try:
-            self.db_cursor.execute(f'SELECT clicks FROM {target} WHERE time = \'{time}\'')
-            clicks = self.db_cursor.fetchall()[0][0] 
-        except:
+        if self.table_exist(target):
             try:
-                self.create_table(target)
+                self.db_cursor.execute(f'UPDATE {target} SET clicks = {clicks + 1} WHERE time = \'{time}\'') 
             except:
-                self.new_row(target, time)
-            self.db_cursor.execute(f'SELECT clicks FROM {target} WHERE time = \'{time}\'')
-            clicks = self.db_cursor.fetchall()[0][0] 
-        self.db_cursor.execute(f'UPDATE {target} SET clicks = {clicks + 1} WHERE time = \'{time}\'') 
+                self._insert(target, time, 1)
         self.db.commit()
+
+    def table_exist(self, target: str) -> bool:
+        self.db_cursor.execute(f'SELECT name FROM sqlite_master WHERE type=table AND name={target}')
+        if self.db_cursor.fetchall() == 0:
+            return False
+        return True
 
     @lock_thread
     def get(self, from_target: str, # Table name
