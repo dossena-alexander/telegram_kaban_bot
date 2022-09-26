@@ -108,12 +108,7 @@ class ClickCollectorDB():
         self.db_cursor = self.db.cursor()
 
     def create_table(self, target: str):
-        """If new DB has no tables"""
         self.db_cursor.execute(f'CREATE TABLE {target} (time TIME, clicks INTEGER DEFAULT (0) )')
-        self.db.commit()
-
-    def new_row(self, target, time):
-        self.db_cursor.execute(f'INSERT INTO {target} (time, clicks) VALUES (?, ?)', (time, 0) )  
         self.db.commit()
 
     def set_date(self, date: date) -> None:
@@ -121,56 +116,64 @@ class ClickCollectorDB():
 
     @lock_thread
     def insert(self, target: str, time: str, clicks: int) -> None:
-        self._insert(target, time, clicks)
-
-    def _insert(self, target, time, clicks):
         db_name = self._current_date_db_name()   
         self.connect(db_name)
-        if self.table_exist(target):
-            self.db_cursor.execute(f'INSERT INTO {target} (time, clicks) VALUES (?, ?)', (time, clicks) ) 
-        else:
+        if not self.table_exist(target):
             self.create_table(target)
-            self.db_cursor.execute(f'INSERT INTO {target} (time, clicks) VALUES (?, ?)', (time, clicks) ) 
+        self._insert(target, time, clicks)
         self.db.commit()
+
+    def _insert(self, target, time, clicks):
+        self.db_cursor.execute(f'INSERT INTO {target} (time, clicks) VALUES (?, ?)', (time, clicks) ) 
 
     @lock_thread
     def update_clicks(self, target: str, time: str) -> None:
         db_name = self._current_date_db_name()
         self.connect(db_name)
-        clicks = 0
         if self.table_exist(target):
+            clicks = self._select_clicks(target, time)
             try:
                 self.db_cursor.execute(f'UPDATE {target} SET clicks = {clicks + 1} WHERE time = \'{time}\'') 
-            except:
+            except Exception:
                 self._insert(target, time, 1)
+        else:
+            self.create_table(target)
+            self._insert(target, time, 1)
         self.db.commit()
 
+    def _select_clicks(self, target: str, time: str) -> int:
+        self.db_cursor.execute(f'SELECT clicks FROM {target} WHERE time=\'{time}\'')
+        try:
+            clicks = self.db_cursor.fetchall()[0][0]
+        except IndexError:
+            clicks = 0
+        return clicks
+
     def table_exist(self, target: str) -> bool:
-        self.db_cursor.execute(f'SELECT name FROM sqlite_master WHERE type=table AND name={target}')
-        if self.db_cursor.fetchall() == 0:
+        try:
+            self.db_cursor.execute(f'SELECT count(*) FROM {target}')
+            return True
+        except:
             return False
-        return True
 
     @lock_thread
     def get(self, from_target: str, # Table name
                   time_interval: TimeInterval) -> tuple[list[str], list[int]]:
         start_time = time_interval.start.time
         end_time = time_interval.end.time
-        try:
+        if self.table_exist(from_target):
             self.db_cursor.execute(f'SELECT time FROM {from_target} WHERE time BETWEEN \'{start_time}\' AND \'{end_time}\' ') 
             times_interval = self.db_cursor.fetchall()
             times = [time[0] for time in times_interval]
-        except: # If no such table or column
-            times = []
-        try:
+
             self.db_cursor.execute(f'SELECT clicks FROM {from_target} WHERE time BETWEEN \'{start_time}\' AND \'{end_time}\' ') 
             clicks_interval = self.db_cursor.fetchall()
             clicks = [click[0] for click in clicks_interval]
-        except: # If no such table or column
+        else:
+            times = []
             clicks = []
 
         return times, clicks
-
 
     def _make_dir(self, path: str):
         try:
