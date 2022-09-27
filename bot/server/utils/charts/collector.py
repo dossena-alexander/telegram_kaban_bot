@@ -27,6 +27,7 @@ class Time():
         else:
             for v in [hour, minute, second]:
                 if v == None: v = 0
+                
         self.hour = hour
         self.minute = minute
         self.second = second
@@ -86,6 +87,7 @@ class ClickCollectorObserver():
         now_hour = Time(now=True).hour
         if now_hour > self.hour:
             self.hour = now_hour
+            self.new_time()
             return False
         return True
 
@@ -134,7 +136,7 @@ class ClickCollectorDB():
             clicks = self._select_clicks(target, time)
             try:
                 self.db_cursor.execute(f'UPDATE {target} SET clicks = {clicks + 1} WHERE time = \'{time}\'') 
-            except Exception:
+            except:
                 self._insert(target, time, 1)
         else:
             self.create_table(target)
@@ -228,8 +230,10 @@ class ClickCollector():
     def new_by_db(self) -> None:
         if not STAT_COLLECTOR_LOCK:
             if self._observer.new_hour():
-                self._observer.new_time()
-            self._db.update_clicks(self._target, self._observer.get_time())
+                self._db.insert(self._target, self._observer.get_time(), 1)
+            else:
+                self._db.update_clicks(self._target, self._observer.get_time())
+
 
 
 class IStatClickCollector():
