@@ -14,10 +14,8 @@ class Time():
     msc_tz = timezone(timedelta(hours=_msc_offset), name='msc')
 
 
-    def __init__(self, hour = None, 
-                       minute = None, 
-                       second = None, 
-                       now = False) -> None:
+    def __init__(self, hour = None, minute = None, 
+                second = None, now = False) -> None:
         if now == True:
             date = datetime.now(self.msc_tz)
             hour = date.hour
@@ -27,6 +25,7 @@ class Time():
         else:
             for v in [hour, minute, second]:
                 if v == None: v = 0
+                
         self.hour = hour
         self.minute = minute
         self.second = second
@@ -151,6 +150,7 @@ class ClickCollectorDB():
     @lock_thread
     def get(self, from_target: str, # Table name
                   time_interval: TimeInterval) -> tuple[list[str], list[int]]:
+
         start_time = time_interval.start.time
         end_time = time_interval.end.time
         try:
@@ -305,19 +305,17 @@ class DayStatClickCollector(IStatClickCollector):
         self._prep_data()
 
     def _prep_data(self):
-        """
-        1. Initialize dict
-        2. Set target
-        3. Get data from db
-        4. Save data to dict
-        5. Go to next target (p. 2)
-        """
+        # 1. Initialize dict
         self._data_dict = self.init_dict()
         db = ClickCollectorDB(db_name=self._target_file)
+        # 2. Set target
         for target in self._targets:
+            # 3. Get data from db
             times, clicks = db.get(target, self._target_time_interval)
+            # 4. Save data to dict
             self._data_dict[target]['times'] = times
             self._data_dict[target]['clicks'] = clicks
+            # 5. Go to next target (p. 2)
         del db
 
     def get_clicks_sum(self, target: str) -> int:
@@ -362,24 +360,22 @@ class DateStatClickCollector(IStatClickCollector):
         self._prep_data()
 
     def _prep_data(self):
-        """
-        1. Initialize dict
-        2. Get files names
-        3. Set file
-        4. Set target
-        5. Connect to db file 
-        6. Get data from db
-        7. Save data to dict
-        8. Go to next file (p. 3)
-        """
+        # 1. Initialize dict
         self._data_dict = self.init_dict()
+        # 2. Get files names
         files = DateStatClickCollector.prep_dates_to_files(self._dates_interval)
+        # 3. Set file
         for file in files:
+            # 4. Set target
             for target in self._targets:
+                # 5. Connect to db file 
                 db = ClickCollectorDB(db_name=file)
+                # 6. Get data from db
                 _, clicks = db.get(target, self.target_time_interval)
+                # 7. Save data to dict
                 self._data_dict[target]['times'] = self._dates_interval
                 self._data_dict[target]['clicks'] = sum(clicks)
+                # 8. Go to next file (p. 3)
         del db
 
     @staticmethod

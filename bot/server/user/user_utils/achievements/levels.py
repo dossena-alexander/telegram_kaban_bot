@@ -1,5 +1,6 @@
 # User levels (in chat too)
 
+from functools import reduce
 from header import userDB, bot
 from server.user.user_utils.achievements.achievements import Achievements
 from server.user.user_utils.achievements.medals import Medals
@@ -30,10 +31,18 @@ def user_get_status(message):
     premium_status = PremiumMenu(user_id).status
 
     tab = '   '
-    user_medals = 'Медали: /n' + str(map(lambda medal: tab + medal + '/n', medals))
+    user_medals = 'Медали: /n' + str(reduce(lambda medal: tab + medal + '/n', medals))
+    if boars == 1 or boars == 101 or boars == 121:
+        t = 'кабан'
+    elif boars > 20 and boars % 2 == 0:
+        t = 'кабана'
+    elif boars > 100 and boars < 105:
+        t = 'кабана'
+    else:
+        t = 'кабанов'
 
     text = (f'<b>{level}</b> /n' +
-            f'Всего открыто {boars} кабанов /n' +
+            f'Всего открыто {boars} {t} /n' +
             user_medals +
             f'Премиум: {premium_status} /n'
     )
